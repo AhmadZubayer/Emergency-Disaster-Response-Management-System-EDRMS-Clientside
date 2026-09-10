@@ -2,12 +2,8 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Geist, Geist_Mono } from 'next/font/google';
 
-import UserSidebar from '@/components/userSidebar';
-import UserHeader from '@/components/userHeader';
-import {
-  SidebarInset,
-  SidebarProvider,
-} from '@/components/ui/sidebar';
+import Navbar from '@/components/navbar';
+import { Toaster } from '@/components/ui/toast';
 
 import './globals.css';
 
@@ -37,14 +33,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <SidebarProvider>
-          <UserSidebar />
-
-          <SidebarInset className="min-w-0">
-            <UserHeader />
-            <div className="flex-1">{children}</div>
-          </SidebarInset>
-        </SidebarProvider>
+        <Toaster>
+          <Navbar />
+          {children}
+        </Toaster>
       </body>
     </html>
   );
