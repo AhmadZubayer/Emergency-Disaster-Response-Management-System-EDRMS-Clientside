@@ -89,6 +89,10 @@ export const ENDPOINTS = {
     MY_REQUESTS: '/rescue-requests/my',
     DETAIL: (id: string | number) =>
       `/rescue-requests/${encodeURIComponent(String(id))}`,
+    UPDATE: (id: string | number) =>
+      `/rescue-requests/${encodeURIComponent(String(id))}`,
+    DELETE: (id: string | number) =>
+      `/rescue-requests/${encodeURIComponent(String(id))}`,
     UPDATE_STATUS: (id: string | number) =>
       `/rescue-requests/${encodeURIComponent(String(id))}/status`,
     CANCEL: (id: string | number) =>
