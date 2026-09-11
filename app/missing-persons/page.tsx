@@ -127,7 +127,7 @@ const MissingPersonsPage = () => {
               <SleekCard
                 key={person.id}
                 person={person}
-                onClick={() => setSelectedPerson(person)}
+                onClick={() => router.push(`/missing-persons/${person.id}`)}
               />
             ))}
           </div>
