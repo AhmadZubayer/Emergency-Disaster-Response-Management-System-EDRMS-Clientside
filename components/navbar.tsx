@@ -5,8 +5,14 @@ import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Menu, UserRound, X, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from '@/components/ui/navigation-menu';
+import {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
+} from '@/components/ui/navigation-menu';
 import { useAuth } from '@/app/hooks/useAuth';
 
 const links = [
@@ -45,26 +51,37 @@ const Navbar = () => {
         </NavigationMenu>
         <div className="flex items-center justify-end gap-3">
           {user ? (
-            <div className="flex items-center gap-3">
-              <div className="hidden sm:flex flex-col text-right">
-                <span className="text-xs font-semibold">{user.name}</span>
-                <span className="text-[10px] text-muted-foreground capitalize">{user.role || 'user'}</span>
-              </div>
-              <Avatar size="default" aria-label="Signed in profile">
-                <AvatarFallback>
-                  <UserRound className="size-4" />
-                </AvatarFallback>
-              </Avatar>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => logOut()}
-                className="gap-1.5 text-xs text-muted-foreground hover:text-destructive"
-              >
-                <LogOut className="size-3.5" />
-                <span className="hidden sm:inline">Logout</span>
-              </Button>
-            </div>
+            <NavigationMenu align="end" className="hidden sm:flex">
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="px-3 py-1.5 text-sm font-semibold text-foreground bg-transparent hover:bg-muted/60 focus:bg-muted/60">
+                    {user.name}
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent className="p-1.5 w-44">
+                    <ul className="grid gap-1">
+                      <li>
+                        <NavigationMenuLink
+                          render={<Link href="/profile" />}
+                          className="flex items-center gap-2 px-2.5 py-2 text-xs font-medium text-foreground hover:bg-muted rounded-md transition-colors"
+                        >
+                          <UserRound className="size-3.5 text-muted-foreground" />
+                          <span>View Profile</span>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <button
+                          onClick={() => logOut()}
+                          className="w-full flex items-center gap-2 px-2.5 py-2 text-xs font-medium text-foreground hover:bg-muted hover:text-destructive rounded-md transition-colors text-left"
+                        >
+                          <LogOut className="size-3.5 text-muted-foreground" />
+                          <span>Logout</span>
+                        </button>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
           ) : (
             <Button
               render={<Link href="/sign-in" />}
@@ -100,19 +117,28 @@ const Navbar = () => {
               {label}
             </Link>
           ))}
-          <div className="pt-2">
+          <div className="pt-2 border-t mt-1 space-y-1">
             {user ? (
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full justify-center text-sm font-medium text-destructive hover:bg-destructive/10"
-                onClick={() => {
-                  setMobileOpen(false);
-                  logOut();
-                }}
-              >
-                Logout
-              </Button>
+              <>
+                <Link
+                  href="/profile"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted text-foreground"
+                >
+                  <UserRound className="size-4 text-muted-foreground" />
+                  <span>View Profile ({user.name})</span>
+                </Link>
+                <button
+                  className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted text-destructive text-left"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    logOut();
+                  }}
+                >
+                  <LogOut className="size-4 text-destructive" />
+                  <span>Logout</span>
+                </button>
+              </>
             ) : (
               <Button
                 render={<Link href="/sign-in" />}
