@@ -10,7 +10,9 @@ export const ENDPOINTS = {
     LOGIN: '/auth/sign-in',
     REFRESH_TOKEN: '/auth/refresh-token',
     LOGOUT: '/auth/logout',
+    ME: '/auth/me',
   },
+
 
   USERS: {
     UPDATE_PROFILE: '/users/update-profile',
