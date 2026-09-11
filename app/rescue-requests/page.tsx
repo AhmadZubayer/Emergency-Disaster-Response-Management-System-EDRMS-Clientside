@@ -130,7 +130,7 @@ const RescueRequestsPage = () => {
               <RescueRequestCard
                 key={request.id}
                 request={request}
-                onClick={() => setSelectedRequest(request)}
+                onClick={() => router.push(`/rescue-requests/${request.id}`)}
               />
             ))}
           </div>
