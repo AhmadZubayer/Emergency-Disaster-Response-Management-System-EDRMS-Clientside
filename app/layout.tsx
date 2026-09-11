@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Geist, Geist_Mono } from 'next/font/google';
 
-import { AuthProvider } from '@/components/auth/auth-provider';
+import { AuthProvider } from '@/app/contexts/AuthProvider';
 import { Toaster } from '@/components/ui/toast';
 
 import './globals.css';
@@ -22,11 +22,11 @@ export const metadata: Metadata = {
   description: 'Emergency & Disaster Response Management System',
 };
 
-export default function RootLayout({
+const RootLayout = ({
   children,
 }: {
   children: ReactNode;
-}) {
+}) => {
   return (
     <html
       lang="en"
@@ -41,5 +41,8 @@ export default function RootLayout({
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;
+
 

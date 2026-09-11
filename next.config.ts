@@ -5,8 +5,13 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.BACKEND_URL || 'http://localhost:3000'}/api/:path*`,
+        destination: `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/:path*`,
       },
+      {
+        source: '/user-files/:path*',
+        destination: `${process.env.BACKEND_URL || 'http://localhost:5000'}/user-files/:path*`,
+      },
+
     ];
   },
 };

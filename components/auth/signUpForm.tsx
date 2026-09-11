@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import ModernButton from '@/components/modernBtn';
 import { signUpSchema } from '@/app/lib/validations/auth';
-import { publicApi } from '@/app/lib/public-api';
+import { useAuth } from '@/app/hooks/useAuth';
 
 const GoogleIcon = () => (
   <svg className="size-4" viewBox="0 0 24 24">
@@ -34,6 +34,7 @@ const GoogleIcon = () => (
 );
 
 const SignUpForm = () => {
+  const { registerUser } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -66,12 +67,7 @@ const SignUpForm = () => {
 
     try {
       setLoading(true);
-      await publicApi.post('/auth/register-user', {
-        name,
-        email,
-        password,
-      });
-
+      await registerUser(name, email, password);
       setSuccess(true);
     } catch (err: any) {
       const message =
@@ -83,6 +79,7 @@ const SignUpForm = () => {
       setLoading(false);
     }
   };
+
 
   return (
     <Card className="w-full max-w-sm rounded-2xl border border-border/50 bg-card/75 backdrop-blur-xl shadow-xl">

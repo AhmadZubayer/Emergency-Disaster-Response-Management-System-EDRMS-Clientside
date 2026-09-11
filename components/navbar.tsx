@@ -3,9 +3,11 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { Menu, UserRound, X, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from '@/components/ui/navigation-menu';
+import { useAuth } from '@/app/hooks/useAuth';
 
 const links = [
   ['Dashboard', '/dashboard'],
@@ -18,6 +20,7 @@ const links = [
 const Navbar = () => {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, logOut } = useAuth();
 
   return (
     <header className="border-b bg-background">
@@ -41,13 +44,36 @@ const Navbar = () => {
           </NavigationMenuList>
         </NavigationMenu>
         <div className="flex items-center justify-end gap-3">
-          <Button
-            render={<Link href="/sign-in" />}
-            size="lg"
-            className="hidden sm:inline-flex px-4 py-2 text-sm font-medium"
-          >
-            Sign In
-          </Button>
+          {user ? (
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:flex flex-col text-right">
+                <span className="text-xs font-semibold">{user.name}</span>
+                <span className="text-[10px] text-muted-foreground capitalize">{user.role || 'user'}</span>
+              </div>
+              <Avatar size="default" aria-label="Signed in profile">
+                <AvatarFallback>
+                  <UserRound className="size-4" />
+                </AvatarFallback>
+              </Avatar>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => logOut()}
+                className="gap-1.5 text-xs text-muted-foreground hover:text-destructive"
+              >
+                <LogOut className="size-3.5" />
+                <span className="hidden sm:inline">Logout</span>
+              </Button>
+            </div>
+          ) : (
+            <Button
+              render={<Link href="/sign-in" />}
+              size="lg"
+              className="hidden sm:inline-flex px-4 py-2 text-sm font-medium"
+            >
+              Sign In
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -75,14 +101,28 @@ const Navbar = () => {
             </Link>
           ))}
           <div className="pt-2">
-            <Button
-              render={<Link href="/sign-in" />}
-              size="lg"
-              className="w-full justify-center text-sm font-medium"
-              onClick={() => setMobileOpen(false)}
-            >
-              Sign In
-            </Button>
+            {user ? (
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full justify-center text-sm font-medium text-destructive hover:bg-destructive/10"
+                onClick={() => {
+                  setMobileOpen(false);
+                  logOut();
+                }}
+              >
+                Logout
+              </Button>
+            ) : (
+              <Button
+                render={<Link href="/sign-in" />}
+                size="lg"
+                className="w-full justify-center text-sm font-medium"
+                onClick={() => setMobileOpen(false)}
+              >
+                Sign In
+              </Button>
+            )}
           </div>
         </nav>
       )}
@@ -91,5 +131,6 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
 
 

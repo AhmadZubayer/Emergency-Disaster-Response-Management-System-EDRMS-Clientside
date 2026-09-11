@@ -2,15 +2,15 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import ModernButton from '@/components/modernBtn';
+import SignInSuccess from '@/components/auth/signInSuccess';
 import { signInSchema } from '@/app/lib/validations/auth';
-import { publicApi } from '@/app/lib/public-api';
+import { useAuth } from '@/app/hooks/useAuth';
 
 const GoogleIcon = () => (
   <svg className="size-4" viewBox="0 0 24 24">
@@ -34,12 +34,13 @@ const GoogleIcon = () => (
 );
 
 const SignInForm = () => {
-  const router = useRouter();
+  const { user, signInUser } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [serverError, setServerError] = useState('');
+  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -65,17 +66,8 @@ const SignInForm = () => {
 
     try {
       setLoading(true);
-      const res = await publicApi.post('/auth/sign-in', { email, password });
-
-      const data = res.data?.data || res.data;
-      if (data?.access_token) {
-        localStorage.setItem('access_token', data.access_token);
-      }
-      if (data?.refresh_token) {
-        localStorage.setItem('refresh_token', data.refresh_token);
-      }
-
-      router.push('/dashboard');
+      await signInUser(email, password);
+      setSuccess(true);
     } catch (err: any) {
       const message =
         err.response?.data?.message ||
@@ -97,74 +89,78 @@ const SignInForm = () => {
       </CardHeader>
 
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {serverError && (
-            <div className="rounded-md border border-destructive/30 bg-destructive/10 p-2 text-xs text-destructive text-center">
-              {serverError}
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="h-10 px-3 bg-background/50"
-            />
-            {errors.email && (
-              <p className="text-xs text-destructive">{errors.email}</p>
+        {success ? (
+          <SignInSuccess userName={user?.name} />
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {serverError && (
+              <div className="rounded-md border border-destructive/30 bg-destructive/10 p-2 text-xs text-destructive text-center">
+                {serverError}
+              </div>
             )}
-          </div>
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
-              <Link
-                href="/forgot-password"
-                className="text-xs text-muted-foreground hover:text-foreground underline-offset-4 hover:underline"
-              >
-                Forgot your password?
-              </Link>
-            </div>
-            <div className="relative">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="h-10 pl-3 pr-10 bg-background/50"
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="h-10 px-3 bg-background/50"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
-              >
-                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-              </button>
+              {errors.email && (
+                <p className="text-xs text-destructive">{errors.email}</p>
+              )}
             </div>
-            {errors.password && (
-              <p className="text-xs text-destructive">{errors.password}</p>
-            )}
-          </div>
 
-          <div className="pt-2 flex justify-center">
-            <ModernButton type="submit" disabled={loading}>
-              {loading ? 'Logging in...' : 'Login'}
-            </ModernButton>
-          </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-muted-foreground hover:text-foreground underline-offset-4 hover:underline"
+                >
+                  Forgot your password?
+                </Link>
+              </div>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-10 pl-3 pr-10 bg-background/50"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-xs text-destructive">{errors.password}</p>
+              )}
+            </div>
 
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full h-10 rounded-full border-border/80 bg-background/50 hover:bg-muted font-medium"
-          >
-            <GoogleIcon />
-            Login with Google
-          </Button>
-        </form>
+            <div className="pt-2 flex justify-center">
+              <ModernButton type="submit" disabled={loading}>
+                {loading ? 'Logging in...' : 'Login'}
+              </ModernButton>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-10 rounded-full border-border/80 bg-background/50 hover:bg-muted font-medium"
+            >
+              <GoogleIcon />
+              Login with Google
+            </Button>
+          </form>
+        )}
       </CardContent>
 
       <CardFooter className="justify-center pt-0">
@@ -180,4 +176,5 @@ const SignInForm = () => {
 };
 
 export default SignInForm;
+
 
