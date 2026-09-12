@@ -1,163 +1,268 @@
 'use client';
 
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
-import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Menu, UserRound, X, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
-  NavigationMenu,
-  NavigationMenuList,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuTrigger,
-  NavigationMenuContent,
-} from '@/components/ui/navigation-menu';
+  ChevronDown,
+  UserRound,
+  LogOut,
+  Menu,
+  X,
+  HeartHandshake,
+  Users,
+  ShieldAlert,
+  Coins,
+} from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/app/hooks/useAuth';
 
-const links = [
-  ['Dashboard', '/dashboard'],
-  ['Disasters', '/disaster'],
-  ['Missing Persons', '/missing-persons'],
-  ['Rescue Requests', '/rescue-requests'],
-  ['Donations', '/donations'],
-  ['Community', '/community'],
+const navItems = [
+  { label: 'Disasters', href: '/disaster' },
+  { label: 'Missing Persons', href: '/missing-persons' },
+  { label: 'Rescue Requests', href: '/rescue-requests' },
+  { label: 'Donations', href: '/donations' },
+  { label: 'Community', href: '/community' },
 ];
 
 const Navbar = () => {
   const pathname = usePathname();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const { user, logOut } = useAuth();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [contributeOpen, setContributeOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+
+  const contributeTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const accountTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleContributeMouseEnter = () => {
+    if (contributeTimerRef.current) clearTimeout(contributeTimerRef.current);
+    setContributeOpen(true);
+  };
+
+  const handleContributeMouseLeave = () => {
+    contributeTimerRef.current = setTimeout(() => {
+      setContributeOpen(false);
+    }, 120);
+  };
+
+  const handleAccountMouseEnter = () => {
+    if (accountTimerRef.current) clearTimeout(accountTimerRef.current);
+    setAccountOpen(true);
+  };
+
+  const handleAccountMouseLeave = () => {
+    accountTimerRef.current = setTimeout(() => {
+      setAccountOpen(false);
+    }, 120);
+  };
 
   return (
-    <header className="border-b bg-background">
-      <div className="grid min-h-16 grid-cols-[1fr_auto] items-center gap-4 px-5 sm:px-8 lg:grid-cols-[1fr_auto_1fr]">
-        <Link href="/" className="w-fit text-xl font-bold tracking-tight">
-          EDRMS
-        </Link>
-        <NavigationMenu aria-label="Main navigation" className="hidden lg:flex">
-          <NavigationMenuList className="gap-2">
-            {links.map(([label, href]) => (
-              <NavigationMenuItem key={href}>
-                <NavigationMenuLink
-                  render={<Link href={href} />}
-                  active={pathname === href}
-                  className="px-3 text-sm"
-                >
-                  {label}
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
-        <div className="flex items-center justify-end gap-3">
-          {user ? (
-            <NavigationMenu align="end" className="hidden sm:flex">
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="px-3 py-1.5 text-sm font-semibold text-foreground bg-transparent hover:bg-muted/60 focus:bg-muted/60">
-                    {user.name}
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent className="p-1.5 w-44">
-                    <ul className="grid gap-1">
-                      <li>
-                        <NavigationMenuLink
-                          render={<Link href="/profile" />}
-                          className="flex items-center gap-2 px-2.5 py-2 text-xs font-medium text-foreground hover:bg-muted rounded-md transition-colors"
-                        >
-                          <UserRound className="size-3.5 text-muted-foreground" />
-                          <span>View Profile</span>
-                        </NavigationMenuLink>
-                      </li>
-                      <li>
-                        <button
-                          onClick={() => logOut()}
-                          className="w-full flex items-center gap-2 px-2.5 py-2 text-xs font-medium text-foreground hover:bg-muted hover:text-destructive rounded-md transition-colors text-left"
-                        >
-                          <LogOut className="size-3.5 text-muted-foreground" />
-                          <span>Logout</span>
-                        </button>
-                      </li>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-          ) : (
-            <Button
-              render={<Link href="/sign-in" />}
-              size="lg"
-              className="hidden sm:inline-flex px-4 py-2 text-sm font-medium"
-            >
-              Sign In
-            </Button>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden"
-            aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-navigation"
-            onClick={() => setMobileOpen(!mobileOpen)}
+    <header className="sticky top-4 z-50 w-full px-4 sm:px-6 pointer-events-none">
+      <div className="max-w-fit mx-auto pointer-events-auto">
+        <nav className="flex items-center gap-1.5 bg-white/95 text-neutral-900 rounded-full py-2 px-3.5 shadow-xl shadow-emerald-950/5 backdrop-blur-xl border border-emerald-600/15 transition-all">
+          <Link
+            href="/"
+            className="px-2.5 py-1 text-emerald-700 font-black text-sm tracking-wider uppercase hover:opacity-80 transition-opacity shrink-0"
+            title="EDRMS Home"
           >
-            {mobileOpen ? <X /> : <Menu />}
-          </Button>
-        </div>
-      </div>
-      {mobileOpen && (
-        <nav id="mobile-navigation" aria-label="Mobile navigation" className="grid gap-1 border-t p-3 lg:hidden">
-          {links.map(([label, href]) => (
-            <Link
-              key={href}
-              href={href}
-              aria-current={pathname === href ? 'page' : undefined}
-              onClick={() => setMobileOpen(false)}
-              className="rounded-md px-3 py-2 text-sm hover:bg-muted focus-visible:outline-ring"
-            >
-              {label}
-            </Link>
-          ))}
-          <div className="pt-2 border-t mt-1 space-y-1">
-            {user ? (
-              <>
+            EDRMS
+          </Link>
+
+          <div className="hidden md:flex items-center gap-1 px-1">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
                 <Link
-                  href="/profile"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted text-foreground"
+                  key={item.href}
+                  href={item.href}
+                  className={`px-3 py-1.5 text-sm font-semibold transition-colors ${
+                    isActive
+                      ? 'text-emerald-700 underline underline-offset-4 decoration-2 decoration-emerald-600'
+                      : 'text-neutral-600 hover:text-neutral-900'
+                  }`}
                 >
-                  <UserRound className="size-4 text-muted-foreground" />
-                  <span>View Profile ({user.name})</span>
+                  {item.label}
                 </Link>
-                <button
-                  className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted text-destructive text-left"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    logOut();
-                  }}
+              );
+            })}
+
+            <div
+              className="relative"
+              onMouseEnter={handleContributeMouseEnter}
+              onMouseLeave={handleContributeMouseLeave}
+            >
+              <DropdownMenu open={contributeOpen} onOpenChange={setContributeOpen}>
+                <DropdownMenuTrigger
+                  render={
+                    <button
+                      type="button"
+                      className="px-3 py-1.5 text-sm font-semibold text-neutral-600 hover:text-neutral-900 flex items-center gap-1 transition-colors"
+                    />
+                  }
                 >
-                  <LogOut className="size-4 text-destructive" />
-                  <span>Logout</span>
-                </button>
-              </>
+                  <span>Contribute</span>
+                  <ChevronDown className={`size-3.5 text-neutral-400 transition-transform duration-200 ${contributeOpen ? 'rotate-180' : ''}`} />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="center"
+                  sideOffset={8}
+                  onMouseEnter={handleContributeMouseEnter}
+                  onMouseLeave={handleContributeMouseLeave}
+                  className="w-52 bg-white/95 text-neutral-900 border border-emerald-600/15 shadow-2xl backdrop-blur-xl rounded-2xl p-1.5"
+                >
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
+                    render={<Link href="/manage-volunteers" />}
+                  >
+                    <Users className="size-4 text-emerald-600" />
+                    <span>Contribute as Volunteer</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
+                    render={<Link href="/donations" />}
+                  >
+                    <HeartHandshake className="size-4 text-emerald-600" />
+                    <span>Contribute as Donor</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 pl-1">
+            {user ? (
+              <div
+                className="relative"
+                onMouseEnter={handleAccountMouseEnter}
+                onMouseLeave={handleAccountMouseLeave}
+              >
+                <DropdownMenu open={accountOpen} onOpenChange={setAccountOpen}>
+                  <DropdownMenuTrigger
+                    render={
+                      <button
+                        type="button"
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-full px-4 py-1.5 text-sm transition-all shadow-md flex items-center gap-1.5 shrink-0 max-w-[200px] truncate"
+                      />
+                    }
+                  >
+                    <span className="truncate">{user.name || user.email}</span>
+                    <ChevronDown className={`size-3.5 text-emerald-100 shrink-0 transition-transform duration-200 ${accountOpen ? 'rotate-180' : ''}`} />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    sideOffset={8}
+                    onMouseEnter={handleAccountMouseEnter}
+                    onMouseLeave={handleAccountMouseLeave}
+                    className="w-52 bg-white/95 text-neutral-900 border border-emerald-600/15 shadow-2xl backdrop-blur-xl rounded-2xl p-1.5"
+                  >
+                    <DropdownMenuItem
+                      className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
+                      render={<Link href="/profile" />}
+                    >
+                      <UserRound className="size-4 text-neutral-500" />
+                      <span>View Profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
+                      render={<Link href="/manage-donations" />}
+                    >
+                      <Coins className="size-4 text-emerald-600" />
+                      <span>Manage Donations</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
+                      render={<Link href="/manage-disaster" />}
+                    >
+                      <ShieldAlert className="size-4 text-amber-600" />
+                      <span>Manage Disasters</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
+                      render={<Link href="/manage-volunteers" />}
+                    >
+                      <Users className="size-4 text-blue-600" />
+                      <span>Manage Volunteers</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={() => logOut()}
+                      className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 focus:bg-red-50 rounded-xl mt-1 border-t border-neutral-100 transition-colors"
+                    >
+                      <LogOut className="size-4" />
+                      <span>Logout</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             ) : (
-              <Button
-                render={<Link href="/sign-in" />}
-                size="lg"
-                className="w-full justify-center text-sm font-medium"
-                onClick={() => setMobileOpen(false)}
+              <Link
+                href="/sign-in"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-full px-4.5 py-1.5 text-sm transition-all shadow-md shrink-0"
               >
                 Sign In
-              </Button>
+              </Link>
             )}
+
+            <button
+              type="button"
+              className="md:hidden size-8 rounded-full flex items-center justify-center text-neutral-600 hover:text-neutral-900 transition-colors shrink-0"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Toggle navigation"
+            >
+              {mobileOpen ? <X className="size-4.5" /> : <Menu className="size-4.5" />}
+            </button>
           </div>
         </nav>
-      )}
+
+        {mobileOpen && (
+          <div className="md:hidden mt-2 p-3 bg-white/95 text-neutral-900 rounded-2xl border border-emerald-600/15 shadow-2xl backdrop-blur-xl flex flex-col gap-1">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                  pathname === item.href
+                    ? 'text-emerald-700 underline underline-offset-4 decoration-2 decoration-emerald-600'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+
+            <div className="pt-2 border-t border-neutral-100 mt-1 flex flex-col gap-1">
+              <span className="text-xs uppercase font-bold text-neutral-400 px-3.5">
+                Contribute
+              </span>
+              <Link
+                href="/manage-volunteers"
+                onClick={() => setMobileOpen(false)}
+                className="px-3.5 py-2 rounded-xl text-sm font-medium text-neutral-600 hover:text-neutral-900 flex items-center gap-2"
+              >
+                <Users className="size-4 text-emerald-600" />
+                <span>Contribute as Volunteer</span>
+              </Link>
+              <Link
+                href="/donations"
+                onClick={() => setMobileOpen(false)}
+                className="px-3.5 py-2 rounded-xl text-sm font-medium text-neutral-600 hover:text-neutral-900 flex items-center gap-2"
+              >
+                <HeartHandshake className="size-4 text-emerald-600" />
+                <span>Contribute as Donor</span>
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
     </header>
   );
 };
 
 export default Navbar;
-
-
-

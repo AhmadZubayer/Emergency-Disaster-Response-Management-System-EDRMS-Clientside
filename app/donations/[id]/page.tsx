@@ -12,6 +12,8 @@ import {
   Users,
   Send,
   X,
+  Upload,
+  FileText,
 } from 'lucide-react';
 import Navbar from '@/components/navbar';
 import { Button } from '@/components/ui/button';
@@ -37,13 +39,16 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from '@/components/ui/toast';
 import ModernButton from '@/components/modernBtn';
+import { cn } from 'cn';
 import { publicApi } from '@/app/lib/public-api';
 import useAuth from '@/app/hooks/useAuth';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import { DonationCampaign } from '@/components/donations/types';
 import { makeDonationSchema } from '@/app/lib/validations/make-donation-schema';
+import { applyAidSchema } from '@/app/lib/validations/apply-aid-schema';
 import { generateDonationReceipt } from '@/lib/generate-donation-receipt';
 
 const chartConfig = {
@@ -78,9 +83,24 @@ const DonationDetailContent = () => {
   const [donationErrors, setDonationErrors] = useState<Record<string, string>>({});
 
   const [aidReason, setAidReason] = useState('');
-  const [aidAmount, setAidAmount] = useState<number>(500);
+  const [paymentMode, setPaymentMode] = useState<'bank' | 'mfs'>('bank');
+  const [bankName, setBankName] = useState('');
+  const [branchName, setBranchName] = useState('');
+  const [bankAccountNo, setBankAccountNo] = useState('');
+  const [accountPhoneNumber, setAccountPhoneNumber] = useState('');
+  const [selectedProofFile, setSelectedProofFile] = useState<File | null>(null);
+  const [aidErrors, setAidErrors] = useState<Record<string, string>>({});
+  const [submittingAid, setSubmittingAid] = useState(false);
+  const [aidServerMsg, setAidServerMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [submittingModal, setSubmittingModal] = useState(false);
   const [modalServerMsg, setModalServerMsg] = useState('');
+
+  const handleProofFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedProofFile(file);
+    }
+  };
 
   const fetchCampaign = async () => {
     try {
@@ -226,27 +246,94 @@ const DonationDetailContent = () => {
     }
   };
 
+  const validateAidForm = () => {
+    const payload =
+      paymentMode === 'bank'
+        ? {
+            paymentMode: 'bank' as const,
+            reason: aidReason.trim(),
+            bankName: bankName.trim(),
+            branchName: branchName.trim(),
+            bankAccountNo: bankAccountNo.trim(),
+          }
+        : {
+            paymentMode: 'mfs' as const,
+            reason: aidReason.trim(),
+            accountPhoneNumber: accountPhoneNumber.trim(),
+          };
+
+    const result = applyAidSchema.safeParse(payload);
+    if (!result.success) {
+      const errMap: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        if (issue.path[0]) {
+          errMap[issue.path[0] as string] = issue.message;
+        }
+      });
+      setAidErrors(errMap);
+      return false;
+    }
+    setAidErrors({});
+    return true;
+  };
+
   const handleRequestAid = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!campaign) return;
-    setSubmittingModal(true);
-    setModalServerMsg('');
+    if (!validateAidForm()) return;
+
+    setSubmittingAid(true);
+    setAidServerMsg(null);
+
+    const payoutDetails =
+      paymentMode === 'bank'
+        ? `Bank: ${bankName.trim()}, Branch: ${branchName.trim()}, Account No: ${bankAccountNo.trim()}`
+        : `MFS: ${accountPhoneNumber.trim()}`;
 
     try {
-      await axiosSecure.post(`/donations/campaigns/${campaign.id}/apply`, {
-        requested_amount: Number(aidAmount),
-        reason: aidReason,
+      const formData = new FormData();
+      formData.append('reason', aidReason.trim());
+      formData.append('payout_details', payoutDetails);
+      if (selectedProofFile) {
+        formData.append('file', selectedProofFile);
+      }
+
+      await axiosSecure.post(`/donations/campaigns/${campaign.id}/apply`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
-      setModalServerMsg('Aid application submitted for relief review.');
+
+      setAidServerMsg({
+        type: 'success',
+        text: 'Your donation aid request has been submitted successfully!',
+      });
+
+      toast.add({
+        id: 'aid-application-success-toast',
+        title: 'Aid application submitted successfully.',
+        type: 'success',
+        timeout: 6000,
+      });
+
       setTimeout(() => {
         setIsRequestAidModalOpen(false);
-        setModalServerMsg('');
+        setAidServerMsg(null);
         setAidReason('');
-      }, 1500);
+        setBankName('');
+        setBranchName('');
+        setBankAccountNo('');
+        setAccountPhoneNumber('');
+        setSelectedProofFile(null);
+        setAidErrors({});
+      }, 1200);
     } catch (err: any) {
-      setModalServerMsg(err?.response?.data?.message || 'Failed to submit aid application.');
+      setAidServerMsg({
+        type: 'error',
+        text: err?.response?.data?.message || 'Failed to submit aid application. Please try again.',
+      });
     } finally {
-      setSubmittingModal(false);
+      setSubmittingAid(false);
     }
   };
 
@@ -432,7 +519,16 @@ const DonationDetailContent = () => {
                     <ModernButton>Make Donation</ModernButton>
                   </div>
 
-                  <div className="w-fit" onClick={() => setIsRequestAidModalOpen(true)}>
+                  <div
+                    className="w-fit"
+                    onClick={() => {
+                      if (!user) {
+                        router.push(`/sign-in?redirect=/donations/${id}`);
+                      } else {
+                        setIsRequestAidModalOpen(true);
+                      }
+                    }}
+                  >
                     <ModernButton>Request for donation</ModernButton>
                   </div>
                 </div>
@@ -470,25 +566,20 @@ const DonationDetailContent = () => {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="donationAmount" className="text-xs font-semibold">
-                Donation Amount ($ USD) *
-              </Label>
-              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
-                ${Number(donationAmount).toLocaleString()}
+              <Label className="text-xs font-semibold">Select Donation Amount</Label>
+              <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                ${Number(donationAmount).toLocaleString()} USD
               </span>
             </div>
 
             <Slider
+              value={[Number(donationAmount)]}
               min={1}
               max={maxAllowedAmount}
               step={1}
-              value={[Number(donationAmount)]}
-              onValueChange={(vals) => {
-                if (Array.isArray(vals)) {
-                  setDonationAmount(vals[0]);
-                } else if (typeof vals === 'number') {
-                  setDonationAmount(vals);
-                }
+              onValueChange={(val) => {
+                const nextVal = Array.isArray(val) ? val[0] : val;
+                setDonationAmount(nextVal);
               }}
               className="py-2"
             />
@@ -496,7 +587,7 @@ const DonationDetailContent = () => {
             <div className="relative">
               <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
               <Input
-                id="donationAmount"
+                id="donationCustomAmount"
                 type="number"
                 min={1}
                 max={maxAllowedAmount}
@@ -583,73 +674,196 @@ const DonationDetailContent = () => {
             >
               <X className="size-4" />
             </Button>
-            <span>Apply for Emergency Aid</span>
+            <span>Apply for Donation</span>
           </div>
         }
         maxWidth="sm"
-        actions={
-          <div className="flex items-center justify-end gap-2 w-full">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsRequestAidModalOpen(false)}
-              className="text-xs"
-            >
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleRequestAid}
-              disabled={submittingModal}
-              className="text-xs font-semibold gap-1.5"
-            >
-              <Send className="size-3.5" />
-              {submittingModal ? 'Submitting...' : 'Submit Application'}
-            </Button>
-          </div>
-        }
       >
         <form onSubmit={handleRequestAid} className="space-y-4 py-1">
-          {modalServerMsg && (
-            <div className="p-3 text-xs text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
-              {modalServerMsg}
+          {aidServerMsg && (
+            <div
+              className={cn(
+                'p-3 text-xs rounded-md border',
+                aidServerMsg.type === 'success'
+                  ? 'text-emerald-600 bg-emerald-500/10 border-emerald-500/20'
+                  : 'text-destructive bg-destructive/10 border-destructive/20'
+              )}
+            >
+              {aidServerMsg.text}
             </div>
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="aidAmount" className="text-xs font-semibold">
-              Requested Aid Amount ($ USD)
+            <Label htmlFor="applicantEmail" className="text-xs font-semibold">
+              User Email
             </Label>
-            <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
-              <Input
-                id="aidAmount"
-                type="number"
-                min={1}
-                value={aidAmount}
-                onChange={(e) => setAidAmount(Number(e.target.value))}
-                className="pl-9 text-xs"
-              />
-            </div>
+            <Input
+              id="applicantEmail"
+              value={user?.email || ''}
+              disabled
+              readOnly
+              className="text-xs bg-muted text-muted-foreground cursor-not-allowed"
+            />
+            <p className="text-xs text-muted-foreground">
+              You will be contacted via your profile email address.
+            </p>
           </div>
 
           <div className="space-y-1.5">
             <Label htmlFor="aidReason" className="text-xs font-semibold">
-              Justification & Loss Details
+              Briefly Enter your situation and loss details
             </Label>
             <Textarea
               id="aidReason"
               rows={3}
-              placeholder="Explain family members affected, damage suffered, and urgent needs..."
+              placeholder="Provide details of damages, emergency requirements, and family situation..."
               value={aidReason}
               onChange={(e) => setAidReason(e.target.value)}
               className="text-xs"
             />
+            {aidErrors.reason && (
+              <p className="text-[11px] text-destructive">{aidErrors.reason}</p>
+            )}
           </div>
 
-          <p className="text-[11px] text-muted-foreground">
-            Aid applications are verified by authorized relief coordinators against on-ground casualty registers.
-          </p>
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold block">Payment Mode</Label>
+            <RadioGroup
+              value={paymentMode}
+              onValueChange={(val) => {
+                setPaymentMode(val as 'bank' | 'mfs');
+                setAidErrors({});
+              }}
+              className="flex items-center gap-6"
+            >
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="bank" id="radio-bank" />
+                <Label htmlFor="radio-bank" className="text-xs font-medium cursor-pointer">
+                  Bank
+                </Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="mfs" id="radio-mfs" />
+                <Label htmlFor="radio-mfs" className="text-xs font-medium cursor-pointer">
+                  MFS
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          {paymentMode === 'bank' ? (
+            <div className="space-y-3 pt-1 border-t border-border/40">
+              <div className="space-y-1.5">
+                <Label htmlFor="bankName" className="text-xs font-semibold">
+                  Bank Name
+                </Label>
+                <Input
+                  id="bankName"
+                  placeholder="e.g. Dutch-Bangla Bank, BRAC Bank"
+                  value={bankName}
+                  onChange={(e) => setBankName(e.target.value)}
+                  className="text-xs"
+                />
+                {aidErrors.bankName && (
+                  <p className="text-[11px] text-destructive">{aidErrors.bankName}</p>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="branchName" className="text-xs font-semibold">
+                  Branch
+                </Label>
+                <Input
+                  id="branchName"
+                  placeholder="e.g. Bashundhara Branch"
+                  value={branchName}
+                  onChange={(e) => setBranchName(e.target.value)}
+                  className="text-xs"
+                />
+                {aidErrors.branchName && (
+                  <p className="text-[11px] text-destructive">{aidErrors.branchName}</p>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="bankAccountNo" className="text-xs font-semibold">
+                  Bank Account No
+                </Label>
+                <Input
+                  id="bankAccountNo"
+                  placeholder="e.g. 115.120.45892"
+                  value={bankAccountNo}
+                  onChange={(e) => setBankAccountNo(e.target.value)}
+                  className="text-xs"
+                />
+                {aidErrors.bankAccountNo && (
+                  <p className="text-[11px] text-destructive">{aidErrors.bankAccountNo}</p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3 pt-1 border-t border-border/40">
+              <div className="space-y-1.5">
+                <Label htmlFor="accountPhoneNumber" className="text-xs font-semibold">
+                  Account Phone Number
+                </Label>
+                <Input
+                  id="accountPhoneNumber"
+                  placeholder="e.g. 01700000000"
+                  value={accountPhoneNumber}
+                  onChange={(e) => setAccountPhoneNumber(e.target.value)}
+                  className="text-xs"
+                />
+                {aidErrors.accountPhoneNumber && (
+                  <p className="text-[11px] text-destructive">{aidErrors.accountPhoneNumber}</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-1.5 pt-1 border-t border-border/40">
+            <Label className="text-xs font-semibold block">Attach Proof Document / Photos (Optional)</Label>
+            <div className="border border-dashed border-border/70 rounded-lg p-3 text-center bg-muted/10 flex flex-col items-center justify-center gap-2">
+              {selectedProofFile ? (
+                <div className="flex items-center justify-between w-full p-2 bg-card rounded-md border text-xs">
+                  <div className="flex items-center gap-2 truncate">
+                    <FileText className="size-4 text-emerald-600 shrink-0" />
+                    <span className="truncate max-w-[200px] font-medium">{selectedProofFile.name}</span>
+                    <span className="text-[10px] text-muted-foreground">
+                      ({(selectedProofFile.size / 1024).toFixed(0)} KB)
+                    </span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-xs"
+                    onClick={() => setSelectedProofFile(null)}
+                    className="size-6 text-muted-foreground hover:text-destructive"
+                  >
+                    <X className="size-3.5" />
+                  </Button>
+                </div>
+              ) : (
+                <label className="cursor-pointer flex flex-col items-center gap-1.5 w-full py-1">
+                  <Upload className="size-4 text-muted-foreground" />
+                  <span className="text-xs font-medium text-foreground">Click to upload document or photo</span>
+                  <span className="text-[10px] text-muted-foreground">PDF, JPG, PNG, DOC (Max 10MB)</span>
+                  <input
+                    type="file"
+                    accept="image/*,.pdf,.doc,.docx"
+                    onChange={handleProofFileChange}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+          </div>
+
+          <div className="pt-3 border-t border-border/50 flex items-center justify-start">
+            <ModernButton type="submit" disabled={submittingAid}>
+              {submittingAid ? 'Submitting...' : 'Apply'}
+            </ModernButton>
+          </div>
         </form>
       </MuiModal>
     </div>
