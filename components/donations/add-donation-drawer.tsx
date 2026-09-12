@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Calendar as CalendarIcon, DollarSign } from 'lucide-react';
+import { Calendar as CalendarIcon, DollarSign, Upload, Image as ImageIcon, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -51,6 +51,8 @@ const AddDonationDrawer = ({
     new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
   );
   const [status, setStatus] = useState<DonationCampaign['status']>('active');
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const [isStartDateOpen, setIsStartDateOpen] = useState(false);
   const [isEndDateOpen, setIsEndDateOpen] = useState(false);
@@ -73,6 +75,12 @@ const AddDonationDrawer = ({
           : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
       );
       setStatus(editCampaign.status || 'active');
+      setPhotoFile(null);
+      setPhotoPreview(
+        editCampaign.photo_url
+          ? `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}${editCampaign.photo_url}`
+          : null
+      );
       setErrors({});
       setServerError('');
     } else if (!editCampaign && open) {
@@ -87,8 +95,24 @@ const AddDonationDrawer = ({
     setStartDate(new Date());
     setEndDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
     setStatus('active');
+    setPhotoFile(null);
+    setPhotoPreview(null);
     setErrors({});
     setServerError('');
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhotoFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setPhotoPreview(previewUrl);
+    }
+  };
+
+  const removePhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview(null);
   };
 
   const validate = () => {
@@ -123,21 +147,34 @@ const AddDonationDrawer = ({
     setServerError('');
 
     try {
-      const payload = {
-        title,
-        description,
-        target_amount: Number(targetAmount),
-        start_date: startDate ? startDate.toISOString() : new Date().toISOString(),
-        end_date: endDate
+      const formData = new FormData();
+      formData.append('title', title.trim());
+      formData.append('description', description.trim());
+      formData.append('target_amount', String(Number(targetAmount)));
+      formData.append(
+        'start_date',
+        startDate ? startDate.toISOString() : new Date().toISOString()
+      );
+      formData.append(
+        'end_date',
+        endDate
           ? endDate.toISOString()
-          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        status,
-      };
+          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      );
+      formData.append('status', status);
+
+      if (photoFile) {
+        formData.append('file', photoFile);
+      }
 
       if (editCampaign) {
-        await axiosSecure.patch(`/donations/campaigns/${editCampaign.id}`, payload);
+        await axiosSecure.patch(`/donations/campaigns/${editCampaign.id}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
       } else {
-        await axiosSecure.post('/donations/campaigns', payload);
+        await axiosSecure.post('/donations/campaigns', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
       }
 
       onSuccess();
@@ -225,6 +262,43 @@ const AddDonationDrawer = ({
           {errors.targetAmount && (
             <p className="text-[11px] text-destructive">{errors.targetAmount}</p>
           )}
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-xs font-semibold">Add Photos (Campaign Banner / Photo)</Label>
+          <div className="space-y-2">
+            <label className="flex items-center justify-center gap-2 h-20 rounded-xl border border-dashed border-border/80 bg-background/50 hover:bg-muted/50 cursor-pointer p-4 transition-colors">
+              <Upload className="size-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">
+                {photoFile ? photoFile.name : 'Click to upload campaign banner photo (JPG, PNG, WebP)'}
+              </span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </label>
+
+            {photoPreview && (
+              <div className="relative w-full h-36 rounded-xl overflow-hidden border border-border/60 bg-muted/20">
+                <img
+                  src={photoPreview}
+                  alt="Campaign Preview"
+                  className="w-full h-full object-cover"
+                />
+                <Button
+                  type="button"
+                  size="icon-xs"
+                  variant="destructive"
+                  onClick={removePhoto}
+                  className="absolute top-2 right-2 size-6 rounded-full shadow"
+                >
+                  <X className="size-3" />
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -324,7 +398,7 @@ const AddDonationDrawer = ({
           </Label>
           <Textarea
             id="description"
-            rows={4}
+            rows={3}
             placeholder="Explain how the funds will be utilized for relief food packages, medical aid, and shelter..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
