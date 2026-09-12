@@ -10,6 +10,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import Navbar from '@/components/navbar';
+import ReliefOrgSidebar from '@/components/relief-org-sidebar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -165,64 +166,70 @@ const ProfilePage = () => {
       <Navbar />
 
       {loading ? (
-        <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-10 space-y-6">
-          <div className="h-28 rounded-2xl bg-muted/40 animate-pulse border border-border/40" />
-          <div className="h-96 rounded-2xl bg-muted/30 animate-pulse border border-border/40" />
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-10 space-y-6">
+          <div className="h-28 rounded-xl bg-muted/40 animate-pulse border border-border/40" />
+          <div className="h-96 rounded-xl bg-muted/30 animate-pulse border border-border/40" />
         </main>
       ) : (
-        <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/60 pb-6">
-            <div className="flex items-center gap-4">
-              <div className="size-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 font-bold text-2xl shrink-0 overflow-hidden">
-                {profile?.photo_url ? (
-                  <img
-                    src={profile.photo_url}
-                    alt={profile.name}
-                    className="size-full object-cover"
-                  />
-                ) : (
-                  <User className="size-8 text-emerald-600" />
-                )}
-              </div>
-              <div>
-                <div className="flex items-center gap-2.5">
-                  <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
-                    {profile?.name || user?.name}
-                  </h1>
-                  <Badge variant="outline" className="text-[10px] px-2 py-0 uppercase font-bold tracking-wider">
-                    {profile?.auth?.role || user?.role || 'user'}
-                  </Badge>
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className={user?.role === 'RELIEF_ORG' || user?.role === 'ADMIN' ? 'flex flex-col md:flex-row gap-8 items-start' : 'max-w-5xl mx-auto'}>
+            {(user?.role === 'RELIEF_ORG' || user?.role === 'ADMIN') && (
+              <ReliefOrgSidebar />
+            )}
+
+            <div className="flex-1 w-full min-w-0 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/60 pb-6">
+                <div className="flex items-center gap-4">
+                  <div className="size-16 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 font-bold text-2xl shrink-0 overflow-hidden">
+                    {profile?.photo_url ? (
+                      <img
+                        src={profile.photo_url}
+                        alt={profile.name}
+                        className="size-full object-cover"
+                      />
+                    ) : (
+                      <User className="size-8 text-emerald-600" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2.5">
+                      <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                        {profile?.name || user?.name}
+                      </h1>
+                      <Badge variant="outline" className="text-[10px] px-2 py-0 uppercase font-bold tracking-wider">
+                        {profile?.auth?.role || user?.role || 'user'}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {profile?.auth?.email || user?.email}
+                    </p>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {profile?.auth?.email || user?.email}
-                </p>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={profile?.is_safe ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={handleToggleSafety}
+                    disabled={togglingSafety}
+                    className="gap-1.5 text-xs font-semibold"
+                  >
+                    {profile?.is_safe ? (
+                      <>
+                        <CheckCircle2 className="size-3.5 text-white" />
+                        Status: Marked Safe
+                      </>
+                    ) : (
+                      <>
+                        <AlertCircle className="size-3.5 text-amber-500" />
+                        Status: Need Help
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
-            </div>
 
-            <div className="flex items-center gap-2">
-              <Button
-                variant={profile?.is_safe ? 'default' : 'outline'}
-                size="sm"
-                onClick={handleToggleSafety}
-                disabled={togglingSafety}
-                className="gap-1.5 rounded-xl text-xs font-semibold"
-              >
-                {profile?.is_safe ? (
-                  <>
-                    <CheckCircle2 className="size-3.5 text-white" />
-                    Status: Marked Safe
-                  </>
-                ) : (
-                  <>
-                    <AlertCircle className="size-3.5 text-amber-500" />
-                    Status: Need Help
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-
-          <Tabs defaultValue="profile" className="w-full space-y-6">
+              <Tabs defaultValue="profile" className="w-full space-y-6">
             <TabsList className="h-9">
               <TabsTrigger value="profile">Your profile</TabsTrigger>
               <TabsTrigger value="activity">Activity</TabsTrigger>
@@ -688,11 +695,13 @@ const ProfilePage = () => {
                     </TableBody>
                   </Table>
                 )}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </main>
-      )}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+      </main>
+    )}
 
       <EditProfileDrawer
         open={isEditOpen}

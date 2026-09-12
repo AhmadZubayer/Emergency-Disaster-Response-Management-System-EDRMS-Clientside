@@ -17,6 +17,7 @@ import { useAuth } from '@/app/hooks/useAuth';
 
 const links = [
   ['Dashboard', '/dashboard'],
+  ['Disasters', '/disaster'],
   ['Missing Persons', '/missing-persons'],
   ['Rescue Requests', '/rescue-requests'],
   ['Donations', '/donations'],
