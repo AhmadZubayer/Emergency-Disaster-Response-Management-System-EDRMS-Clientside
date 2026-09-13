@@ -8,6 +8,9 @@ import {
   FileEdit,
   CheckCircle2,
   AlertCircle,
+  Trash2,
+  RotateCcw,
+  Loader2,
 } from 'lucide-react';
 import Navbar from '@/components/navbar';
 import ReliefOrgSidebar from '@/components/relief-org-sidebar';
@@ -23,6 +26,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import MuiChip from '@/components/mui-chip';
+import { toast } from '@/components/ui/toast';
 import useAuth from '@/app/hooks/useAuth';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import EditProfileDrawer, { UserProfileData } from '@/components/profile/edit-profile-drawer';
@@ -63,14 +67,51 @@ interface UserApplication {
   updated_at: string;
 }
 
+interface TrashItemData {
+  id: string;
+  item_id: string;
+  item_type: 'MISSING_PERSON' | 'RESCUE_REQUEST' | 'COMMUNITY_POST';
+  item_title: string;
+  deleted_at: string;
+  expires_at: string;
+}
+
 const ACTIVITY_TABS = [
   'MISSING PERSONS',
   'RESCUE REQUESTS',
   'DONATIONS',
   'APPLICATIONS',
+  'TRASH',
 ] as const;
 
 type ActivityTabType = (typeof ACTIVITY_TABS)[number];
+
+const formatTrashType = (type: string) => {
+  switch (type) {
+    case 'MISSING_PERSON':
+      return 'Missing person';
+    case 'RESCUE_REQUEST':
+      return 'Rescue request';
+    case 'COMMUNITY_POST':
+      return 'Community post';
+    default:
+      return type;
+  }
+};
+
+const formatTrashDate = (dateStr?: string) => {
+  if (!dateStr) return 'N/A';
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+};
 
 const renderValue = (val?: string | number | null) => {
   if (val !== undefined && val !== null && String(val).trim().length > 0) {
@@ -89,6 +130,8 @@ const ProfilePage = () => {
   const [myRescueRequests, setMyRescueRequests] = useState<RescueRequest[]>([]);
   const [myDonations, setMyDonations] = useState<UserDonation[]>([]);
   const [myApplications, setMyApplications] = useState<UserApplication[]>([]);
+  const [myTrashItems, setMyTrashItems] = useState<TrashItemData[]>([]);
+  const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [activeChip, setActiveChip] = useState<ActivityTabType>('MISSING PERSONS');
   const [loading, setLoading] = useState(true);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -105,12 +148,13 @@ const ProfilePage = () => {
   const fetchProfileData = async () => {
     try {
       setLoading(true);
-      const [profileRes, mpRes, rrRes, donRes, appRes] = await Promise.allSettled([
+      const [profileRes, mpRes, rrRes, donRes, appRes, trashRes] = await Promise.allSettled([
         axiosSecure.get('/users/profile'),
         axiosSecure.get('/missing-persons/my'),
         axiosSecure.get('/rescue-requests/my'),
         axiosSecure.get('/donations/my-donations'),
         axiosSecure.get('/donations/my-applications'),
+        axiosSecure.get('/trash'),
       ]);
 
       if (profileRes.status === 'fulfilled') {
@@ -133,9 +177,59 @@ const ProfilePage = () => {
         const data = appRes.value.data?.data || appRes.value.data || [];
         setMyApplications(Array.isArray(data) ? data : []);
       }
+      if (trashRes.status === 'fulfilled') {
+        const data = trashRes.value.data?.data || trashRes.value.data || [];
+        setMyTrashItems(Array.isArray(data) ? data : []);
+      }
     } catch {
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRestore = async (id: string, title: string) => {
+    try {
+      setActionInProgress(`restore-${id}`);
+      await axiosSecure.post(`/trash/${id}/restore`);
+      toast.add({
+        id: `restore-${id}`,
+        title: `Restored "${title}" successfully`,
+        type: 'success',
+        timeout: 4000,
+      });
+      await fetchProfileData();
+    } catch (err: any) {
+      toast.add({
+        id: `restore-error-${id}`,
+        title: err?.response?.data?.message || 'Failed to restore item',
+        type: 'error',
+        timeout: 5000,
+      });
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
+  const handleDeletePermanently = async (id: string, title: string) => {
+    try {
+      setActionInProgress(`delete-${id}`);
+      await axiosSecure.delete(`/trash/${id}`);
+      toast.add({
+        id: `delete-${id}`,
+        title: `Permanently deleted "${title}"`,
+        type: 'success',
+        timeout: 4000,
+      });
+      await fetchProfileData();
+    } catch (err: any) {
+      toast.add({
+        id: `delete-error-${id}`,
+        title: err?.response?.data?.message || 'Failed to permanently delete item',
+        type: 'error',
+        timeout: 5000,
+      });
+    } finally {
+      setActionInProgress(null);
     }
   };
 
@@ -417,6 +511,7 @@ const ProfilePage = () => {
                       {activeChip === 'RESCUE REQUESTS' && 'Emergency rescue alerts registered by your account.'}
                       {activeChip === 'DONATIONS' && 'Contribution history and disaster relief fund payments.'}
                       {activeChip === 'APPLICATIONS' && 'Financial aid applications and payout review requests.'}
+                      {activeChip === 'TRASH' && 'Deleted reports, requests, and posts. Items are automatically permanently removed after 30 days.'}
                     </p>
                   </div>
                   {activeChip === 'MISSING PERSONS' && (
@@ -691,6 +786,82 @@ const ProfilePage = () => {
                             </TableCell>
                           </TableRow>
                         ))
+                      )}
+                    </TableBody>
+                  </Table>
+                )}
+
+                {activeChip === 'TRASH' && (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Item</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Date deleted</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {myTrashItems.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
+                            Trash is empty.
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        myTrashItems.map((item) => {
+                          const isRestoring = actionInProgress === `restore-${item.id}`;
+                          const isDeleting = actionInProgress === `delete-${item.id}`;
+                          const isBusy = !!actionInProgress;
+
+                          return (
+                            <TableRow key={item.id}>
+                              <TableCell className="font-semibold text-foreground max-w-[200px] truncate">
+                                {item.item_title}
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="text-[10px] font-medium tracking-wide">
+                                  {formatTrashType(item.item_type)}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-muted-foreground text-xs">
+                                {formatTrashDate(item.deleted_at)}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={isBusy}
+                                    onClick={() => handleRestore(item.id, item.item_title)}
+                                    className="h-7 text-xs font-semibold px-2.5 gap-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200 dark:border-emerald-900/50"
+                                  >
+                                    {isRestoring ? (
+                                      <Loader2 className="size-3 animate-spin" />
+                                    ) : (
+                                      <RotateCcw className="size-3" />
+                                    )}
+                                    Restore
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    disabled={isBusy}
+                                    onClick={() => handleDeletePermanently(item.id, item.item_title)}
+                                    className="size-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                    title="Delete permanently"
+                                  >
+                                    {isDeleting ? (
+                                      <Loader2 className="size-3 animate-spin" />
+                                    ) : (
+                                      <Trash2 className="size-3.5" />
+                                    )}
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
                       )}
                     </TableBody>
                   </Table>
