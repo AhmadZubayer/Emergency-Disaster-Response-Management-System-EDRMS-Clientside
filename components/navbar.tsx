@@ -13,6 +13,7 @@ import {
   Users,
   ShieldAlert,
   Coins,
+  Building2,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -125,10 +126,10 @@ const Navbar = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                    render={<Link href="/donations" />}
+                    render={<Link href="/signup-as-relief-org" />}
                   >
-                    <HeartHandshake className="size-4 text-emerald-600" />
-                    <span>Contribute as Donor</span>
+                    <Building2 className="size-4 text-emerald-600" />
+                    <span>Contribute as Relief Org</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -250,12 +251,12 @@ const Navbar = () => {
                 <span>Contribute as Volunteer</span>
               </Link>
               <Link
-                href="/donations"
+                href="/signup-as-relief-org"
                 onClick={() => setMobileOpen(false)}
                 className="px-3.5 py-2 rounded-xl text-sm font-medium text-neutral-600 hover:text-neutral-900 flex items-center gap-2"
               >
-                <HeartHandshake className="size-4 text-emerald-600" />
-                <span>Contribute as Donor</span>
+                <Building2 className="size-4 text-emerald-600" />
+                <span>Contribute as Relief Org</span>
               </Link>
             </div>
           </div>
