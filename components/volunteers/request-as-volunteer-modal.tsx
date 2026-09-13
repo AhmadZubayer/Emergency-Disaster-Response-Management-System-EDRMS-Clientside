@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { UserCheck, Shield, Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Shield, Send, CheckCircle2, AlertCircle } from 'lucide-react';
 import MuiModal from '@/components/mui-modal';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/app/hooks/useAuth';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 
@@ -14,6 +16,18 @@ interface RequestAsVolunteerModalProps {
   onClose: () => void;
 }
 
+const AVAILABLE_SKILLS = [
+  { id: 'first_aid', label: 'First Aid' },
+  { id: 'search_and_rescue', label: 'Search and Rescue' },
+  { id: 'flood_rescue', label: 'Flood Rescue' },
+  { id: 'medical_assistance', label: 'Medical Assistance' },
+  { id: 'food_distribution', label: 'Food Distribution' },
+  { id: 'shelter_management', label: 'Shelter Management' },
+  { id: 'logistics_transport', label: 'Logistics & Transport' },
+  { id: 'psychosocial_support', label: 'Psychosocial Support' },
+  { id: 'other', label: 'Other' },
+];
+
 export default function RequestAsVolunteerModal({
   open,
   onClose,
@@ -21,29 +35,43 @@ export default function RequestAsVolunteerModal({
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
 
-  const [phone, setPhone] = useState('');
-  const [skills, setSkills] = useState('First Aid, Relief Distribution, Field Operations');
-  const [location, setLocation] = useState('Dhaka, Bangladesh');
+  const [selectedSkills, setSelectedSkills] = useState<string[]>(['first_aid', 'food_distribution']);
+  const [whyJoin, setWhyJoin] = useState('I want to support emergency disaster response efforts and help people in need.');
+  const [available, setAvailable] = useState(true);
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
+  const toggleSkill = (skillId: string) => {
+    setSelectedSkills((prev) =>
+      prev.includes(skillId)
+        ? prev.filter((s) => s !== skillId)
+        : [...prev, skillId]
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (selectedSkills.length === 0) {
+      setError('Please select at least one skill.');
+      return;
+    }
+
+    if (!whyJoin.trim()) {
+      setError('Please provide a reason why you want to join.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const skillsArray = skills
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean);
-
       await axiosSecure.post('/volunteers/register', {
-        skills: skillsArray,
-        location: location,
-        phone: phone || user?.phone || '',
-        status: 'pending',
+        skills: selectedSkills,
+        why_join: whyJoin.trim(),
+        available: available,
       });
 
       setSuccess(true);
@@ -56,7 +84,7 @@ export default function RequestAsVolunteerModal({
         err.response?.data?.message ||
         err.response?.data?.error ||
         'Failed to submit volunteer application. Please try again.';
-      setError(Array.isArray(msg) ? msg[0] : msg);
+      setError(Array.isArray(msg) ? msg.join(', ') : msg);
     } finally {
       setLoading(false);
     }
@@ -76,9 +104,9 @@ export default function RequestAsVolunteerModal({
               <CheckCircle2 className="size-8" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-foreground">Request Submitted!</h3>
+              <h3 className="text-lg font-bold text-foreground">Registration Successful!</h3>
               <p className="text-xs text-muted-foreground mt-1 max-w-xs">
-                Your volunteer application has been submitted to the admin team for verification.
+                Your volunteer application has been submitted successfully.
               </p>
             </div>
           </div>
@@ -92,8 +120,8 @@ export default function RequestAsVolunteerModal({
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 p-2.5 rounded-lg bg-destructive/10 border border-destructive/30 text-xs text-destructive">
-                <AlertCircle className="size-4 shrink-0" />
+              <div className="flex items-start gap-2 p-2.5 rounded-lg bg-destructive/10 border border-destructive/30 text-xs text-destructive">
+                <AlertCircle className="size-4 shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
             )}
@@ -108,43 +136,48 @@ export default function RequestAsVolunteerModal({
               />
             </div>
 
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold">Select Your Skills</Label>
+              <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-2 border border-border/70 rounded-xl bg-background/50">
+                {AVAILABLE_SKILLS.map((skill) => (
+                  <label
+                    key={skill.id}
+                    className="flex items-center gap-2 text-xs font-medium cursor-pointer p-1.5 rounded-lg hover:bg-muted/60 transition-colors"
+                  >
+                    <Checkbox
+                      checked={selectedSkills.includes(skill.id)}
+                      onCheckedChange={() => toggleSkill(skill.id)}
+                    />
+                    <span>{skill.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <div className="space-y-1.5">
-              <Label htmlFor="vol-phone">Contact Phone Number</Label>
-              <Input
-                id="vol-phone"
-                type="tel"
-                placeholder="+8801700000000"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+              <Label htmlFor="why-join">Why do you want to join as a volunteer?</Label>
+              <Textarea
+                id="why-join"
+                placeholder="Describe your motivation, experience, or availability..."
+                value={whyJoin}
+                onChange={(e) => setWhyJoin(e.target.value)}
                 required
-                className="text-xs"
+                className="text-xs min-h-[70px]"
               />
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="vol-location">Preferred Operational District / Area</Label>
-              <Input
-                id="vol-location"
-                placeholder="e.g. Feni, Sylhet, Chittagong"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                required
-                className="text-xs"
+            <div className="flex items-center gap-2 pt-1">
+              <Checkbox
+                id="vol-available"
+                checked={available}
+                onCheckedChange={(c) => setAvailable(!!c)}
               />
+              <Label htmlFor="vol-available" className="text-xs cursor-pointer">
+                I am currently available for emergency dispatch.
+              </Label>
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="vol-skills">Special Skills (comma separated)</Label>
-              <Input
-                id="vol-skills"
-                placeholder="First Aid, Boat Rescue, Logistics, Cooking"
-                value={skills}
-                onChange={(e) => setSkills(e.target.value)}
-                className="text-xs"
-              />
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-2">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/50">
               <Button
                 type="button"
                 variant="outline"
