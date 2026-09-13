@@ -3,13 +3,19 @@
 import React, { useEffect, useState } from 'react';
 import {
   Plus,
+  MoreHorizontal,
   FileEdit,
   ShieldCheck,
   Trash2,
   AlertCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Table,
   TableBody,
@@ -107,8 +113,8 @@ const ManageDisasterAlertPage = () => {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/40 text-xs">
-                <TableHead className="font-bold text-foreground">Date Added</TableHead>
                 <TableHead className="font-bold text-foreground">Name</TableHead>
+                <TableHead className="font-bold text-foreground">Type</TableHead>
                 <TableHead className="font-bold text-foreground">Location</TableHead>
                 <TableHead className="font-bold text-foreground">Status</TableHead>
                 <TableHead className="text-right font-bold text-foreground">Actions</TableHead>
@@ -130,61 +136,66 @@ const ManageDisasterAlertPage = () => {
               ) : (
                 disasters.map((d) => (
                   <TableRow key={d.id} className="text-xs">
-                    <TableCell className="font-medium whitespace-nowrap">
-                      {d.created_at ? new Date(d.created_at).toLocaleDateString() : 'N/A'}
+                    <TableCell className="font-semibold text-foreground">
+                      {d.disaster_name}
                     </TableCell>
-                    <TableCell>
-                      <div className="font-semibold text-foreground">{d.disaster_name}</div>
-                      <div className="text-[10px] text-muted-foreground uppercase">{d.type}</div>
+                    <TableCell className="font-semibold text-foreground uppercase text-xs">
+                      {d.type}
                     </TableCell>
-                    <TableCell className="max-w-[140px] truncate text-muted-foreground">
+                    <TableCell className="max-w-[160px] truncate text-muted-foreground">
                       {d.impacted_location}
                     </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={d.is_verified ? 'default' : 'destructive'}
-                        className="text-[10px] uppercase font-bold"
-                      >
-                        {d.is_verified ? 'Safe' : 'Active Alert'}
-                      </Badge>
+                    <TableCell className={`font-bold uppercase text-xs ${
+                      d.is_verified
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-amber-600 dark:text-amber-400'
+                    }`}>
+                      {d.is_verified ? 'SAFE' : 'ACTIVE ALERT'}
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setEditingDisaster(d);
-                            setIsDrawerOpen(true);
-                          }}
-                          className="h-7 text-xs px-2 gap-1"
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-xs"
+                              className="size-8 text-muted-foreground hover:text-foreground"
+                            />
+                          }
                         >
-                          <FileEdit className="size-3" />
-                          Update
-                        </Button>
-
-                        {!d.is_verified && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setConfirmSafeTarget(d)}
-                            className="h-7 text-xs px-2 gap-1 text-emerald-600 hover:text-emerald-700"
+                          <MoreHorizontal className="size-4" />
+                          <span className="sr-only">Open menu</span>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-44">
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setEditingDisaster(d);
+                              setIsDrawerOpen(true);
+                            }}
+                            className="gap-2 cursor-pointer"
                           >
-                            <ShieldCheck className="size-3" />
-                            Mark as Safe
-                          </Button>
-                        )}
-
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => setConfirmDeleteTarget(d)}
-                          className="h-7 text-xs px-2 gap-1"
-                        >
-                          <Trash2 className="size-3" />
-                          Delete
-                        </Button>
-                      </div>
+                            <FileEdit className="size-3.5 text-muted-foreground" />
+                            <span>Update</span>
+                          </DropdownMenuItem>
+                          {!d.is_verified && (
+                            <DropdownMenuItem
+                              onClick={() => setConfirmSafeTarget(d)}
+                              className="gap-2 cursor-pointer text-emerald-600 focus:text-emerald-600"
+                            >
+                              <ShieldCheck className="size-3.5" />
+                              <span>Mark as Safe</span>
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() => setConfirmDeleteTarget(d)}
+                            className="gap-2 cursor-pointer text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="size-3.5" />
+                            <span>Delete</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))
@@ -275,5 +286,3 @@ const ManageDisasterAlertPage = () => {
 };
 
 export default ManageDisasterAlertPage;
-
-

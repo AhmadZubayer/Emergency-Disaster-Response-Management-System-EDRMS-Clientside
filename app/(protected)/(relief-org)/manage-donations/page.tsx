@@ -1,9 +1,15 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Plus, FileEdit, Trash2, AlertCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Plus, MoreHorizontal, FileEdit, Eye, Trash2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Table,
   TableBody,
@@ -17,14 +23,19 @@ import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import { publicApi } from '@/app/lib/public-api';
 import { DonationCampaign } from '@/components/donations/types';
 import AddDonationDrawer from '@/components/donations/add-donation-drawer';
+import CampaignProgressDrawer from '@/components/donations/campaign-progress-drawer';
 
 const ManageDonationPage = () => {
+  const router = useRouter();
   const axiosSecure = useAxiosSecure();
 
   const [campaigns, setCampaigns] = useState<DonationCampaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<DonationCampaign | null>(null);
+
+  const [selectedProgressCampaign, setSelectedProgressCampaign] = useState<DonationCampaign | null>(null);
+  const [isProgressDrawerOpen, setIsProgressDrawerOpen] = useState(false);
 
   const [confirmDeleteTarget, setConfirmDeleteTarget] = useState<DonationCampaign | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -112,67 +123,66 @@ const ManageDonationPage = () => {
                 campaigns.map((c) => {
                   const target = Number(c.target_amount) || 0;
                   const collected = Number(c.raised_amount) || 0;
-                  const progressPct = target > 0 ? Math.min(100, Math.round((collected / target) * 100)) : 0;
 
                   return (
                     <TableRow key={c.id} className="text-xs">
-                      <TableCell>
-                        <div className="font-semibold text-foreground">{c.title}</div>
-                        <div className="text-[10px] text-muted-foreground">
-                          {c.start_date ? new Date(c.start_date).toLocaleDateString() : 'N/A'} -{' '}
-                          {c.end_date ? new Date(c.end_date).toLocaleDateString() : 'N/A'}
-                        </div>
+                      <TableCell className="font-semibold text-foreground">
+                        {c.title}
                       </TableCell>
                       <TableCell className="font-semibold text-foreground">
                         ${target.toLocaleString()}
                       </TableCell>
-                      <TableCell>
-                        <div className="font-semibold text-emerald-600 dark:text-emerald-400">
-                          ${collected.toLocaleString()}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground font-medium">
-                          {progressPct}% funded
-                        </div>
+                      <TableCell className="font-semibold text-emerald-600 dark:text-emerald-400">
+                        ${collected.toLocaleString()}
                       </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            c.status === 'active'
-                              ? 'default'
-                              : c.status === 'completed'
-                              ? 'secondary'
-                              : 'destructive'
-                          }
-                          className="text-[10px] uppercase font-bold"
-                        >
-                          {c.status}
-                        </Badge>
+                      <TableCell className="font-bold text-emerald-600 dark:text-emerald-400 uppercase text-xs">
+                        {c.status}
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setEditingCampaign(c);
-                              setIsDrawerOpen(true);
-                            }}
-                            className="h-7 text-xs px-2 gap-1"
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            render={
+                              <Button
+                                variant="ghost"
+                                size="icon-xs"
+                                className="size-8 text-muted-foreground hover:text-foreground"
+                              />
+                            }
                           >
-                            <FileEdit className="size-3" />
-                            Update
-                          </Button>
-
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => setConfirmDeleteTarget(c)}
-                            className="h-7 text-xs px-2 gap-1"
-                          >
-                            <Trash2 className="size-3" />
-                            Delete
-                          </Button>
-                        </div>
+                            <MoreHorizontal className="size-4" />
+                            <span className="sr-only">Open menu</span>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setEditingCampaign(c);
+                                setIsDrawerOpen(true);
+                              }}
+                              className="gap-2 cursor-pointer"
+                            >
+                              <FileEdit className="size-3.5 text-muted-foreground" />
+                              <span>Edit View</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedProgressCampaign(c);
+                                setIsProgressDrawerOpen(true);
+                              }}
+                              className="gap-2 cursor-pointer"
+                            >
+                              <Eye className="size-3.5 text-muted-foreground" />
+                              <span>Progress & Requests</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              variant="destructive"
+                              onClick={() => setConfirmDeleteTarget(c)}
+                              className="gap-2 cursor-pointer text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="size-3.5" />
+                              <span>Delete</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   );
@@ -188,6 +198,16 @@ const ManageDonationPage = () => {
         onOpenChange={setIsDrawerOpen}
         onSuccess={fetchCampaigns}
         editCampaign={editingCampaign}
+      />
+
+      <CampaignProgressDrawer
+        open={isProgressDrawerOpen}
+        onClose={() => {
+          setIsProgressDrawerOpen(false);
+          setSelectedProgressCampaign(null);
+        }}
+        campaign={selectedProgressCampaign}
+        onCampaignUpdated={fetchCampaigns}
       />
 
       <MuiModal

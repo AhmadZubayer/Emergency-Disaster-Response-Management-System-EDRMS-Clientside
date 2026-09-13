@@ -1,9 +1,14 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Plus, FileEdit, Trash2, AlertCircle } from 'lucide-react';
+import { Plus, MoreHorizontal, FileEdit, Trash2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Table,
   TableBody,
@@ -89,54 +94,35 @@ const ManageVolunteerGroupsPage = () => {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/40 text-xs">
-                <TableHead className="font-bold text-foreground">Group No</TableHead>
-                <TableHead className="font-bold text-foreground">No of Volunteers</TableHead>
+                <TableHead className="font-bold text-foreground">Group Name</TableHead>
+                <TableHead className="font-bold text-foreground">Volunteers</TableHead>
                 <TableHead className="font-bold text-foreground">Location</TableHead>
                 <TableHead className="font-bold text-foreground">Disaster</TableHead>
+                <TableHead className="font-bold text-foreground">Status</TableHead>
                 <TableHead className="text-right font-bold text-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-32 text-center text-xs text-muted-foreground">
+                  <TableCell colSpan={6} className="h-32 text-center text-xs text-muted-foreground">
                     Loading volunteer groups...
                   </TableCell>
                 </TableRow>
               ) : groups.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-40 text-center text-xs text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center gap-2 py-4">
-                      <p>No volunteer groups found yet.</p>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setEditingGroup(null);
-                          setIsDrawerOpen(true);
-                        }}
-                        className="gap-1 text-xs font-medium"
-                      >
-                        <Plus className="size-3.5" />
-                        Add Volunteer Group
-                      </Button>
-                    </div>
+                  <TableCell colSpan={6} className="h-32 text-center text-xs text-muted-foreground">
+                    No volunteer groups found yet. Press &quot;+ Add Volunteer Group&quot; to create one.
                   </TableCell>
                 </TableRow>
               ) : (
                 groups.map((group) => (
                   <TableRow key={group.id} className="text-xs">
                     <TableCell className="font-semibold text-foreground">
-                      <div>{group.title}</div>
-                      <Badge
-                        variant={group.status === 'open' ? 'default' : 'secondary'}
-                        className="text-[9px] uppercase px-1.5 py-0 mt-0.5"
-                      >
-                        {group.status === 'open' ? 'Accepting' : 'Locked'}
-                      </Badge>
+                      {group.title}
                     </TableCell>
-                    <TableCell className="font-medium text-foreground">
-                      <span className="text-emerald-600 font-bold">
+                    <TableCell className="font-semibold text-foreground">
+                      <span className="text-emerald-600 dark:text-emerald-400">
                         {group.joined_volunteers || 0}
                       </span>
                       <span className="text-muted-foreground"> / {group.needed_volunteers}</span>
@@ -147,31 +133,48 @@ const ManageVolunteerGroupsPage = () => {
                     <TableCell className="text-muted-foreground">
                       {group.disaster_name || 'General / None'}
                     </TableCell>
+                    <TableCell className={`font-bold uppercase text-xs ${
+                      group.status === 'open'
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-muted-foreground'
+                    }`}>
+                      {group.status === 'open' ? 'OPEN' : 'LOCKED'}
+                    </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setEditingGroup(group);
-                            setIsDrawerOpen(true);
-                          }}
-                          className="h-7 text-xs px-2 gap-1"
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-xs"
+                              className="size-8 text-muted-foreground hover:text-foreground"
+                            />
+                          }
                         >
-                          <FileEdit className="size-3" />
-                          Update
-                        </Button>
-
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => setConfirmDeleteTarget(group)}
-                          className="h-7 text-xs px-2 gap-1"
-                        >
-                          <Trash2 className="size-3" />
-                          Delete
-                        </Button>
-                      </div>
+                          <MoreHorizontal className="size-4" />
+                          <span className="sr-only">Open menu</span>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-44">
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setEditingGroup(group);
+                              setIsDrawerOpen(true);
+                            }}
+                            className="gap-2 cursor-pointer"
+                          >
+                            <FileEdit className="size-3.5 text-muted-foreground" />
+                            <span>Update</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() => setConfirmDeleteTarget(group)}
+                            className="gap-2 cursor-pointer text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="size-3.5" />
+                            <span>Delete</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))
