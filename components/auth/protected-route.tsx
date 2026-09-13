@@ -18,16 +18,12 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     }
   }, [user, loading, router]);
 
-  if (loading) {
+  if (loading || !user) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="size-8 rounded-full border-2 border-emerald-600 border-t-transparent animate-spin" />
       </div>
     );
-  }
-
-  if (!user) {
-    return null;
   }
 
   return <>{children}</>;

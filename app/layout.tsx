@@ -1,36 +1,48 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import AuthProvider from "@/app/contexts/AuthProvider";
+import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
+import { Geist, Geist_Mono } from 'next/font/google';
+
+import { AuthProvider } from '@/app/contexts/AuthProvider';
+import { Toaster } from '@/components/ui/toast';
+
+import './globals.css';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  title: "EDRMS Admin Panel",
-  description: "Emergency Disaster Response Management System Admin",
+  title: 'EDRMS',
+  description: 'Emergency & Disaster Response Management System',
 };
 
-export default function RootLayout({
+const RootLayout = ({
   children,
 }: {
-  children: React.ReactNode;
-}) {
+  children: ReactNode;
+}) => {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <AuthProvider>{children}</AuthProvider>
+      <body className="min-h-full">
+        <AuthProvider>
+          <Toaster>
+            {children}
+          </Toaster>
+        </AuthProvider>
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;
+
+

@@ -2,6 +2,12 @@ import axios from 'axios';
 
 export const publicApi = axios.create({
   baseURL: '/api',
-  withCredentials: true,
   timeout: 15000,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
+
+
+export default publicApi;
