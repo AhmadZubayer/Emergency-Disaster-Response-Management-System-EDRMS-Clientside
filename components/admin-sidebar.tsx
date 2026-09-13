@@ -12,6 +12,7 @@ import {
   LifeBuoy,
   MessageSquare,
   FileSpreadsheet,
+  Database,
 } from 'lucide-react';
 
 const navItems = [
@@ -49,6 +50,11 @@ const navItems = [
     label: 'Community Posts',
     href: '/admin/community-posts',
     icon: MessageSquare,
+  },
+  {
+    label: 'Database Explorer',
+    href: '/admin/tables',
+    icon: Database,
   },
   {
     label: 'Reports',

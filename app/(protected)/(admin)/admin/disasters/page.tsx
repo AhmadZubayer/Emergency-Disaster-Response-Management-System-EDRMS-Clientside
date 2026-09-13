@@ -12,10 +12,19 @@ import {
   ShieldAlert,
   MapPin,
   Calendar,
+  Plus,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 
 interface DisasterRecord {
@@ -38,6 +47,17 @@ export default function AdminDisastersPage() {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Create Modal
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [createData, setCreateData] = useState({
+    disaster_name: '',
+    disaster_type: 'FLOOD',
+    impacted_location: '',
+    severity_level: 'HIGH',
+    is_verified: true,
+  });
+  const [creating, setCreating] = useState(false);
 
   const fetchDisasters = useCallback(async () => {
     setLoading(true);
@@ -69,6 +89,23 @@ export default function AdminDisastersPage() {
     fetchDisasters();
   }, [fetchDisasters]);
 
+  const handleCreateDisaster = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreating(true);
+    try {
+      await axiosSecure.post('/admin/disasters', createData);
+      setSuccessMsg(`Disaster alert "${createData.disaster_name}" created successfully.`);
+      setCreateModalOpen(false);
+      setCreateData({ disaster_name: '', disaster_type: 'FLOOD', impacted_location: '', severity_level: 'HIGH', is_verified: true });
+      fetchDisasters();
+      setTimeout(() => setSuccessMsg(null), 4000);
+    } catch (error) {
+      console.error('Failed to create disaster alert:', error);
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const handleVerifyToggle = async (disasterId: string, currentVerified: boolean) => {
     const nextStatus = !currentVerified;
     try {
@@ -94,12 +131,22 @@ export default function AdminDisastersPage() {
             <h1 className="text-2xl font-bold text-foreground">Disaster Alert Verification</h1>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            Review emergency disaster reports and broadcast official verified alerts.
+            Review emergency disaster reports, create new alerts, and broadcast verified warnings.
           </p>
         </div>
-        <Badge variant="secondary" className="self-start sm:self-auto text-xs px-3 py-1 font-semibold">
-          Total: {total} Disasters
-        </Badge>
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          <Badge variant="secondary" className="text-xs px-3 py-1 font-semibold">
+            Total: {total} Disasters
+          </Badge>
+          <Button
+            size="sm"
+            onClick={() => setCreateModalOpen(true)}
+            className="bg-emerald-600 hover:bg-emerald-500 gap-1.5 font-bold shadow-xs"
+          >
+            <Plus className="size-4" />
+            <span>Create Alert</span>
+          </Button>
+        </div>
       </div>
 
       {successMsg && (
@@ -253,6 +300,76 @@ export default function AdminDisastersPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Create Disaster Modal */}
+      {createModalOpen && (
+        <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <AlertTriangle className="size-5 text-amber-600" />
+                <span>Broadcast New Disaster Alert</span>
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleCreateDisaster} className="space-y-3 py-2 text-sm">
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase block mb-1">Disaster Title</label>
+                <Input
+                  required
+                  placeholder="e.g. Cyclone Remal Flash Flood"
+                  value={createData.disaster_name}
+                  onChange={(e) => setCreateData({ ...createData, disaster_name: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase block mb-1">Disaster Type</label>
+                <select
+                  value={createData.disaster_type}
+                  onChange={(e) => setCreateData({ ...createData, disaster_type: e.target.value })}
+                  className="w-full h-9 rounded-md border border-input bg-background px-3 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option value="FLOOD">Flood</option>
+                  <option value="CYCLONE">Cyclone</option>
+                  <option value="EARTHQUAKE">Earthquake</option>
+                  <option value="LANDSLIDE">Landslide</option>
+                  <option value="FIRE">Fire</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase block mb-1">Impacted Location</label>
+                <Input
+                  required
+                  placeholder="e.g. Sylhet Sadar, Sunamganj"
+                  value={createData.impacted_location}
+                  onChange={(e) => setCreateData({ ...createData, impacted_location: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase block mb-1">Severity Level</label>
+                <select
+                  value={createData.severity_level}
+                  onChange={(e) => setCreateData({ ...createData, severity_level: e.target.value })}
+                  className="w-full h-9 rounded-md border border-input bg-background px-3 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option value="CRITICAL">Critical</option>
+                  <option value="HIGH">High</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="LOW">Low</option>
+                </select>
+              </div>
+              <DialogFooter className="gap-2 pt-3">
+                <Button type="button" variant="outline" onClick={() => setCreateModalOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={creating} className="bg-emerald-600 hover:bg-emerald-500">
+                  {creating ? 'Broadcasting...' : 'Broadcast Alert'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

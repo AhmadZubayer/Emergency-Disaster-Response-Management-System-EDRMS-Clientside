@@ -11,8 +11,10 @@ import {
   ChevronRight,
   Filter,
   CheckCircle2,
+  Plus,
+  UserPlus,
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -55,6 +57,18 @@ export default function AdminAccountsPage() {
   const [newRole, setNewRole] = useState<string>('');
   const [updating, setUpdating] = useState(false);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+
+  // Create Account Modal state
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [createData, setCreateData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'user',
+    phone: '',
+  });
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
 
   const fetchAccounts = useCallback(async () => {
     setLoading(true);
@@ -105,6 +119,28 @@ export default function AdminAccountsPage() {
       console.error('Failed to update role:', error);
     } finally {
       setUpdating(false);
+    }
+  };
+
+  const handleCreateAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreateError('');
+    if (!createData.name || !createData.email || !createData.password) {
+      setCreateError('Name, email, and password are required.');
+      return;
+    }
+    setCreating(true);
+    try {
+      await axiosSecure.post('/admin/accounts', createData);
+      setActionSuccess(`Account ${createData.email} created successfully as ${createData.role.toUpperCase()}`);
+      setCreateModalOpen(false);
+      setCreateData({ name: '', email: '', password: '', role: 'user', phone: '' });
+      fetchAccounts();
+      setTimeout(() => setActionSuccess(null), 4000);
+    } catch (error: any) {
+      setCreateError(error.response?.data?.message || 'Failed to create account.');
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -160,12 +196,22 @@ export default function AdminAccountsPage() {
             <h1 className="text-2xl font-bold text-foreground">Account Management</h1>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            Manage user accounts, change permission roles, and handle soft deletions.
+            Manage user accounts, add new records, change roles, and handle soft deletions.
           </p>
         </div>
-        <Badge variant="secondary" className="self-start sm:self-auto text-xs px-3 py-1 font-semibold">
-          Total: {total} Records
-        </Badge>
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          <Badge variant="secondary" className="text-xs px-3 py-1 font-semibold">
+            Total: {total} Records
+          </Badge>
+          <Button
+            size="sm"
+            onClick={() => setCreateModalOpen(true)}
+            className="bg-emerald-600 hover:bg-emerald-500 gap-1.5 font-bold shadow-xs"
+          >
+            <Plus className="size-4" />
+            <span>Add Account</span>
+          </Button>
+        </div>
       </div>
 
       {actionSuccess && (
@@ -346,6 +392,85 @@ export default function AdminAccountsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Create Account Modal */}
+      {createModalOpen && (
+        <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <UserPlus className="size-5 text-emerald-600" />
+                <span>Create New Account</span>
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleCreateAccount} className="space-y-3 py-2 text-sm">
+              {createError && (
+                <div className="p-2.5 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs font-semibold">
+                  {createError}
+                </div>
+              )}
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase block mb-1">Full Name</label>
+                <Input
+                  required
+                  placeholder="John Doe"
+                  value={createData.name}
+                  onChange={(e) => setCreateData({ ...createData, name: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase block mb-1">Email Address</label>
+                <Input
+                  required
+                  type="email"
+                  placeholder="user@example.com"
+                  value={createData.email}
+                  onChange={(e) => setCreateData({ ...createData, email: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase block mb-1">Password</label>
+                <Input
+                  required
+                  type="password"
+                  placeholder="Password123!"
+                  value={createData.password}
+                  onChange={(e) => setCreateData({ ...createData, password: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase block mb-1">Phone Number</label>
+                <Input
+                  placeholder="+8801700000000"
+                  value={createData.phone}
+                  onChange={(e) => setCreateData({ ...createData, phone: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase block mb-1">Assign Role</label>
+                <select
+                  value={createData.role}
+                  onChange={(e) => setCreateData({ ...createData, role: e.target.value })}
+                  className="w-full h-9 rounded-md border border-input bg-background px-3 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option value="user">User (Standard)</option>
+                  <option value="volunteer">Volunteer</option>
+                  <option value="relief_org">Relief Organization</option>
+                  <option value="admin">Administrator</option>
+                </select>
+              </div>
+              <DialogFooter className="gap-2 pt-3">
+                <Button type="button" variant="outline" onClick={() => setCreateModalOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={creating} className="bg-emerald-600 hover:bg-emerald-500">
+                  {creating ? 'Creating...' : 'Create Account'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Role Change Modal */}
       {roleModalAccount && (

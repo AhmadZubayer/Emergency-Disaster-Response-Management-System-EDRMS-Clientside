@@ -13,9 +13,11 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
+  Plus,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
@@ -49,6 +51,18 @@ export default function AdminRescueRequestsPage() {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [selectedRequest, setSelectedRequest] = useState<RescueRecord | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Create Modal
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [createData, setCreateData] = useState({
+    requester_name: '',
+    contact_phone: '',
+    location: '',
+    urgency_level: 'CRITICAL',
+    details: '',
+  });
+  const [creating, setCreating] = useState(false);
 
   const fetchRequests = useCallback(async () => {
     setLoading(true);
@@ -79,6 +93,23 @@ export default function AdminRescueRequestsPage() {
   useEffect(() => {
     fetchRequests();
   }, [fetchRequests]);
+
+  const handleCreateRescueRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreating(true);
+    try {
+      await axiosSecure.post('/admin/rescue-requests', createData);
+      setSuccessMsg(`Emergency rescue call created for ${createData.requester_name || 'Requester'}`);
+      setCreateModalOpen(false);
+      setCreateData({ requester_name: '', contact_phone: '', location: '', urgency_level: 'CRITICAL', details: '' });
+      fetchRequests();
+      setTimeout(() => setSuccessMsg(null), 4000);
+    } catch (error) {
+      console.error('Failed to create rescue request:', error);
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const getUrgencyBadge = (urgency: string) => {
     const u = urgency?.toUpperCase();
@@ -140,13 +171,30 @@ export default function AdminRescueRequestsPage() {
             <h1 className="text-2xl font-bold text-foreground">Rescue Requests Monitor</h1>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            Real-time emergency rescue requests tracking and dispatch overview.
+            Real-time emergency rescue requests tracking, call creation, and dispatch overview.
           </p>
         </div>
-        <Badge variant="secondary" className="self-start sm:self-auto text-xs px-3 py-1 font-semibold">
-          Total: {total} Calls
-        </Badge>
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          <Badge variant="secondary" className="text-xs px-3 py-1 font-semibold">
+            Total: {total} Calls
+          </Badge>
+          <Button
+            size="sm"
+            onClick={() => setCreateModalOpen(true)}
+            className="bg-emerald-600 hover:bg-emerald-500 gap-1.5 font-bold shadow-xs"
+          >
+            <Plus className="size-4" />
+            <span>New Rescue Call</span>
+          </Button>
+        </div>
       </div>
+
+      {successMsg && (
+        <div className="flex items-center gap-2 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-sm font-semibold">
+          <CheckCircle2 className="size-5 shrink-0" />
+          <span>{successMsg}</span>
+        </div>
+      )}
 
       <Card className="border-border/60">
         <CardHeader className="p-4 sm:p-6 pb-2">
@@ -267,6 +315,77 @@ export default function AdminRescueRequestsPage() {
         </CardContent>
       </Card>
 
+      {/* Create Rescue Request Modal */}
+      {createModalOpen && (
+        <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <LifeBuoy className="size-5 text-rose-600" />
+                <span>New Emergency Rescue Call</span>
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleCreateRescueRequest} className="space-y-3 py-2 text-sm">
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase block mb-1">Requester Name</label>
+                <Input
+                  placeholder="e.g. Rahim Uddin"
+                  value={createData.requester_name}
+                  onChange={(e) => setCreateData({ ...createData, requester_name: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase block mb-1">Contact Phone</label>
+                <Input
+                  required
+                  placeholder="+8801700000000"
+                  value={createData.contact_phone}
+                  onChange={(e) => setCreateData({ ...createData, contact_phone: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase block mb-1">Emergency Location</label>
+                <Input
+                  required
+                  placeholder="e.g. House 12, Road 4, Sunamganj"
+                  value={createData.location}
+                  onChange={(e) => setCreateData({ ...createData, location: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase block mb-1">Urgency Level</label>
+                <select
+                  value={createData.urgency_level}
+                  onChange={(e) => setCreateData({ ...createData, urgency_level: e.target.value })}
+                  className="w-full h-9 rounded-md border border-input bg-background px-3 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option value="CRITICAL">Critical (Immediate Rescue Needed)</option>
+                  <option value="HIGH">High</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="LOW">Low</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase block mb-1">Emergency Details</label>
+                <Input
+                  placeholder="Trapped on roof, 3 family members..."
+                  value={createData.details}
+                  onChange={(e) => setCreateData({ ...createData, details: e.target.value })}
+                />
+              </div>
+              <DialogFooter className="gap-2 pt-3">
+                <Button type="button" variant="outline" onClick={() => setCreateModalOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={creating} className="bg-rose-600 hover:bg-rose-500 text-white">
+                  {creating ? 'Creating...' : 'Log Rescue Call'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
+
       {/* Detail Modal */}
       {selectedRequest && (
         <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
@@ -301,17 +420,6 @@ export default function AdminRescueRequestsPage() {
                   <span>{selectedRequest.location}</span>
                 </div>
               </div>
-
-              {selectedRequest.number_of_people && (
-                <div className="text-xs">
-                  <span className="font-bold text-muted-foreground uppercase tracking-wider block mb-1">
-                    People Needing Assistance
-                  </span>
-                  <div className="p-2.5 rounded-lg bg-muted/40 font-bold text-foreground">
-                    {selectedRequest.number_of_people} Person(s)
-                  </div>
-                </div>
-              )}
 
               {selectedRequest.details && (
                 <div>
