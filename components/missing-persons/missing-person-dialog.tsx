@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/app/hooks/useAuth';
+import { useAuth } from '@/hooks/use-auth';
 
 export interface MissingPerson {
   id: string;
@@ -120,7 +120,7 @@ const MissingPersonDialog = ({
               <Button
                 variant="outline"
                 className="w-full h-11 rounded-xl font-medium gap-2 border-primary/40 text-primary hover:bg-primary/10"
-                render={<Link href="/sign-in" />}
+                render={<Link href={`/sign-in?returnUrl=/missing-persons/${person.id}`} />}
               >
                 <Lock className="size-4" />
                 Sign in to contact informer

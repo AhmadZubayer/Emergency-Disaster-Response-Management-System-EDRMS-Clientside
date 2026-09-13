@@ -6,13 +6,7 @@ import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import MuiSelect from '@/components/mui-select';
 import {
   Popover,
   PopoverContent,
@@ -22,8 +16,9 @@ import { Calendar } from '@/components/ui/calendar';
 import ModernButton from '@/components/modernBtn';
 import MuiDrawer from '@/components/mui-drawer';
 import MuiModal from '@/components/mui-modal';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { disasterAlertSchema } from '@/app/lib/validations/disaster-alert-schema';
+import { toast } from '@/components/ui/toast';
+import { axiosSecure } from '@/lib/api';
+import { disasterAlertSchema } from '@/lib/validations/disaster-alert-schema';
 import { Disaster, DisasterTypeCategory } from './types';
 import { cn } from 'cn';
 
@@ -58,7 +53,6 @@ const AddDisasterDrawer = ({
   onSuccess,
   editDisaster,
 }: AddDisasterDrawerProps) => {
-  const axiosSecure = useAxiosSecure();
 
   const [disasterName, setDisasterName] = useState('');
   const [impactedLocation, setImpactedLocation] = useState('');
@@ -157,8 +151,20 @@ const AddDisasterDrawer = ({
 
       if (editDisaster) {
         await axiosSecure.patch(`/disaster/${editDisaster.id}`, payload);
+        toast.add({
+          id: 'disaster-alert-updated',
+          title: 'Disaster alert updated successfully!',
+          type: 'success',
+          timeout: 4000,
+        });
       } else {
         await axiosSecure.post('/disaster', payload);
+        toast.add({
+          id: 'disaster-alert-created',
+          title: 'Disaster alert published successfully!',
+          type: 'success',
+          timeout: 4000,
+        });
       }
 
       onSuccess();
@@ -212,18 +218,16 @@ const AddDisasterDrawer = ({
             <Label htmlFor="type" className="text-xs font-semibold">
               Disaster Type *
             </Label>
-            <Select value={type} onValueChange={(val: any) => setType(val)}>
-              <SelectTrigger id="type" className="w-full text-xs">
-                <SelectValue placeholder="Select disaster category" />
-              </SelectTrigger>
-              <SelectContent className="max-h-60">
-                {DISASTER_TYPES.map((t) => (
-                  <SelectItem key={t.value} value={t.value} className="text-xs">
-                    {t.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <MuiSelect
+              id="type"
+              value={type}
+              onChange={(val) => setType(val as any)}
+              placeholder="Select disaster category"
+              options={DISASTER_TYPES.map((t) => ({
+                label: t.label,
+                value: t.value,
+              }))}
+            />
             {errors.type && (
               <p className="text-[11px] text-destructive">{errors.type}</p>
             )}
@@ -336,7 +340,7 @@ const AddDisasterDrawer = ({
         }
       >
         <div className="flex items-start gap-3 py-1">
-          <AlertTriangle className="size-5 text-amber-500 shrink-0 mt-0.5" />
+          <AlertTriangle className="size-5 text-muted-foreground shrink-0 mt-0.5" />
           <p className="text-xs leading-relaxed text-muted-foreground">
             {editDisaster
               ? 'This will update the disaster alert in the system. Do you want to continue?'

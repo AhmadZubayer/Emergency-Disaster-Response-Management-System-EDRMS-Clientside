@@ -1,10 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import SignInForm from '@/components/auth/signInForm';
 
 const SignInPage = () => {
-  return <SignInForm />;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+      <SignInForm />
+    </Suspense>
+  );
 };
 
 export default SignInPage;

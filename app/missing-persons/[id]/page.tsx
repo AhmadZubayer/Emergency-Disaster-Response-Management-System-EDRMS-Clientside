@@ -19,6 +19,7 @@ import {
 import Navbar from '@/components/navbar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -28,9 +29,9 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import MuiModal from '@/components/mui-modal';
-import { publicApi } from '@/app/lib/public-api';
-import useAuth from '@/app/hooks/useAuth';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
+import { toast } from '@/components/ui/toast';
+import { axiosSecure, publicApi } from '@/lib/api';
+import useAuth from '@/hooks/use-auth';
 import { MissingPerson } from '@/components/missing-persons/missing-person-dialog';
 import AddMissingPersonDrawer from '@/components/missing-persons/add-missing-person-drawer';
 
@@ -38,7 +39,6 @@ const MissingPersonDetailPage = () => {
   const params = useParams();
   const router = useRouter();
   const { user } = useAuth();
-  const axiosSecure = useAxiosSecure();
 
   const id = params?.id as string;
 
@@ -83,6 +83,12 @@ const MissingPersonDetailPage = () => {
       await axiosSecure.patch(`/missing-persons/${person.id}/status`, {
         status: newStatus,
       });
+      toast.add({
+        id: `person-status-${person.id}`,
+        title: `Report status updated to ${newStatus}.`,
+        type: 'success',
+        timeout: 4000,
+      });
       await fetchPerson();
     } finally {
       setActionLoading(false);
@@ -95,6 +101,12 @@ const MissingPersonDetailPage = () => {
     try {
       setActionLoading(true);
       await axiosSecure.delete(`/missing-persons/${person.id}`);
+      toast.add({
+        id: `person-delete-${person.id}`,
+        title: 'Missing person report moved to trash.',
+        type: 'success',
+        timeout: 4000,
+      });
       router.push('/missing-persons');
     } finally {
       setActionLoading(false);
@@ -128,13 +140,26 @@ const MissingPersonDetailPage = () => {
           </Breadcrumb>
 
           {loading ? (
-            <div className="space-y-6 animate-pulse">
-              <div className="h-32 rounded-lg bg-muted/40" />
-              <div className="space-y-3">
-                <div className="h-8 w-1/3 bg-muted/40 rounded" />
-                <div className="h-4 w-1/2 bg-muted/30 rounded" />
-                <div className="h-24 w-full bg-muted/20 rounded" />
+            <div className="space-y-8">
+              <div className="flex items-center gap-5 pb-6 border-b border-border/40">
+                <Skeleton className="size-24 sm:size-28 rounded-lg shrink-0" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-8 w-1/3" />
+                  <Skeleton className="h-5 w-20 rounded-full" />
+                </div>
               </div>
+              <div className="space-y-4">
+                <Skeleton className="h-6 w-32" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                  <Skeleton className="h-12 w-full rounded-xl" />
+                  <Skeleton className="h-12 w-full rounded-xl" />
+                  <Skeleton className="h-12 w-full col-span-2 rounded-xl" />
+                  <Skeleton className="h-12 w-full rounded-xl" />
+                  <Skeleton className="h-12 w-full rounded-xl" />
+                  <Skeleton className="h-12 w-full col-span-2 rounded-xl" />
+                </div>
+              </div>
+              <Skeleton className="h-24 w-full rounded-xl" />
             </div>
           ) : !person ? (
             <div className="py-16 text-center space-y-4">
@@ -310,11 +335,11 @@ const MissingPersonDetailPage = () => {
                       </div>
                     ) : (
                       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <Lock className="size-3 text-amber-500 shrink-0" />
+                        <Lock className="size-3 text-muted-foreground shrink-0" />
                         <span>
                           <Link
-                            href={`/sign-in?redirect=/missing-persons/${id}`}
-                            className="font-semibold text-emerald-600 underline"
+                            href={`/sign-in?returnUrl=/missing-persons/${id}`}
+                            className="font-semibold text-foreground underline hover:text-primary"
                           >
                             Sign in
                           </Link>{' '}

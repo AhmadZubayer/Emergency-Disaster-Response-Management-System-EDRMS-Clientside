@@ -31,10 +31,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import ModernButton from '@/components/modernBtn';
+import MuiSelect from '@/components/mui-select';
 import { toast } from '@/components/ui/toast';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { useAuth } from '@/app/hooks/useAuth';
-import { reliefOrgSchema } from '@/app/lib/validations/relief-org-schema';
+import { axiosSecure } from '@/lib/api';
+import { useAuth } from '@/hooks/use-auth';
+import { reliefOrgSchema } from '@/lib/validations/relief-org-schema';
 
 const ORGANIZATION_TYPES = [
   'NGO (Non-Governmental Organization)',
@@ -49,7 +50,6 @@ const ORGANIZATION_TYPES = [
 const ReliefOrgSignUpForm = () => {
   const router = useRouter();
   const { user } = useAuth();
-  const axiosSecure = useAxiosSecure();
 
   const [orgName, setOrgName] = useState('');
   const [regNumber, setRegNumber] = useState('');
@@ -173,11 +173,11 @@ const ReliefOrgSignUpForm = () => {
   if (submittedSuccess) {
     return (
       <Card className="w-full max-w-xl shadow-2xl border-border/80 bg-white/95 dark:bg-card/95 backdrop-blur-md rounded-2xl p-6 text-center space-y-6">
-        <div className="size-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto text-emerald-600">
+        <div className="size-16 rounded-2xl bg-muted/60 border border-border/60 flex items-center justify-center mx-auto text-foreground">
           <CheckCircle2 className="size-9" />
         </div>
         <div className="space-y-2">
-          <Badge variant="outline" className="text-emerald-700 bg-emerald-50 border-emerald-200 uppercase font-bold text-[10px] tracking-wider px-2.5 py-0.5">
+          <Badge variant="outline" className="text-foreground bg-muted border-border/60 uppercase font-bold text-[10px] tracking-wider px-2.5 py-0.5">
             Application Received
           </Badge>
           <h2 className="text-2xl font-bold tracking-tight text-foreground">
@@ -192,12 +192,12 @@ const ReliefOrgSignUpForm = () => {
           <Button
             variant="outline"
             className="w-full sm:w-auto rounded-xl text-xs font-semibold px-6"
-            onClick={() => router.push('/profile')}
+            onClick={() => router.push('/relief-org/profile')}
           >
             Go to Profile
           </Button>
           <Button
-            className="w-full sm:w-auto rounded-xl text-xs font-semibold px-6 bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="w-full sm:w-auto rounded-xl text-xs font-semibold px-6"
             onClick={() => router.push('/')}
           >
             Return to Home
@@ -210,7 +210,7 @@ const ReliefOrgSignUpForm = () => {
   return (
     <Card className="w-full max-w-2xl shadow-2xl border-border/80 bg-white/95 dark:bg-card/95 backdrop-blur-md rounded-2xl p-2 sm:p-4 my-6">
       <CardHeader className="text-center pb-4 space-y-1.5">
-        <div className="size-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto text-emerald-600 mb-1">
+        <div className="size-12 rounded-xl bg-muted/60 border border-border/60 flex items-center justify-center mx-auto text-foreground mb-1">
           <Building2 className="size-6" />
         </div>
         <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
@@ -269,18 +269,16 @@ const ReliefOrgSignUpForm = () => {
               <Label htmlFor="orgType" className="text-xs font-semibold flex items-center gap-1">
                 Organization Type <span className="text-destructive">*</span>
               </Label>
-              <select
+              <MuiSelect
                 id="orgType"
                 value={orgType}
-                onChange={(e) => setOrgType(e.target.value)}
-                className="h-10 w-full rounded-md border border-input bg-background/60 px-3 py-2 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                {ORGANIZATION_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setOrgType(val)}
+                placeholder="Select organization type"
+                options={ORGANIZATION_TYPES.map((t) => ({
+                  label: t,
+                  value: t,
+                }))}
+              />
               {errors.organization_type && (
                 <p className="text-[11px] text-destructive">{errors.organization_type}</p>
               )}
@@ -388,7 +386,7 @@ const ReliefOrgSignUpForm = () => {
                 id="verificationDocs"
               />
               <div className="flex flex-col items-center justify-center gap-1.5 pointer-events-none">
-                <div className="size-9 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                <div className="size-9 rounded-full bg-muted/60 flex items-center justify-center text-foreground">
                   <Upload className="size-4.5" />
                 </div>
                 <div className="text-xs font-semibold text-foreground">
@@ -412,7 +410,7 @@ const ReliefOrgSignUpForm = () => {
                     className="flex items-center justify-between px-3 py-2 bg-muted/40 border border-border/60 rounded-xl text-xs"
                   >
                     <div className="flex items-center gap-2 truncate min-w-0">
-                      <FileText className="size-4 text-emerald-600 shrink-0" />
+                      <FileText className="size-4 text-muted-foreground shrink-0" />
                       <span className="font-medium text-foreground truncate">{file.name}</span>
                       <span className="text-[10px] text-muted-foreground shrink-0 font-mono">
                         ({formatFileSize(file.size)})

@@ -11,8 +11,8 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { toast } from '@/components/ui/toast';
-import useAuth from '@/app/hooks/useAuth';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
+import useAuth from '@/hooks/use-auth';
+import { axiosSecure } from '@/lib/api';
 import { CommunityPost } from './types';
 
 interface CommunityPostCardProps {
@@ -22,7 +22,6 @@ interface CommunityPostCardProps {
 
 const CommunityPostCard = ({ post, onPostUpdated }: CommunityPostCardProps) => {
   const { user } = useAuth();
-  const axiosSecure = useAxiosSecure();
 
   const [hasLiked, setHasLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(

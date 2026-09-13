@@ -35,7 +35,7 @@ import MuiDrawer from '@/components/mui-drawer';
 import MuiTabs from '@/components/mui-tabs';
 import MuiModal from '@/components/mui-modal';
 import ModernButton from '@/components/modernBtn';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
+import { axiosSecure } from '@/lib/api';
 import {
   DonationCampaign,
   DonationApplication,
@@ -62,7 +62,6 @@ const CampaignProgressDrawer = ({
   campaign,
   onCampaignUpdated,
 }: CampaignProgressDrawerProps) => {
-  const axiosSecure = useAxiosSecure();
 
   const [transactions, setTransactions] = useState<DonationTransaction[]>([]);
   const [applications, setApplications] = useState<DonationApplication[]>([]);

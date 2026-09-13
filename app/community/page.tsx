@@ -2,12 +2,13 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Plus, MessageSquarePlus, AlertCircle } from 'lucide-react';
+import { Plus, MessageSquarePlus } from 'lucide-react';
 import Navbar from '@/components/navbar';
-import { Input } from '@/components/ui/input';
+import Search from '@/components/Search';
 import { Button } from '@/components/ui/button';
-import useAuth from '@/app/hooks/useAuth';
-import { publicApi } from '@/app/lib/public-api';
+import { Skeleton } from '@/components/ui/skeleton';
+import useAuth from '@/hooks/use-auth';
+import { publicApi } from '@/lib/api';
 import { CommunityPost } from '@/components/community/types';
 import CommunityPostCard from '@/components/community/community-post-card';
 import AddCommunityPostDrawer from '@/components/community/add-community-post-drawer';
@@ -41,14 +42,14 @@ const CommunityPage = () => {
     fetchPosts();
   }, [fetchPosts]);
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetchPosts(searchQuery);
+  const handleSearchChange = (val: string) => {
+    setSearchQuery(val);
+    fetchPosts(val);
   };
 
   const handleOpenDrawer = () => {
     if (!user) {
-      router.push('/sign-in');
+      router.push('/sign-in?returnUrl=/community');
       return;
     }
     setIsDrawerOpen(true);
@@ -60,25 +61,15 @@ const CommunityPage = () => {
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="w-full md:w-[65%] max-w-3xl mx-auto space-y-6">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-card p-3.5 rounded-2xl border border-border/70 shadow-sm">
-            <form
-              onSubmit={handleSearchSubmit}
-              className="relative flex-1"
-            >
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search community posts, topics, or updates..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  if (e.target.value === '') {
-                    fetchPosts('');
-                  }
-                }}
-                className="pl-9 h-10 text-xs bg-muted/20 rounded-xl"
-              />
-            </form>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-card p-3.5 rounded-2xl border border-border/70 shadow-sm">
+            <Search
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onSubmit={() => fetchPosts(searchQuery)}
+              placeholder="Search community posts..."
+              className="flex-1"
+              inputClassName="w-full sm:w-full focus:w-full sm:focus:w-full"
+            />
 
             <Button
               onClick={handleOpenDrawer}
@@ -96,17 +87,26 @@ const CommunityPage = () => {
                 {[1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="p-6 rounded-2xl border border-border/60 bg-card/60 shadow-sm space-y-3 animate-pulse"
+                    className="p-6 rounded-2xl border border-border/60 bg-card shadow-sm space-y-3"
                   >
                     <div className="flex items-center gap-3">
                       <div className="size-9 rounded-full bg-muted/70" />
+                      <Skeleton className="size-10 rounded-full" />
                       <div className="space-y-1.5 flex-1">
                         <div className="h-3 w-32 bg-muted/70 rounded" />
                         <div className="h-2.5 w-20 bg-muted/50 rounded" />
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-20" />
                       </div>
                     </div>
                     <div className="h-4 w-3/4 bg-muted/70 rounded" />
                     <div className="h-16 bg-muted/40 rounded-xl" />
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-16 w-full rounded-xl" />
+                    <div className="flex items-center gap-4 pt-1">
+                      <Skeleton className="h-4 w-16" />
+                      <Skeleton className="h-4 w-20" />
+                    </div>
                   </div>
                 ))}
               </div>

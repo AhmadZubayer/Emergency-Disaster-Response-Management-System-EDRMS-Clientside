@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { AxiosError } from 'axios';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { ENDPOINTS } from '@/app/lib/endpoints';
+import { axiosSecure } from '@/lib/api';
+import { ENDPOINTS } from '@/lib/endpoints';
+import { toast } from '@/components/ui/toast';
 import {
   volunteerProfileUpdateSchema,
   volunteerRegistrationSchema,
-} from '@/app/lib/validations/volunteer-profile-schema';
+} from '@/lib/validations/volunteer-profile-schema';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -36,7 +37,6 @@ const VolunteerProfileForm = ({
   onSuccess,
   onCancel,
 }: VolunteerProfileFormProps) => {
-  const axiosSecure = useAxiosSecure();
   const [skills, setSkills] = useState<VolunteerSkill[]>(profile?.skills || []);
   const [whyJoin, setWhyJoin] = useState(profile?.why_join || '');
   const [available, setAvailable] = useState(profile?.available || false);
@@ -77,8 +77,20 @@ const VolunteerProfileForm = ({
     try {
       if (profile) {
         await axiosSecure.patch(ENDPOINTS.VOLUNTEERS.UPDATE_PROFILE, payload);
+        toast.add({
+          id: 'volunteer-profile-updated',
+          title: 'Volunteer profile updated successfully!',
+          type: 'success',
+          timeout: 4000,
+        });
       } else {
         await axiosSecure.post(ENDPOINTS.VOLUNTEERS.REGISTER, payload);
+        toast.add({
+          id: 'volunteer-registered',
+          title: 'Joined volunteer network successfully!',
+          type: 'success',
+          timeout: 5000,
+        });
       }
       onSuccess();
     } catch (error) {

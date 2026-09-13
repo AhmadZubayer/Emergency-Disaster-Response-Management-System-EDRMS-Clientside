@@ -18,6 +18,7 @@ import {
 import Navbar from '@/components/navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -43,13 +44,12 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from '@/components/ui/toast';
 import ModernButton from '@/components/modernBtn';
 import { cn } from 'cn';
-import { publicApi } from '@/app/lib/public-api';
-import useAuth from '@/app/hooks/useAuth';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
+import { axiosSecure, publicApi } from '@/lib/api';
+import useAuth from '@/hooks/use-auth';
 import { DonationCampaign } from '@/components/donations/types';
-import { makeDonationSchema } from '@/app/lib/validations/make-donation-schema';
-import { applyAidSchema } from '@/app/lib/validations/apply-aid-schema';
-import { generateDonationReceipt } from '@/lib/generate-donation-receipt';
+import { makeDonationSchema } from '@/lib/validations/make-donation-schema';
+import { applyAidSchema } from '@/lib/validations/apply-aid-schema';
+import { generateDonationReceipt } from '@/utils/generate-donation-receipt';
 
 const chartConfig = {
   amount: {
@@ -63,7 +63,6 @@ const DonationDetailContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useAuth();
-  const axiosSecure = useAxiosSecure();
 
   const id = params?.id as string;
   const paymentStatus = searchParams?.get('payment');
@@ -368,9 +367,32 @@ const DonationDetailContent = () => {
           </Breadcrumb>
 
           {loading ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-pulse">
-              <div className="h-96 rounded-2xl bg-muted/40" />
-              <div className="h-96 rounded-2xl bg-muted/30" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              <div className="space-y-6">
+                <div className="space-y-2 border-b border-border/40 pb-5">
+                  <Skeleton className="h-9 w-3/4" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-5 w-40" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                </div>
+                <Skeleton className="h-56 w-full rounded-2xl" />
+                <div className="grid grid-cols-2 gap-4 pt-2">
+                  <Skeleton className="h-12 w-full rounded-xl" />
+                  <Skeleton className="h-12 w-full rounded-xl" />
+                  <Skeleton className="h-12 w-full rounded-xl" />
+                  <Skeleton className="h-12 w-full rounded-xl" />
+                </div>
+              </div>
+              <div className="w-full space-y-5">
+                <Skeleton className="h-80 w-full rounded-2xl" />
+                <div className="flex gap-3">
+                  <Skeleton className="h-11 w-36 rounded-full" />
+                  <Skeleton className="h-11 w-44 rounded-full" />
+                </div>
+              </div>
             </div>
           ) : !campaign ? (
             <div className="py-16 text-center space-y-4">
@@ -523,7 +545,7 @@ const DonationDetailContent = () => {
                     className="w-fit"
                     onClick={() => {
                       if (!user) {
-                        router.push(`/sign-in?redirect=/donations/${id}`);
+                        router.push(`/sign-in?returnUrl=/donations/${id}`);
                       } else {
                         setIsRequestAidModalOpen(true);
                       }
@@ -827,7 +849,7 @@ const DonationDetailContent = () => {
               {selectedProofFile ? (
                 <div className="flex items-center justify-between w-full p-2 bg-card rounded-md border text-xs">
                   <div className="flex items-center gap-2 truncate">
-                    <FileText className="size-4 text-emerald-600 shrink-0" />
+                    <FileText className="size-4 text-muted-foreground shrink-0" />
                     <span className="truncate max-w-[200px] font-medium">{selectedProofFile.name}</span>
                     <span className="text-[10px] text-muted-foreground">
                       ({(selectedProofFile.size / 1024).toFixed(0)} KB)
@@ -872,7 +894,20 @@ const DonationDetailContent = () => {
 
 const DonationDetailPage = () => {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex flex-col bg-background">
+          <Navbar />
+          <div className="max-w-7xl w-full mx-auto px-4 py-8 space-y-6">
+            <Skeleton className="h-8 w-1/3" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <Skeleton className="h-96 rounded-2xl" />
+              <Skeleton className="h-96 rounded-2xl" />
+            </div>
+          </div>
+        </div>
+      }
+    >
       <DonationDetailContent />
     </Suspense>
   );

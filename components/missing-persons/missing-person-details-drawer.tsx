@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { User } from 'lucide-react';
-import useAuth from '@/app/hooks/useAuth';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
+import { toast } from '@/components/ui/toast';
+import useAuth from '@/hooks/use-auth';
+import { axiosSecure } from '@/lib/api';
 import MuiDrawer from '@/components/mui-drawer';
 import { MissingPerson } from '@/components/missing-persons/missing-person-dialog';
 
@@ -26,7 +27,6 @@ const MissingPersonDetailsDrawer = ({
   onRefresh,
 }: MissingPersonDetailsDrawerProps) => {
   const { user } = useAuth();
-  const axiosSecure = useAxiosSecure();
   const [cachedPerson, setCachedPerson] = useState<MissingPerson | null>(person);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState('');
@@ -50,6 +50,12 @@ const MissingPersonDetailsDrawer = ({
       await axiosSecure.patch(`/missing-persons/${displayPerson.id}/status`, {
         status: 'FOUND',
       });
+      toast.add({
+        id: 'missing-person-found',
+        title: 'Report status updated to Found.',
+        type: 'success',
+        timeout: 4000,
+      });
       onRefresh();
       onOpenChange(false);
     } catch (err: any) {
@@ -65,6 +71,12 @@ const MissingPersonDetailsDrawer = ({
       setActionLoading(true);
       setActionError('');
       await axiosSecure.delete(`/missing-persons/${displayPerson.id}`);
+      toast.add({
+        id: 'missing-person-deleted',
+        title: 'Missing person report moved to trash.',
+        type: 'success',
+        timeout: 4000,
+      });
       onRefresh();
       onOpenChange(false);
     } catch (err: any) {

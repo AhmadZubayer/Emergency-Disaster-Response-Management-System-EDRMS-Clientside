@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, AlertCircle, Plus } from 'lucide-react';
+import { AlertCircle, Plus } from 'lucide-react';
 import Navbar from '@/components/navbar';
-import { Input } from '@/components/ui/input';
+import Search from '@/components/Search';
 import { Button } from '@/components/ui/button';
-import { publicApi } from '@/app/lib/public-api';
-import useAuth from '@/app/hooks/useAuth';
+import { Skeleton } from '@/components/ui/skeleton';
+import { publicApi } from '@/lib/api';
+import useAuth from '@/hooks/use-auth';
 import RescueRequestCard from '@/components/rescue-requests/rescue-request-card';
 import { RescueRequest } from '@/components/rescue-requests/types';
 import RescueRequestDetailsDrawer from '@/components/rescue-requests/rescue-request-details-drawer';
@@ -23,10 +24,13 @@ const RescueRequestsPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const fetchRescueRequests = async () => {
+  const fetchRescueRequests = useCallback(async (search?: string) => {
     try {
       setLoading(true);
-      const res = await publicApi.get('/rescue-requests');
+      const url = search?.trim()
+        ? `/rescue-requests?search=${encodeURIComponent(search.trim())}`
+        : '/rescue-requests';
+      const res = await publicApi.get(url);
       const data = res.data?.data || res.data || [];
       setRequests(Array.isArray(data) ? data : []);
     } catch {
@@ -34,18 +38,23 @@ const RescueRequestsPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchRescueRequests();
-  }, []);
+  }, [fetchRescueRequests]);
+
+  const handleSearchChange = (val: string) => {
+    setSearchTerm(val);
+    fetchRescueRequests(val);
+  };
 
   const handleAddClick = () => {
     if (user) {
       setEditingRequest(null);
       setIsDrawerOpen(true);
     } else {
-      router.push('/sign-in');
+      router.push('/sign-in?returnUrl=/rescue-requests');
     }
   };
 
@@ -54,19 +63,6 @@ const RescueRequestsPage = () => {
     setEditingRequest(request);
     setIsDrawerOpen(true);
   };
-
-  const filteredRequests = requests.filter((r) => {
-    const term = searchTerm.toLowerCase();
-    return (
-      r.address?.toLowerCase().includes(term) ||
-      r.description?.toLowerCase().includes(term) ||
-      r.status?.toLowerCase().includes(term) ||
-      r.urgency_level?.toLowerCase().includes(term) ||
-      r.contact_phone?.toLowerCase().includes(term) ||
-      String(r.latitude).includes(term) ||
-      String(r.longitude).includes(term)
-    );
-  });
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -92,29 +88,36 @@ const RescueRequestsPage = () => {
               Add Rescue Request
             </Button>
 
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search by address, description..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 h-10 bg-card border-border/60 rounded-xl"
-              />
-            </div>
+            <Search
+              value={searchTerm}
+              onChange={handleSearchChange}
+              onSubmit={() => fetchRescueRequests(searchTerm)}
+              placeholder="Search by address, description..."
+            />
           </div>
         </div>
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map((idx) => (
-              <div
-                key={idx}
-                className="h-32 rounded-2xl bg-muted/40 animate-pulse border border-border/40"
-              />
+              <div key={idx} className="p-4 rounded-2xl border border-border/60 bg-card space-y-3">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-4 w-32" />
+                  <div className="flex gap-1.5">
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                  </div>
+                </div>
+                <Skeleton className="h-3.5 w-full" />
+                <Skeleton className="h-3.5 w-3/4" />
+                <div className="flex items-center justify-between pt-1">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+              </div>
             ))}
           </div>
-        ) : filteredRequests.length === 0 ? (
+        ) : requests.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-dashed border-border/60 bg-muted/10 space-y-3">
             <AlertCircle className="size-10 text-muted-foreground/60" />
             <h3 className="text-base font-semibold">No rescue requests found</h3>
@@ -126,7 +129,7 @@ const RescueRequestsPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredRequests.map((request) => (
+            {requests.map((request) => (
               <RescueRequestCard
                 key={request.id}
                 request={request}
@@ -144,7 +147,7 @@ const RescueRequestsPage = () => {
           if (!open) setSelectedRequest(null);
         }}
         onEdit={handleEdit}
-        onRefresh={fetchRescueRequests}
+        onRefresh={() => fetchRescueRequests(searchTerm)}
       />
 
       <AddRescueRequestDrawer
@@ -154,7 +157,7 @@ const RescueRequestsPage = () => {
           if (!open) setEditingRequest(null);
         }}
         onSuccess={() => {
-          fetchRescueRequests();
+          fetchRescueRequests(searchTerm);
           setEditingRequest(null);
         }}
         editRequest={editingRequest}
