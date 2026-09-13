@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 import Navbar from '@/components/navbar';
 import { Button } from '@/components/ui/button';
-import { publicApi } from '@/app/lib/public-api';
+import { publicApi } from '@/lib/api';
 
 const PaymentCancelContent = () => {
   const searchParams = useSearchParams();

@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 import { AxiosError } from 'axios';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { ENDPOINTS } from '@/app/lib/endpoints';
+import { axiosSecure } from '@/lib/api';
+import { ENDPOINTS } from '@/lib/endpoints';
 import { toast } from '@/components/ui/toast';
 import {
   volunteerProfileUpdateSchema,
   volunteerRegistrationSchema,
-} from '@/app/lib/validations/volunteer-profile-schema';
+} from '@/lib/validations/volunteer-profile-schema';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -37,7 +37,6 @@ const VolunteerProfileForm = ({
   onSuccess,
   onCancel,
 }: VolunteerProfileFormProps) => {
-  const axiosSecure = useAxiosSecure();
   const [skills, setSkills] = useState<VolunteerSkill[]>(profile?.skills || []);
   const [whyJoin, setWhyJoin] = useState(profile?.why_join || '');
   const [available, setAvailable] = useState(profile?.available || false);

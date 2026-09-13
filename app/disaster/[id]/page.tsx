@@ -15,6 +15,7 @@ import Navbar from '@/components/navbar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -26,9 +27,8 @@ import {
 import MuiModal from '@/components/mui-modal';
 import { toast } from '@/components/ui/toast';
 import LeafletMap from '@/components/leaflet-map';
-import { publicApi } from '@/app/lib/public-api';
-import useAuth from '@/app/hooks/useAuth';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
+import { axiosSecure, publicApi } from '@/lib/api';
+import useAuth from '@/hooks/use-auth';
 import { Disaster } from '@/components/disaster/types';
 import AddDisasterDrawer from '@/components/disaster/add-disaster-drawer';
 
@@ -36,7 +36,6 @@ const DisasterDetailPage = () => {
   const params = useParams();
   const router = useRouter();
   const { user } = useAuth();
-  const axiosSecure = useAxiosSecure();
 
   const id = params?.id as string;
 
@@ -166,12 +165,32 @@ const DisasterDetailPage = () => {
           </Breadcrumb>
 
           {loading ? (
-            <div className="space-y-6 animate-pulse">
-              <div className="h-32 rounded-lg bg-muted/40" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              <div className="space-y-6">
+                <div className="pb-5 border-b border-border/40 space-y-2">
+                  <Skeleton className="h-8 w-2/3" />
+                  <div className="flex gap-2">
+                    <Skeleton className="h-5 w-20 rounded-full" />
+                    <Skeleton className="h-5 w-24 rounded-full" />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <Skeleton className="h-6 w-32" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <Skeleton className="h-12 w-full rounded-xl" />
+                    <Skeleton className="h-12 w-full rounded-xl" />
+                    <Skeleton className="h-12 w-full col-span-2 rounded-xl" />
+                    <Skeleton className="h-12 w-full rounded-xl" />
+                    <Skeleton className="h-12 w-full rounded-xl" />
+                  </div>
+                </div>
+              </div>
               <div className="space-y-3">
                 <div className="h-8 w-1/3 bg-muted/40 rounded" />
                 <div className="h-4 w-1/2 bg-muted/30 rounded" />
                 <div className="h-24 w-full bg-muted/20 rounded" />
+                <Skeleton className="h-14 w-full rounded-xl" />
+                <Skeleton className="h-[460px] w-full rounded-2xl" />
               </div>
             </div>
           ) : !disaster ? (

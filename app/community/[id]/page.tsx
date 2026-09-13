@@ -15,10 +15,10 @@ import {
   Share2,
 } from 'lucide-react';
 import Navbar from '@/components/navbar';
-import ProtectedRoute from '@/components/auth/protected-route';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -28,16 +28,14 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { toast } from '@/components/ui/toast';
-import useAuth from '@/app/hooks/useAuth';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { publicApi } from '@/app/lib/public-api';
+import useAuth from '@/hooks/use-auth';
+import { axiosSecure, publicApi } from '@/lib/api';
 import { CommunityPost, PostComment } from '@/components/community/types';
 
 const CommunityPostDetailPage = () => {
   const params = useParams();
   const router = useRouter();
   const { user } = useAuth();
-  const axiosSecure = useAxiosSecure();
 
   const id = params?.id as string;
 
@@ -179,8 +177,7 @@ const CommunityPostDetailPage = () => {
   const authorInitial = (post?.postedBy?.name || 'U').charAt(0).toUpperCase();
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
 
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
@@ -205,9 +202,31 @@ const CommunityPostDetailPage = () => {
           </Breadcrumb>
 
           {loading ? (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-pulse">
-              <div className="lg:col-span-7 h-96 rounded-2xl bg-card border border-border/60" />
-              <div className="lg:col-span-5 h-96 rounded-2xl bg-card border border-border/60" />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              <div className="lg:col-span-7 space-y-4">
+                <div className="rounded-2xl border border-border/70 bg-card p-5 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="size-10 rounded-full shrink-0" />
+                    <div className="space-y-1.5 flex-1">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-7 w-3/4" />
+                  <Skeleton className="h-20 w-full rounded-xl" />
+                  <Skeleton className="h-48 w-full rounded-xl" />
+                </div>
+              </div>
+              <div className="lg:col-span-5 space-y-4">
+                <div className="rounded-2xl border border-border/70 bg-card p-4 space-y-3">
+                  <Skeleton className="h-5 w-32" />
+                  <Skeleton className="h-9 w-full rounded-xl" />
+                  <div className="space-y-2 pt-2">
+                    <Skeleton className="h-16 w-full rounded-xl" />
+                    <Skeleton className="h-16 w-full rounded-xl" />
+                  </div>
+                </div>
+              </div>
             </div>
           ) : !post ? (
             <div className="py-16 text-center space-y-4">
@@ -412,7 +431,6 @@ const CommunityPostDetailPage = () => {
           )}
         </main>
       </div>
-    </ProtectedRoute>
   );
 };
 

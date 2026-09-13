@@ -7,17 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import MuiSelect from '@/components/mui-select';
 import ModernButton from '@/components/modernBtn';
 import { toast } from '@/components/ui/toast';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { missingPersonSchema } from '@/app/lib/validations/missing-person-form-schema';
+import { axiosSecure } from '@/lib/api';
+import { missingPersonSchema } from '@/lib/validations/missing-person-form-schema';
 import { MissingPerson } from '@/components/missing-persons/missing-person-dialog';
 import MuiDrawer from '@/components/mui-drawer';
 
@@ -34,7 +28,6 @@ const AddMissingPersonDrawer = ({
   onSuccess,
   editPerson,
 }: AddMissingPersonDrawerProps) => {
-  const axiosSecure = useAxiosSecure();
 
   const [fullName, setFullName] = useState('');
   const [age, setAge] = useState('');
@@ -225,16 +218,17 @@ const AddMissingPersonDrawer = ({
 
             <div className="space-y-1.5">
               <Label htmlFor="gender">Gender</Label>
-              <Select value={gender} onValueChange={(val) => val && setGender(val)}>
-                <SelectTrigger className="w-full h-10 bg-background/50 px-3">
-                  <SelectValue placeholder="Select gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+              <MuiSelect
+                id="gender"
+                value={gender}
+                onChange={(val) => setGender(val)}
+                placeholder="Select gender"
+                options={[
+                  { label: 'Male', value: 'male' },
+                  { label: 'Female', value: 'female' },
+                  { label: 'Other', value: 'other' },
+                ]}
+              />
               {errors.gender && (
                 <p className="text-xs text-destructive">{errors.gender}</p>
               )}

@@ -19,7 +19,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { toast } from '@/components/ui/toast';
-import { useAuth } from '@/app/hooks/useAuth';
+import { useAuth } from '@/hooks/use-auth';
+import { getPrimaryProfileRoute } from '@/lib/dashboard-routes';
 
 const navItems = [
   { label: 'Disasters', href: '/disaster' },
@@ -118,7 +119,7 @@ const Navbar = () => {
                 >
                   <DropdownMenuItem
                     className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                    render={<Link href="/volunteer-profile" />}
+                    render={<Link href="/volunteer-registration-form" />}
                   >
                     <Users className="size-4" />
                     <span>Contribute as Volunteer</span>
@@ -163,7 +164,9 @@ const Navbar = () => {
                   >
                     <DropdownMenuItem
                       className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                      render={<Link href="/profile" />}
+                      render={
+                        <Link href={getPrimaryProfileRoute(user.role)} />
+                      }
                     >
                       <UserRound className="size-4" />
                       <span>Your Profile</span>

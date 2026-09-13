@@ -1,22 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Upload, MapPin, Loader2 } from 'lucide-react';
+import { Upload, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Spinner } from '@/components/ui/spinner';
+import MuiSelect from '@/components/mui-select';
 import ModernButton from '@/components/modernBtn';
 import { toast } from '@/components/ui/toast';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { rescueRequestSchema } from '@/app/lib/validations/rescue-request-form-schema';
+import { axiosSecure } from '@/lib/api';
+import { rescueRequestSchema } from '@/lib/validations/rescue-request-form-schema';
 import { RescueRequest, UrgencyLevel } from './types';
 import MuiDrawer from '@/components/mui-drawer';
 
@@ -33,7 +28,6 @@ const AddRescueRequestDrawer = ({
   onSuccess,
   editRequest,
 }: AddRescueRequestDrawerProps) => {
-  const axiosSecure = useAxiosSecure();
 
   const [address, setAddress] = useState('');
   const [latitude, setLatitude] = useState('');
@@ -229,7 +223,7 @@ const AddRescueRequestDrawer = ({
             className="gap-1.5 h-8 text-xs font-semibold"
           >
             {detectingLocation ? (
-              <Loader2 className="size-3.5 animate-spin" />
+              <Spinner className="size-3.5" />
             ) : (
               <MapPin className="size-3.5" />
             )}
@@ -298,23 +292,21 @@ const AddRescueRequestDrawer = ({
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold">
+            <Label htmlFor="urgency" className="text-xs font-semibold">
               Urgency Level <span className="text-red-500">*</span>
             </Label>
-            <Select
+            <MuiSelect
+              id="urgency"
               value={urgencyLevel}
-              onValueChange={(val) => setUrgencyLevel(val as UrgencyLevel)}
-            >
-              <SelectTrigger className="h-10 text-xs rounded-xl">
-                <SelectValue placeholder="Select urgency" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="LOW">LOW</SelectItem>
-                <SelectItem value="MEDIUM">MEDIUM</SelectItem>
-                <SelectItem value="HIGH">HIGH</SelectItem>
-                <SelectItem value="CRITICAL">CRITICAL</SelectItem>
-              </SelectContent>
-            </Select>
+              onChange={(val) => setUrgencyLevel(val as UrgencyLevel)}
+              placeholder="Select urgency"
+              options={[
+                { label: 'LOW', value: 'LOW' },
+                { label: 'MEDIUM', value: 'MEDIUM' },
+                { label: 'HIGH', value: 'HIGH' },
+                { label: 'CRITICAL', value: 'CRITICAL' },
+              ]}
+            />
           </div>
 
           <div className="space-y-1.5">

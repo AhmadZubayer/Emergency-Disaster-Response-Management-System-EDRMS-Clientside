@@ -6,8 +6,8 @@ import { Upload, X, AlertCircle } from 'lucide-react';
 import MuiDrawer from '@/components/mui-drawer';
 import ModernButton from '@/components/modernBtn';
 import { toast } from '@/components/ui/toast';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { communityPostSchema } from '@/app/lib/validations/community-post-schema';
+import { axiosSecure } from '@/lib/api';
+import { communityPostSchema } from '@/lib/validations/community-post-schema';
 
 interface AddCommunityPostDrawerProps {
   open: boolean;
@@ -47,7 +47,6 @@ const AddCommunityPostDrawer = ({
   onOpenChange,
   onSuccess,
 }: AddCommunityPostDrawerProps) => {
-  const axiosSecure = useAxiosSecure();
 
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');

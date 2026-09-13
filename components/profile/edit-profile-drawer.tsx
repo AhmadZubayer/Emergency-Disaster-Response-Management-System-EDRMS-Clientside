@@ -1,15 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Upload, MapPin, Loader2 } from 'lucide-react';
+import { Upload, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import ModernButton from '@/components/modernBtn';
 import { toast } from '@/components/ui/toast';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { userProfileSchema } from '@/app/lib/validations/user-profile-schema';
+import { axiosSecure } from '@/lib/api';
+import { userProfileSchema } from '@/lib/validations/user-profile-schema';
 import MuiDrawer from '@/components/mui-drawer';
 
 export interface UserProfileData {
@@ -49,7 +50,6 @@ const EditProfileDrawer = ({
   onSuccess,
   profile,
 }: EditProfileDrawerProps) => {
-  const axiosSecure = useAxiosSecure();
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -315,7 +315,7 @@ const EditProfileDrawer = ({
               className="gap-1.5 h-8 text-xs font-semibold"
             >
               {detectingLocation ? (
-                <Loader2 className="size-3.5 animate-spin" />
+                <Spinner className="size-3.5" />
               ) : (
                 <MapPin className="size-3.5" />
               )}

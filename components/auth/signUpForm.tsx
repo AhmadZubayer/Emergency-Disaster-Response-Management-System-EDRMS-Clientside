@@ -11,8 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import ModernButton from '@/components/modernBtn';
 import { toast } from '@/components/ui/toast';
-import { signUpSchema } from '@/app/lib/validations/auth';
-import { useAuth } from '@/app/hooks/useAuth';
+import { signUpSchema } from '@/lib/validations/auth';
+import { useAuth } from '@/hooks/use-auth';
 
 const GoogleIcon = () => (
   <svg className="size-4" viewBox="0 0 24 24">

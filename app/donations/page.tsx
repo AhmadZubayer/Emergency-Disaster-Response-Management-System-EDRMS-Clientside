@@ -1,18 +1,19 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, HeartHandshake, Plus } from 'lucide-react';
+import { HeartHandshake, Plus } from 'lucide-react';
 import Navbar from '@/components/navbar';
-import { Input } from '@/components/ui/input';
+import Search from '@/components/Search';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
-import { publicApi } from '@/app/lib/public-api';
-import useAuth from '@/app/hooks/useAuth';
+import { publicApi } from '@/lib/api';
+import useAuth from '@/hooks/use-auth';
 import DonationCard from '@/components/donations/donation-card';
 import { DonationCampaign } from '@/components/donations/types';
 import AddDonationDrawer from '@/components/donations/add-donation-drawer';
-import { generateDonationReceipt } from '@/lib/generate-donation-receipt';
+import { generateDonationReceipt } from '@/utils/generate-donation-receipt';
 
 const DonationsContent = () => {
   const router = useRouter();
@@ -28,10 +29,13 @@ const DonationsContent = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const fetchCampaigns = async () => {
+  const fetchCampaigns = useCallback(async (search?: string) => {
     try {
       setLoading(true);
-      const res = await publicApi.get('/donations/campaigns');
+      const url = search?.trim()
+        ? `/donations/campaigns?search=${encodeURIComponent(search.trim())}`
+        : '/donations/campaigns';
+      const res = await publicApi.get(url);
       const data = res.data?.data || res.data || [];
       setCampaigns(Array.isArray(data) ? data : []);
     } catch {
@@ -39,11 +43,16 @@ const DonationsContent = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchCampaigns();
-  }, []);
+  }, [fetchCampaigns]);
+
+  const handleSearchChange = (val: string) => {
+    setSearchTerm(val);
+    fetchCampaigns(val);
+  };
 
   const hasVerifiedRef = React.useRef(false);
 
@@ -93,7 +102,7 @@ const DonationsContent = () => {
       };
       verifyAndToast();
     }
-  }, [paymentStatus, sessionId, txId]);
+  }, [paymentStatus, sessionId, txId, fetchCampaigns]);
 
   const handleAddClick = () => {
     if (user?.role === 'RELIEF_ORG' || user?.role === 'ADMIN') {
@@ -102,14 +111,6 @@ const DonationsContent = () => {
       router.push('/manage-donations');
     }
   };
-
-  const filteredCampaigns = campaigns.filter((c) => {
-    const term = searchTerm.toLowerCase();
-    return (
-      c.title?.toLowerCase().includes(term) ||
-      c.description?.toLowerCase().includes(term)
-    );
-  });
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -134,29 +135,34 @@ const DonationsContent = () => {
               </Button>
             )}
 
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search campaigns, relief..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 h-10 bg-card border-border/60"
-              />
-            </div>
+            <Search
+              value={searchTerm}
+              onChange={handleSearchChange}
+              onSubmit={() => fetchCampaigns(searchTerm)}
+              placeholder="Search campaigns, relief..."
+            />
           </div>
         </div>
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map((idx) => (
-              <div
-                key={idx}
-                className="h-36 rounded-2xl bg-muted/40 animate-pulse border border-border/40"
-              />
+              <div key={idx} className="p-5 rounded-2xl border border-border/60 bg-card space-y-3">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-5 w-36" />
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                </div>
+                <Skeleton className="h-3.5 w-full" />
+                <Skeleton className="h-3.5 w-4/5" />
+                <Skeleton className="h-3 w-full rounded-full" />
+                <div className="flex items-center justify-between pt-1">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+              </div>
             ))}
           </div>
-        ) : filteredCampaigns.length === 0 ? (
+        ) : campaigns.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-dashed border-border/60 bg-muted/10 space-y-3">
             <HeartHandshake className="size-10 text-muted-foreground/60" />
             <h3 className="text-base font-semibold">No relief campaigns found</h3>
@@ -168,7 +174,7 @@ const DonationsContent = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredCampaigns.map((campaign) => (
+            {campaigns.map((campaign) => (
               <DonationCard
                 key={campaign.id}
                 campaign={campaign}
@@ -182,7 +188,7 @@ const DonationsContent = () => {
       <AddDonationDrawer
         open={isDrawerOpen}
         onOpenChange={setIsDrawerOpen}
-        onSuccess={fetchCampaigns}
+        onSuccess={() => fetchCampaigns(searchTerm)}
       />
     </div>
   );
@@ -190,7 +196,21 @@ const DonationsContent = () => {
 
 const DonationsPage = () => {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex flex-col bg-background">
+          <Navbar />
+          <div className="max-w-7xl w-full mx-auto px-4 py-8 space-y-6">
+            <Skeleton className="h-12 w-1/3" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-48 rounded-2xl" />
+              ))}
+            </div>
+          </div>
+        </div>
+      }
+    >
       <DonationsContent />
     </Suspense>
   );

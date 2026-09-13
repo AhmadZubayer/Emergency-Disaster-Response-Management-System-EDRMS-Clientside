@@ -31,10 +31,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import ModernButton from '@/components/modernBtn';
+import MuiSelect from '@/components/mui-select';
 import { toast } from '@/components/ui/toast';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { useAuth } from '@/app/hooks/useAuth';
-import { reliefOrgSchema } from '@/app/lib/validations/relief-org-schema';
+import { axiosSecure } from '@/lib/api';
+import { useAuth } from '@/hooks/use-auth';
+import { reliefOrgSchema } from '@/lib/validations/relief-org-schema';
 
 const ORGANIZATION_TYPES = [
   'NGO (Non-Governmental Organization)',
@@ -49,7 +50,6 @@ const ORGANIZATION_TYPES = [
 const ReliefOrgSignUpForm = () => {
   const router = useRouter();
   const { user } = useAuth();
-  const axiosSecure = useAxiosSecure();
 
   const [orgName, setOrgName] = useState('');
   const [regNumber, setRegNumber] = useState('');
@@ -192,7 +192,7 @@ const ReliefOrgSignUpForm = () => {
           <Button
             variant="outline"
             className="w-full sm:w-auto rounded-xl text-xs font-semibold px-6"
-            onClick={() => router.push('/profile')}
+            onClick={() => router.push('/relief-org/profile')}
           >
             Go to Profile
           </Button>
@@ -269,18 +269,16 @@ const ReliefOrgSignUpForm = () => {
               <Label htmlFor="orgType" className="text-xs font-semibold flex items-center gap-1">
                 Organization Type <span className="text-destructive">*</span>
               </Label>
-              <select
+              <MuiSelect
                 id="orgType"
                 value={orgType}
-                onChange={(e) => setOrgType(e.target.value)}
-                className="h-10 w-full rounded-md border border-input bg-background/60 px-3 py-2 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                {ORGANIZATION_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setOrgType(val)}
+                placeholder="Select organization type"
+                options={ORGANIZATION_TYPES.map((t) => ({
+                  label: t,
+                  value: t,
+                }))}
+              />
               {errors.organization_type && (
                 <p className="text-[11px] text-destructive">{errors.organization_type}</p>
               )}

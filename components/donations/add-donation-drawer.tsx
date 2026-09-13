@@ -14,18 +14,12 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import MuiSelect from '@/components/mui-select';
 import ModernButton from '@/components/modernBtn';
 import MuiDrawer from '@/components/mui-drawer';
 import { toast } from '@/components/ui/toast';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { donationCampaignSchema } from '@/app/lib/validations/donation-campaign-schema';
+import { axiosSecure } from '@/lib/api';
+import { donationCampaignSchema } from '@/lib/validations/donation-campaign-schema';
 import { DonationCampaign } from './types';
 import { cn } from 'cn';
 
@@ -42,7 +36,6 @@ const AddDonationDrawer = ({
   onSuccess,
   editCampaign,
 }: AddDonationDrawerProps) => {
-  const axiosSecure = useAxiosSecure();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -383,25 +376,17 @@ const AddDonationDrawer = ({
             <Label htmlFor="status" className="text-xs font-semibold">
               Campaign Status
             </Label>
-            <Select
+            <MuiSelect
+              id="status"
               value={status}
-              onValueChange={(val: any) => setStatus(val)}
-            >
-              <SelectTrigger id="status" className="w-full text-xs">
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active" className="text-xs">
-                  Active
-                </SelectItem>
-                <SelectItem value="completed" className="text-xs">
-                  Completed
-                </SelectItem>
-                <SelectItem value="closed" className="text-xs">
-                  Closed
-                </SelectItem>
-              </SelectContent>
-            </Select>
+              onChange={(val) => setStatus(val as any)}
+              placeholder="Select status"
+              options={[
+                { label: 'Active', value: 'active' },
+                { label: 'Completed', value: 'completed' },
+                { label: 'Closed', value: 'closed' },
+              ]}
+            />
           </div>
         )}
 

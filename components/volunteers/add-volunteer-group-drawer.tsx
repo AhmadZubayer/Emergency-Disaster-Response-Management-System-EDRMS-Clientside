@@ -5,19 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import MuiSelect from '@/components/mui-select';
 import ModernButton from '@/components/modernBtn';
 import MuiDrawer from '@/components/mui-drawer';
 import { toast } from '@/components/ui/toast';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { publicApi } from '@/app/lib/public-api';
-import { volunteerGroupSchema } from '@/app/lib/validations/volunteer-group-schema';
+import { axiosSecure, publicApi } from '@/lib/api';
+import { volunteerGroupSchema } from '@/lib/validations/volunteer-group-schema';
 import { VolunteerGroup } from './types';
 import { Disaster } from '@/components/disaster/types';
 
@@ -34,7 +27,6 @@ const AddVolunteerGroupDrawer = ({
   onSuccess,
   editGroup,
 }: AddVolunteerGroupDrawerProps) => {
-  const axiosSecure = useAxiosSecure();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -216,24 +208,19 @@ const AddVolunteerGroupDrawer = ({
           <Label htmlFor="disaster" className="text-xs font-semibold">
             Assigned Disaster Alert
           </Label>
-          <Select
+          <MuiSelect
+            id="disaster"
             value={disasterName}
-            onValueChange={(val) => setDisasterName(val || 'none')}
-          >
-            <SelectTrigger id="disaster" className="w-full text-xs">
-              <SelectValue placeholder="Select assigned disaster" />
-            </SelectTrigger>
-            <SelectContent className="max-h-60">
-              <SelectItem value="none" className="text-xs">
-                None / General Deployment
-              </SelectItem>
-              {disasters.map((d) => (
-                <SelectItem key={d.id} value={d.disaster_name} className="text-xs">
-                  {d.disaster_name} ({d.type})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            onChange={(val) => setDisasterName(val || 'none')}
+            placeholder="Select assigned disaster"
+            options={[
+              { label: 'None / General Deployment', value: 'none' },
+              ...disasters.map((d) => ({
+                label: `${d.disaster_name} (${d.type})`,
+                value: d.disaster_name,
+              })),
+            ]}
+          />
         </div>
 
         <div className="space-y-1.5">

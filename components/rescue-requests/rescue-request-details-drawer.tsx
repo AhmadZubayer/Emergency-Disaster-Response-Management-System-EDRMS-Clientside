@@ -6,8 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { LifeBuoy } from 'lucide-react';
 import { toast } from '@/components/ui/toast';
-import useAuth from '@/app/hooks/useAuth';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
+import useAuth from '@/hooks/use-auth';
+import { axiosSecure } from '@/lib/api';
 import MuiDrawer from '@/components/mui-drawer';
 import { RescueRequest } from './types';
 
@@ -35,7 +35,6 @@ const RescueRequestDetailsDrawer = ({
   onRefresh,
 }: RescueRequestDetailsDrawerProps) => {
   const { user } = useAuth();
-  const axiosSecure = useAxiosSecure();
   const [cachedRequest, setCachedRequest] = useState<RescueRequest | null>(request);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState('');

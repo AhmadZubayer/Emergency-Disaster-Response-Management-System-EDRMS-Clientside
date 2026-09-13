@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/app/hooks/useAuth';
+import { useAuth } from '@/hooks/use-auth';
 
 export interface MissingPerson {
   id: string;

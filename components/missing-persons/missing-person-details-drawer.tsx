@@ -6,8 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { User } from 'lucide-react';
 import { toast } from '@/components/ui/toast';
-import useAuth from '@/app/hooks/useAuth';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
+import useAuth from '@/hooks/use-auth';
+import { axiosSecure } from '@/lib/api';
 import MuiDrawer from '@/components/mui-drawer';
 import { MissingPerson } from '@/components/missing-persons/missing-person-dialog';
 
@@ -27,7 +27,6 @@ const MissingPersonDetailsDrawer = ({
   onRefresh,
 }: MissingPersonDetailsDrawerProps) => {
   const { user } = useAuth();
-  const axiosSecure = useAxiosSecure();
   const [cachedPerson, setCachedPerson] = useState<MissingPerson | null>(person);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState('');
