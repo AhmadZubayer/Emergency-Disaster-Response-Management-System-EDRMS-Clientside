@@ -51,11 +51,11 @@ const navItems = [
     href: '/admin/community-posts',
     icon: MessageSquare,
   },
-  {
-    label: 'Database Explorer',
-    href: '/admin/tables',
-    icon: Database,
-  },
+  // {
+  //   label: 'Database Explorer',
+  //   href: '/admin/tables',
+  //   icon: Database,
+  // },
   {
     label: 'Reports',
     href: '/admin/reports',
@@ -82,18 +82,16 @@ const AdminSidebar = () => {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all ${
-                isActive
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all ${isActive
                   ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400 font-bold shadow-xs'
                   : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'
-              }`}
+                }`}
             >
               <Icon
-                className={`size-4 shrink-0 ${
-                  isActive
+                className={`size-4 shrink-0 ${isActive
                     ? 'text-emerald-600 dark:text-emerald-400'
                     : 'text-muted-foreground'
-                }`}
+                  }`}
               />
               <span>{item.label}</span>
             </Link>

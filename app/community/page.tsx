@@ -37,7 +37,8 @@ interface Comment {
 }
 
 interface Post {
-  id: string;
+  id?: string;
+  postId?: string;
   title: string;
   body: string;
   author_id?: string;
@@ -45,8 +46,16 @@ interface Post {
     id: string;
     name?: string;
   };
+  postedBy?: {
+    name?: string;
+    role?: string;
+  };
   reactions_count?: number;
   comments_count?: number;
+  CommunityResponse?: {
+    Reactions?: { total?: number };
+    totalComments?: number;
+  };
   created_at: string;
 }
 
@@ -126,21 +135,34 @@ export default function CommunityPage() {
       setToastMsg('Please sign in to react to posts.');
       return;
     }
+    if (!postId) return;
+
     try {
-      await axiosSecure.post(`/community-posts/${postId}/react`, { type: 'like' });
+      await axiosSecure.post(`/community-posts/${postId}/react`, { type: 'LIKE' });
       setPosts((prev) =>
-        prev.map((p) =>
-          p.id === postId
-            ? { ...p, reactions_count: (p.reactions_count || 0) + 1 }
-            : p
-        )
+        prev.map((p) => {
+          const pId = p.id || p.postId;
+          if (pId === postId) {
+            const currentTotal = p.reactions_count ?? p.CommunityResponse?.Reactions?.total ?? 0;
+            return {
+              ...p,
+              reactions_count: currentTotal + 1,
+              CommunityResponse: {
+                ...p.CommunityResponse,
+                Reactions: { total: currentTotal + 1 },
+              },
+            };
+          }
+          return p;
+        })
       );
     } catch {
-      // Ignore double react
+      // Ignore duplicate reaction error
     }
   };
 
   const toggleComments = async (postId: string) => {
+    if (!postId) return;
     if (activeCommentPostId === postId) {
       setActiveCommentPostId(null);
       return;
@@ -163,6 +185,8 @@ export default function CommunityPage() {
       setToastMsg('Please sign in to comment.');
       return;
     }
+    if (!postId) return;
+
     const text = commentInput[postId]?.trim();
     if (!text) return;
 
@@ -176,9 +200,21 @@ export default function CommunityPage() {
       setCommentsMap((prev) => ({ ...prev, [postId]: Array.isArray(updatedComments) ? updatedComments : [] }));
 
       setPosts((prev) =>
-        prev.map((p) =>
-          p.id === postId ? { ...p, comments_count: (p.comments_count || 0) + 1 } : p
-        )
+        prev.map((p) => {
+          const pId = p.id || p.postId;
+          if (pId === postId) {
+            const currentCount = p.comments_count ?? p.CommunityResponse?.totalComments ?? 0;
+            return {
+              ...p,
+              comments_count: currentCount + 1,
+              CommunityResponse: {
+                ...p.CommunityResponse,
+                totalComments: currentCount + 1,
+              },
+            };
+          }
+          return p;
+        })
       );
     } catch {
       setToastMsg('Failed to post comment.');
@@ -192,6 +228,8 @@ export default function CommunityPage() {
       setToastMsg('Please sign in to report.');
       return;
     }
+    if (!postId) return;
+
     try {
       await axiosSecure.post(`/community-posts/${postId}/report`, { reason: 'Inappropriate content' });
       setToastMsg('Post reported for moderation review.');
@@ -275,20 +313,25 @@ export default function CommunityPage() {
             </Card>
           ) : (
             posts.map((post) => {
-              const postComments = commentsMap[post.id] || [];
-              const isCommentOpen = activeCommentPostId === post.id;
+              const targetPostId = post.id || post.postId || '';
+              const authorName = post.author?.name || post.postedBy?.name || 'Community Member';
+              const totalLikes = post.reactions_count ?? post.CommunityResponse?.Reactions?.total ?? 0;
+              const totalComments = post.comments_count ?? post.CommunityResponse?.totalComments ?? 0;
+
+              const postComments = commentsMap[targetPostId] || [];
+              const isCommentOpen = activeCommentPostId === targetPostId;
 
               return (
-                <Card key={post.id} className="border-border/60 shadow-xs hover:border-border transition-colors">
+                <Card key={targetPostId} className="border-border/60 shadow-xs hover:border-border transition-colors">
                   <CardHeader className="p-5 pb-2">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-2.5">
                         <div className="size-9 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs uppercase">
-                          {post.author?.name ? post.author.name.charAt(0) : <User className="size-4" />}
+                          {authorName ? authorName.charAt(0) : <User className="size-4" />}
                         </div>
                         <div>
                           <div className="font-semibold text-sm text-foreground">
-                            {post.author?.name || 'Community Member'}
+                            {authorName}
                           </div>
                           <div className="text-[11px] text-muted-foreground flex items-center gap-1">
                             <Calendar className="size-3" />
@@ -300,7 +343,7 @@ export default function CommunityPage() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleReportPost(post.id)}
+                        onClick={() => handleReportPost(targetPostId)}
                         title="Report Post"
                         className="size-7 text-muted-foreground hover:text-destructive"
                       >
@@ -321,20 +364,20 @@ export default function CommunityPage() {
                     <div className="flex items-center gap-4 border-t border-border/40 pt-3">
                       <button
                         type="button"
-                        onClick={() => handleLikePost(post.id)}
+                        onClick={() => handleLikePost(targetPostId)}
                         className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-emerald-600 font-medium transition-colors"
                       >
                         <Heart className="size-4 text-emerald-600" />
-                        <span>{post.reactions_count || 0} Likes</span>
+                        <span>{totalLikes} Likes</span>
                       </button>
 
                       <button
                         type="button"
-                        onClick={() => toggleComments(post.id)}
+                        onClick={() => toggleComments(targetPostId)}
                         className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground font-medium transition-colors"
                       >
                         <MessageSquare className="size-4" />
-                        <span>{post.comments_count || postComments.length || 0} Comments</span>
+                        <span>{totalComments || postComments.length || 0} Comments</span>
                       </button>
                     </div>
 
@@ -365,16 +408,16 @@ export default function CommunityPage() {
                           <div className="flex items-center gap-2 pt-1">
                             <Input
                               placeholder="Write a comment..."
-                              value={commentInput[post.id] || ''}
+                              value={commentInput[targetPostId] || ''}
                               onChange={(e) =>
-                                setCommentInput((prev) => ({ ...prev, [post.id]: e.target.value }))
+                                setCommentInput((prev) => ({ ...prev, [targetPostId]: e.target.value }))
                               }
                               className="text-xs h-9 bg-card"
                             />
                             <Button
                               size="sm"
-                              onClick={() => handleAddComment(post.id)}
-                              disabled={commentLoading[post.id]}
+                              onClick={() => handleAddComment(targetPostId)}
+                              disabled={commentLoading[targetPostId]}
                               className="h-9 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white"
                             >
                               <Send className="size-3.5" />
