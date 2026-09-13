@@ -81,6 +81,10 @@ const SignUpForm = () => {
   };
 
 
+  const handleGoogleSignIn = () => {
+    window.location.href = '/auth/google';
+  };
+
   return (
     <Card className="w-full max-w-sm rounded-2xl border border-border/50 bg-card/75 backdrop-blur-xl shadow-xl">
       <CardHeader className="space-y-1">
@@ -199,6 +203,7 @@ const SignUpForm = () => {
             <Button
               type="button"
               variant="outline"
+              onClick={handleGoogleSignIn}
               className="w-full h-10 rounded-full border-border/80 bg-background/50 hover:bg-muted font-medium"
             >
               <GoogleIcon />

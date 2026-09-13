@@ -6,11 +6,11 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/auth/:path*',
-        destination: `${backend}/auth/:path*`,
+        destination: `${backend}/api/auth/:path*`,
       },
       {
         source: '/api/:path*',
-        destination: `${backend}/:path*`,
+        destination: `${backend}/api/:path*`,
       },
       {
         source: '/user-files/:path*',
