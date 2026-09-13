@@ -12,6 +12,7 @@ interface MuiDrawerProps {
   subtitle?: string;
   children: React.ReactNode;
   width?: number | string;
+  anchor?: 'left' | 'right';
 }
 
 const MuiDrawer = ({
@@ -21,6 +22,7 @@ const MuiDrawer = ({
   subtitle,
   children,
   width = 460,
+  anchor = 'right',
 }: MuiDrawerProps) => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -35,7 +37,7 @@ const MuiDrawer = ({
 
   return (
     <SwipeableDrawer
-      anchor={isMobile ? 'bottom' : 'right'}
+      anchor={isMobile ? 'bottom' : anchor}
       open={open}
       onClose={onClose}
       onOpen={() => {}}
