@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { publicApi } from '@/app/lib/public-api';
 
 export type UserType = {
@@ -30,21 +30,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserType>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchCurrentUser = async () => {
+  const fetchCurrentUser = useCallback(async () => {
     try {
-      const res = await publicApi.get('/auth/me', { withCredentials: true });
+      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+      if (!token) {
+        setUser(null);
+        return;
+      }
+      const res = await publicApi.get('/auth/me');
       const userData = res.data?.data || res.data;
       setUser(userData);
-    } catch {
+    } catch (err) {
+      console.error('fetchCurrentUser failed:', err);
       setUser(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchCurrentUser();
-  }, []);
+  }, [fetchCurrentUser]);
 
   const signInUser = async (email: string, pass: string) => {
     setLoading(true);
@@ -54,6 +60,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         { email, password: pass },
         { withCredentials: true }
       );
+      const token = res.data?.data?.access_token || res.data?.access_token;
+      if (token && typeof window !== 'undefined') {
+        localStorage.setItem('access_token', token);
+      }
       await fetchCurrentUser();
       return res.data;
     } finally {
@@ -78,9 +88,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logOut = async () => {
     setLoading(true);
     try {
-      await publicApi.post('/auth/logout', {}, { withCredentials: true });
+      await publicApi.post('/auth/logout');
     } catch {
     } finally {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('access_token');
+      }
       setUser(null);
       setLoading(false);
     }
@@ -103,4 +116,4 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => useContext(AuthContext);
 
-export default AuthProvider;
+export default AuthProvider;

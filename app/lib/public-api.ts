@@ -2,12 +2,16 @@ import axios from 'axios';
 
 export const publicApi = axios.create({
   baseURL: '/api',
-  timeout: 15000,
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  timeout: 15000,
 });
 
-
-export default publicApi;
+publicApi.interceptors.request.use((config) => {
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
