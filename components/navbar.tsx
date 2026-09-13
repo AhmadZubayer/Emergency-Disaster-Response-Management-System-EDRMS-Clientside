@@ -118,7 +118,7 @@ const Navbar = () => {
                 >
                   <DropdownMenuItem
                     className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                    render={<Link href="/manage-volunteers" />}
+                    render={<Link href="/volunteer-profile" />}
                   >
                     <Users className="size-4 text-emerald-600" />
                     <span>Contribute as Volunteer</span>
@@ -242,7 +242,7 @@ const Navbar = () => {
                 Contribute
               </span>
               <Link
-                href="/manage-volunteers"
+                href="/volunteer-profile"
                 onClick={() => setMobileOpen(false)}
                 className="px-3.5 py-2 rounded-xl text-sm font-medium text-neutral-600 hover:text-neutral-900 flex items-center gap-2"
               >
