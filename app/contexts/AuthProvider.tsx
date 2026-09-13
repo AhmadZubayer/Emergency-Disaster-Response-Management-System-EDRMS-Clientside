@@ -8,6 +8,7 @@ export type UserType = {
   name: string;
   email: string;
   role?: string;
+  phone?: string;
 } | null;
 
 interface AuthContextType {
