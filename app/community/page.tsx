@@ -48,7 +48,7 @@ const CommunityPage = () => {
 
   const handleOpenDrawer = () => {
     if (!user) {
-      router.push('/sign-in');
+      router.push('/sign-in?returnUrl=/community');
       return;
     }
     setIsDrawerOpen(true);

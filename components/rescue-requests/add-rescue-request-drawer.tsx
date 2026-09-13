@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import ModernButton from '@/components/modernBtn';
+import { toast } from '@/components/ui/toast';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import { rescueRequestSchema } from '@/app/lib/validations/rescue-request-form-schema';
 import { RescueRequest, UrgencyLevel } from './types';
@@ -170,9 +171,21 @@ const AddRescueRequestDrawer = ({
         await axiosSecure.patch(`/rescue-requests/${editRequest.id}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
+        toast.add({
+          id: 'rescue-request-updated',
+          title: 'Rescue request updated successfully.',
+          type: 'success',
+          timeout: 4000,
+        });
       } else {
         await axiosSecure.post('/rescue-requests', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        toast.add({
+          id: 'rescue-request-created',
+          title: 'Emergency rescue alert submitted successfully.',
+          type: 'success',
+          timeout: 4000,
         });
       }
 

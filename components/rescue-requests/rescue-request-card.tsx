@@ -85,7 +85,7 @@ const RescueRequestCard = ({ request, onClick }: RescueRequestCardProps) => {
                   onError={() => setImgError(true)}
                 />
               ) : (
-                <LifeBuoy className="size-8 text-emerald-600/70 dark:text-emerald-400/70" />
+                <LifeBuoy className="size-8 text-muted-foreground/60" />
               )}
             </div>
           </div>

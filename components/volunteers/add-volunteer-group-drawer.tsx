@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import ModernButton from '@/components/modernBtn';
 import MuiDrawer from '@/components/mui-drawer';
+import { toast } from '@/components/ui/toast';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import { publicApi } from '@/app/lib/public-api';
 import { volunteerGroupSchema } from '@/app/lib/validations/volunteer-group-schema';
@@ -149,8 +150,20 @@ const AddVolunteerGroupDrawer = ({
           `/volunteers/organization-requests/${editGroup.id}`,
           payload
         );
+        toast.add({
+          id: 'volunteer-group-updated',
+          title: 'Volunteer group updated successfully!',
+          type: 'success',
+          timeout: 4000,
+        });
       } else {
         await axiosSecure.post('/volunteers/organization-requests', payload);
+        toast.add({
+          id: 'volunteer-group-created',
+          title: 'Volunteer group created successfully!',
+          type: 'success',
+          timeout: 4000,
+        });
       }
 
       onSuccess();

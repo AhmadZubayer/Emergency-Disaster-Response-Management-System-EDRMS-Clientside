@@ -28,6 +28,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import MuiModal from '@/components/mui-modal';
+import { toast } from '@/components/ui/toast';
 import { publicApi } from '@/app/lib/public-api';
 import useAuth from '@/app/hooks/useAuth';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
@@ -83,6 +84,12 @@ const MissingPersonDetailPage = () => {
       await axiosSecure.patch(`/missing-persons/${person.id}/status`, {
         status: newStatus,
       });
+      toast.add({
+        id: `person-status-${person.id}`,
+        title: `Report status updated to ${newStatus}.`,
+        type: 'success',
+        timeout: 4000,
+      });
       await fetchPerson();
     } finally {
       setActionLoading(false);
@@ -95,6 +102,12 @@ const MissingPersonDetailPage = () => {
     try {
       setActionLoading(true);
       await axiosSecure.delete(`/missing-persons/${person.id}`);
+      toast.add({
+        id: `person-delete-${person.id}`,
+        title: 'Missing person report moved to trash.',
+        type: 'success',
+        timeout: 4000,
+      });
       router.push('/missing-persons');
     } finally {
       setActionLoading(false);
@@ -310,11 +323,11 @@ const MissingPersonDetailPage = () => {
                       </div>
                     ) : (
                       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <Lock className="size-3 text-amber-500 shrink-0" />
+                        <Lock className="size-3 text-muted-foreground shrink-0" />
                         <span>
                           <Link
-                            href={`/sign-in?redirect=/missing-persons/${id}`}
-                            className="font-semibold text-emerald-600 underline"
+                            href={`/sign-in?returnUrl=/missing-persons/${id}`}
+                            className="font-semibold text-foreground underline hover:text-primary"
                           >
                             Sign in
                           </Link>{' '}

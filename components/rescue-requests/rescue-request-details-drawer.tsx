@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { LifeBuoy } from 'lucide-react';
+import { toast } from '@/components/ui/toast';
 import useAuth from '@/app/hooks/useAuth';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import MuiDrawer from '@/components/mui-drawer';
@@ -63,6 +64,12 @@ const RescueRequestDetailsDrawer = ({
       await axiosSecure.patch(`/rescue-requests/${displayRequest.id}/status`, {
         status: 'RESCUED',
       });
+      toast.add({
+        id: 'rescue-request-rescued',
+        title: 'Status updated to Rescued.',
+        type: 'success',
+        timeout: 4000,
+      });
       onRefresh();
       onOpenChange(false);
     } catch (err: any) {
@@ -78,6 +85,12 @@ const RescueRequestDetailsDrawer = ({
       setActionLoading(true);
       setActionError('');
       await axiosSecure.delete(`/rescue-requests/${displayRequest.id}`);
+      toast.add({
+        id: 'rescue-request-deleted',
+        title: 'Rescue request moved to trash.',
+        type: 'success',
+        timeout: 4000,
+      });
       onRefresh();
       onOpenChange(false);
     } catch (err: any) {

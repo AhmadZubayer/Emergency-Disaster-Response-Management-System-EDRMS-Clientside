@@ -173,11 +173,11 @@ const ReliefOrgSignUpForm = () => {
   if (submittedSuccess) {
     return (
       <Card className="w-full max-w-xl shadow-2xl border-border/80 bg-white/95 dark:bg-card/95 backdrop-blur-md rounded-2xl p-6 text-center space-y-6">
-        <div className="size-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto text-emerald-600">
+        <div className="size-16 rounded-2xl bg-muted/60 border border-border/60 flex items-center justify-center mx-auto text-foreground">
           <CheckCircle2 className="size-9" />
         </div>
         <div className="space-y-2">
-          <Badge variant="outline" className="text-emerald-700 bg-emerald-50 border-emerald-200 uppercase font-bold text-[10px] tracking-wider px-2.5 py-0.5">
+          <Badge variant="outline" className="text-foreground bg-muted border-border/60 uppercase font-bold text-[10px] tracking-wider px-2.5 py-0.5">
             Application Received
           </Badge>
           <h2 className="text-2xl font-bold tracking-tight text-foreground">
@@ -197,7 +197,7 @@ const ReliefOrgSignUpForm = () => {
             Go to Profile
           </Button>
           <Button
-            className="w-full sm:w-auto rounded-xl text-xs font-semibold px-6 bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="w-full sm:w-auto rounded-xl text-xs font-semibold px-6"
             onClick={() => router.push('/')}
           >
             Return to Home
@@ -210,7 +210,7 @@ const ReliefOrgSignUpForm = () => {
   return (
     <Card className="w-full max-w-2xl shadow-2xl border-border/80 bg-white/95 dark:bg-card/95 backdrop-blur-md rounded-2xl p-2 sm:p-4 my-6">
       <CardHeader className="text-center pb-4 space-y-1.5">
-        <div className="size-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto text-emerald-600 mb-1">
+        <div className="size-12 rounded-xl bg-muted/60 border border-border/60 flex items-center justify-center mx-auto text-foreground mb-1">
           <Building2 className="size-6" />
         </div>
         <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
@@ -388,7 +388,7 @@ const ReliefOrgSignUpForm = () => {
                 id="verificationDocs"
               />
               <div className="flex flex-col items-center justify-center gap-1.5 pointer-events-none">
-                <div className="size-9 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                <div className="size-9 rounded-full bg-muted/60 flex items-center justify-center text-foreground">
                   <Upload className="size-4.5" />
                 </div>
                 <div className="text-xs font-semibold text-foreground">
@@ -412,7 +412,7 @@ const ReliefOrgSignUpForm = () => {
                     className="flex items-center justify-between px-3 py-2 bg-muted/40 border border-border/60 rounded-xl text-xs"
                   >
                     <div className="flex items-center gap-2 truncate min-w-0">
-                      <FileText className="size-4 text-emerald-600 shrink-0" />
+                      <FileText className="size-4 text-muted-foreground shrink-0" />
                       <span className="font-medium text-foreground truncate">{file.name}</span>
                       <span className="text-[10px] text-muted-foreground shrink-0 font-mono">
                         ({formatFileSize(file.size)})

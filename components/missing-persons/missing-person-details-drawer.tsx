@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { User } from 'lucide-react';
+import { toast } from '@/components/ui/toast';
 import useAuth from '@/app/hooks/useAuth';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import MuiDrawer from '@/components/mui-drawer';
@@ -50,6 +51,12 @@ const MissingPersonDetailsDrawer = ({
       await axiosSecure.patch(`/missing-persons/${displayPerson.id}/status`, {
         status: 'FOUND',
       });
+      toast.add({
+        id: 'missing-person-found',
+        title: 'Report status updated to Found.',
+        type: 'success',
+        timeout: 4000,
+      });
       onRefresh();
       onOpenChange(false);
     } catch (err: any) {
@@ -65,6 +72,12 @@ const MissingPersonDetailsDrawer = ({
       setActionLoading(true);
       setActionError('');
       await axiosSecure.delete(`/missing-persons/${displayPerson.id}`);
+      toast.add({
+        id: 'missing-person-deleted',
+        title: 'Missing person report moved to trash.',
+        type: 'success',
+        timeout: 4000,
+      });
       onRefresh();
       onOpenChange(false);
     } catch (err: any) {

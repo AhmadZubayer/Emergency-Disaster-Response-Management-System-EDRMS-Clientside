@@ -50,13 +50,7 @@ const ReliefOrgSidebar = () => {
                   : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'
               }`}
             >
-              <Icon
-                className={`size-4 shrink-0 ${
-                  isActive
-                    ? 'text-emerald-600 dark:text-emerald-400'
-                    : 'text-muted-foreground'
-                }`}
-              />
+              <Icon className="size-4 shrink-0" />
               <span>{item.label}</span>
             </Link>
           );

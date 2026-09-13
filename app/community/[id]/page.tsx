@@ -119,6 +119,12 @@ const CommunityPostDetailPage = () => {
       await axiosSecure.post(`/community-posts/${post.postId}/comments`, {
         content: newComment.trim(),
       });
+      toast.add({
+        id: 'comment-posted-success',
+        title: 'Comment posted successfully!',
+        type: 'success',
+        timeout: 4000,
+      });
       setNewComment('');
       await fetchComments();
       await fetchPost();
@@ -140,6 +146,12 @@ const CommunityPostDetailPage = () => {
       await axiosSecure.delete(
         `/community-posts/${post.postId}/comments/${commentId}`
       );
+      toast.add({
+        id: 'comment-deleted-success',
+        title: 'Comment deleted.',
+        type: 'success',
+        timeout: 4000,
+      });
       setComments((prev) => prev.filter((c) => c.id !== commentId));
       await fetchPost();
     } catch (err: any) {
@@ -310,7 +322,7 @@ const CommunityPostDetailPage = () => {
                   <CardHeader className="p-4 pb-3 border-b border-border/40">
                     <div className="flex items-center justify-between">
                       <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-                        <MessageSquare className="size-4 text-emerald-600" />
+                        <MessageSquare className="size-4 text-muted-foreground" />
                         Comments ({comments.length})
                       </h2>
                     </div>

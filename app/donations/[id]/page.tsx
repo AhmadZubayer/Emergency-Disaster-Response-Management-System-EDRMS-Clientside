@@ -523,7 +523,7 @@ const DonationDetailContent = () => {
                     className="w-fit"
                     onClick={() => {
                       if (!user) {
-                        router.push(`/sign-in?redirect=/donations/${id}`);
+                        router.push(`/sign-in?returnUrl=/donations/${id}`);
                       } else {
                         setIsRequestAidModalOpen(true);
                       }
@@ -827,7 +827,7 @@ const DonationDetailContent = () => {
               {selectedProofFile ? (
                 <div className="flex items-center justify-between w-full p-2 bg-card rounded-md border text-xs">
                   <div className="flex items-center gap-2 truncate">
-                    <FileText className="size-4 text-emerald-600 shrink-0" />
+                    <FileText className="size-4 text-muted-foreground shrink-0" />
                     <span className="truncate max-w-[200px] font-medium">{selectedProofFile.name}</span>
                     <span className="text-[10px] text-muted-foreground">
                       ({(selectedProofFile.size / 1024).toFixed(0)} KB)

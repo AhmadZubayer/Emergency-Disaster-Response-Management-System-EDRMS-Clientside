@@ -21,7 +21,7 @@ const NearbyRescueCard = ({
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-            <MapPin className="size-3.5 text-emerald-600" />
+            <MapPin className="size-3.5" />
             {request.address || 'Location provided by coordinates'}
           </p>
           <p className="mt-2 text-sm font-semibold leading-relaxed">{request.description}</p>

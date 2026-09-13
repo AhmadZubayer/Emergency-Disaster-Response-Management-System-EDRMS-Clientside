@@ -71,7 +71,7 @@ const SleekCard = ({ person, onClick }: SleekCardProps) => {
                   onError={() => setImgError(true)}
                 />
               ) : (
-                <User className="size-8 text-emerald-600/70 dark:text-emerald-400/70" />
+                <User className="size-8 text-muted-foreground/60" />
               )}
             </div>
           </div>

@@ -22,6 +22,7 @@ import { Calendar } from '@/components/ui/calendar';
 import ModernButton from '@/components/modernBtn';
 import MuiDrawer from '@/components/mui-drawer';
 import MuiModal from '@/components/mui-modal';
+import { toast } from '@/components/ui/toast';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import { disasterAlertSchema } from '@/app/lib/validations/disaster-alert-schema';
 import { Disaster, DisasterTypeCategory } from './types';
@@ -157,8 +158,20 @@ const AddDisasterDrawer = ({
 
       if (editDisaster) {
         await axiosSecure.patch(`/disaster/${editDisaster.id}`, payload);
+        toast.add({
+          id: 'disaster-alert-updated',
+          title: 'Disaster alert updated successfully!',
+          type: 'success',
+          timeout: 4000,
+        });
       } else {
         await axiosSecure.post('/disaster', payload);
+        toast.add({
+          id: 'disaster-alert-created',
+          title: 'Disaster alert published successfully!',
+          type: 'success',
+          timeout: 4000,
+        });
       }
 
       onSuccess();
@@ -336,7 +349,7 @@ const AddDisasterDrawer = ({
         }
       >
         <div className="flex items-start gap-3 py-1">
-          <AlertTriangle className="size-5 text-amber-500 shrink-0 mt-0.5" />
+          <AlertTriangle className="size-5 text-muted-foreground shrink-0 mt-0.5" />
           <p className="text-xs leading-relaxed text-muted-foreground">
             {editDisaster
               ? 'This will update the disaster alert in the system. Do you want to continue?'

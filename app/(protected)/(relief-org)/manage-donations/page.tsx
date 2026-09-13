@@ -19,6 +19,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import MuiModal from '@/components/mui-modal';
+import { toast } from '@/components/ui/toast';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import { publicApi } from '@/app/lib/public-api';
 import { DonationCampaign } from '@/components/donations/types';
@@ -62,6 +63,12 @@ const ManageDonationPage = () => {
     try {
       setActionLoading(true);
       await axiosSecure.delete(`/donations/campaigns/${confirmDeleteTarget.id}`);
+      toast.add({
+        id: `delete-campaign-${confirmDeleteTarget.id}`,
+        title: `Deleted donation campaign "${confirmDeleteTarget.title}".`,
+        type: 'success',
+        timeout: 4000,
+      });
       setConfirmDeleteTarget(null);
       await fetchCampaigns();
     } finally {

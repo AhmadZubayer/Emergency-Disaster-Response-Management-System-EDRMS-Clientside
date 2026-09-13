@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import ModernButton from '@/components/modernBtn';
+import { toast } from '@/components/ui/toast';
 import { signUpSchema } from '@/app/lib/validations/auth';
 import { useAuth } from '@/app/hooks/useAuth';
 
@@ -34,6 +36,7 @@ const GoogleIcon = () => (
 );
 
 const SignUpForm = () => {
+  const router = useRouter();
   const { registerUser } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -68,7 +71,14 @@ const SignUpForm = () => {
     try {
       setLoading(true);
       await registerUser(name, email, password);
+      toast.add({
+        id: 'signup-toast',
+        title: 'Check your email and sign in again.',
+        type: 'success',
+        timeout: 5000,
+      });
       setSuccess(true);
+      router.push('/');
     } catch (err: any) {
       const message =
         err.response?.data?.message ||

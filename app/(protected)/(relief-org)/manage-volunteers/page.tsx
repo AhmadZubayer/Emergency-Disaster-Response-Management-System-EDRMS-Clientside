@@ -18,6 +18,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import MuiModal from '@/components/mui-modal';
+import { toast } from '@/components/ui/toast';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import { VolunteerGroup } from '@/components/volunteers/types';
 import AddVolunteerGroupDrawer from '@/components/volunteers/add-volunteer-group-drawer';
@@ -57,6 +58,12 @@ const ManageVolunteerGroupsPage = () => {
       await axiosSecure.delete(
         `/volunteers/organization-requests/${confirmDeleteTarget.id}`
       );
+      toast.add({
+        id: `delete-group-${confirmDeleteTarget.id}`,
+        title: `Deleted "${confirmDeleteTarget.title}" successfully.`,
+        type: 'success',
+        timeout: 4000,
+      });
       setConfirmDeleteTarget(null);
       await fetchGroups();
     } finally {

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { AxiosError } from 'axios';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import { ENDPOINTS } from '@/app/lib/endpoints';
+import { toast } from '@/components/ui/toast';
 import {
   volunteerProfileUpdateSchema,
   volunteerRegistrationSchema,
@@ -77,8 +78,20 @@ const VolunteerProfileForm = ({
     try {
       if (profile) {
         await axiosSecure.patch(ENDPOINTS.VOLUNTEERS.UPDATE_PROFILE, payload);
+        toast.add({
+          id: 'volunteer-profile-updated',
+          title: 'Volunteer profile updated successfully!',
+          type: 'success',
+          timeout: 4000,
+        });
       } else {
         await axiosSecure.post(ENDPOINTS.VOLUNTEERS.REGISTER, payload);
+        toast.add({
+          id: 'volunteer-registered',
+          title: 'Joined volunteer network successfully!',
+          type: 'success',
+          timeout: 5000,
+        });
       }
       onSuccess();
     } catch (error) {

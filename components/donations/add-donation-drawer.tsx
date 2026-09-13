@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/select';
 import ModernButton from '@/components/modernBtn';
 import MuiDrawer from '@/components/mui-drawer';
+import { toast } from '@/components/ui/toast';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import { donationCampaignSchema } from '@/app/lib/validations/donation-campaign-schema';
 import { DonationCampaign } from './types';
@@ -171,9 +172,21 @@ const AddDonationDrawer = ({
         await axiosSecure.patch(`/donations/campaigns/${editCampaign.id}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
+        toast.add({
+          id: 'donation-campaign-updated',
+          title: 'Donation campaign updated successfully!',
+          type: 'success',
+          timeout: 4000,
+        });
       } else {
         await axiosSecure.post('/donations/campaigns', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        toast.add({
+          id: 'donation-campaign-created',
+          title: 'Donation campaign created successfully!',
+          type: 'success',
+          timeout: 4000,
         });
       }
 

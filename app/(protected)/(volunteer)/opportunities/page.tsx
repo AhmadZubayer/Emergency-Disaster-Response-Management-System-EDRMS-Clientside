@@ -6,6 +6,7 @@ import { HeartHandshake } from 'lucide-react';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import { ENDPOINTS } from '@/app/lib/endpoints';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from '@/components/ui/toast';
 import OpportunityCard from '@/components/volunteers/opportunity-card';
 import { OrganizationJoin, OrganizationOpportunity, VolunteerProfile } from '@/components/volunteers/types';
 
@@ -60,6 +61,12 @@ const OpportunitiesPage = () => {
     setMessage(null);
     try {
       await axiosSecure.post(ENDPOINTS.VOLUNTEERS.JOIN_ORGANIZATION_REQUEST(id));
+      toast.add({
+        id: `join-opportunity-${id}`,
+        title: 'You joined the volunteer opportunity successfully.',
+        type: 'success',
+        timeout: 4000,
+      });
       setMessage({ type: 'success', text: 'You joined the volunteer opportunity successfully.' });
       await loadData();
     } catch (error) {

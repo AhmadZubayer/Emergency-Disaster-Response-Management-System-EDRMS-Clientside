@@ -24,6 +24,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import MuiModal from '@/components/mui-modal';
+import { toast } from '@/components/ui/toast';
 import LeafletMap from '@/components/leaflet-map';
 import { publicApi } from '@/app/lib/public-api';
 import useAuth from '@/app/hooks/useAuth';
@@ -104,6 +105,12 @@ const DisasterDetailPage = () => {
     try {
       setActionLoading(true);
       await axiosSecure.patch(`/disaster/${disaster.id}/mark-safe`);
+      toast.add({
+        id: `disaster-safe-${disaster.id}`,
+        title: `Disaster alert "${disaster.disaster_name}" marked as safe.`,
+        type: 'success',
+        timeout: 4000,
+      });
       setConfirmSafeModal(false);
       await fetchDisaster();
     } finally {
@@ -116,6 +123,12 @@ const DisasterDetailPage = () => {
     try {
       setActionLoading(true);
       await axiosSecure.delete(`/disaster/${disaster.id}`);
+      toast.add({
+        id: `disaster-delete-${disaster.id}`,
+        title: `Disaster alert "${disaster.disaster_name}" deleted.`,
+        type: 'success',
+        timeout: 4000,
+      });
       setConfirmDeleteModal(false);
       router.push('/disaster');
     } finally {
@@ -340,7 +353,7 @@ const DisasterDetailPage = () => {
                         </>
                       ) : (
                         <>
-                          <ShieldCheck className="size-3.5 text-emerald-600" />
+                          <ShieldCheck className="size-3.5" />
                           I am safe
                         </>
                       )}
@@ -400,7 +413,7 @@ const DisasterDetailPage = () => {
         }
       >
         <div className="flex items-start gap-3 py-1">
-          <ShieldCheck className="size-5 text-emerald-600 shrink-0 mt-0.5" />
+          <ShieldCheck className="size-5 text-muted-foreground shrink-0 mt-0.5" />
           <p className="text-xs leading-relaxed text-muted-foreground">
             Are you sure you want to mark <strong>{disaster?.disaster_name}</strong> as safe?
           </p>

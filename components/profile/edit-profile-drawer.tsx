@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import ModernButton from '@/components/modernBtn';
+import { toast } from '@/components/ui/toast';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import { userProfileSchema } from '@/app/lib/validations/user-profile-schema';
 import MuiDrawer from '@/components/mui-drawer';
@@ -173,6 +174,13 @@ const EditProfileDrawer = ({
 
       await axiosSecure.patch('/users/update-profile', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      toast.add({
+        id: 'profile-update-success',
+        title: 'Profile updated successfully!',
+        type: 'success',
+        timeout: 4000,
       });
 
       onSuccess();

@@ -274,7 +274,7 @@ const ProfilePage = () => {
             <div className="flex-1 w-full min-w-0 space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/60 pb-6">
                 <div className="flex items-center gap-4">
-                  <div className="size-16 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 font-bold text-2xl shrink-0 overflow-hidden">
+                  <div className="size-16 rounded-xl bg-muted/60 border border-border/60 flex items-center justify-center text-foreground font-bold text-2xl shrink-0 overflow-hidden">
                     {profile?.photo_url ? (
                       <img
                         src={profile.photo_url}
@@ -282,7 +282,7 @@ const ProfilePage = () => {
                         className="size-full object-cover"
                       />
                     ) : (
-                      <User className="size-8 text-emerald-600" />
+                      <User className="size-8 text-muted-foreground" />
                     )}
                   </div>
                   <div>
@@ -834,7 +834,7 @@ const ProfilePage = () => {
                                     size="sm"
                                     disabled={isBusy}
                                     onClick={() => handleRestore(item.id, item.item_title)}
-                                    className="h-7 text-xs font-semibold px-2.5 gap-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200 dark:border-emerald-900/50"
+                                    className="h-7 text-xs font-semibold px-2.5 gap-1"
                                   >
                                     {isRestoring ? (
                                       <Loader2 className="size-3 animate-spin" />

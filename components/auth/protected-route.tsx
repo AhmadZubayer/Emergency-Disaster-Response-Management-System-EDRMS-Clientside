@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import useAuth from '@/app/hooks/useAuth';
 
 interface ProtectedRouteProps {
@@ -11,12 +11,14 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/sign-in');
+      const returnUrl = pathname ? `?returnUrl=${encodeURIComponent(pathname)}` : '';
+      router.push(`/sign-in${returnUrl}`);
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, pathname]);
 
   if (loading || !user) {
     return (

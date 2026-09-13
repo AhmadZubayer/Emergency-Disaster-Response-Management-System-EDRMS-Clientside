@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import ModernButton from '@/components/modernBtn';
+import { toast } from '@/components/ui/toast';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import { missingPersonSchema } from '@/app/lib/validations/missing-person-form-schema';
 import { MissingPerson } from '@/components/missing-persons/missing-person-dialog';
@@ -136,9 +137,21 @@ const AddMissingPersonDrawer = ({
         await axiosSecure.patch(`/missing-persons/${editPerson.id}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
+        toast.add({
+          id: 'missing-person-updated',
+          title: 'Missing person report updated successfully.',
+          type: 'success',
+          timeout: 4000,
+        });
       } else {
         await axiosSecure.post('/missing-persons', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        toast.add({
+          id: 'missing-person-created',
+          title: 'Missing person reported successfully.',
+          type: 'success',
+          timeout: 4000,
         });
       }
 

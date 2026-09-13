@@ -32,6 +32,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import MuiModal from '@/components/mui-modal';
+import { toast } from '@/components/ui/toast';
 import LeafletMap from '@/components/leaflet-map';
 import { publicApi } from '@/app/lib/public-api';
 import useAuth from '@/app/hooks/useAuth';
@@ -104,6 +105,12 @@ const RescueRequestDetailPage = () => {
       await axiosSecure.patch(`/rescue-requests/${request.id}/status`, {
         status: newStatus,
       });
+      toast.add({
+        id: `rescue-status-${request.id}`,
+        title: `Rescue request marked as ${newStatus}.`,
+        type: 'success',
+        timeout: 4000,
+      });
       await fetchRequest();
     } finally {
       setActionLoading(false);
@@ -116,6 +123,12 @@ const RescueRequestDetailPage = () => {
     try {
       setActionLoading(true);
       await axiosSecure.delete(`/rescue-requests/${request.id}`);
+      toast.add({
+        id: `rescue-delete-${request.id}`,
+        title: 'Rescue request moved to trash.',
+        type: 'success',
+        timeout: 4000,
+      });
       router.push('/rescue-requests');
     } finally {
       setActionLoading(false);
@@ -202,7 +215,7 @@ const RescueRequestDetailPage = () => {
                           </div>
                         </>
                       ) : (
-                        <LifeBuoy className="size-8 text-emerald-600" />
+                        <LifeBuoy className="size-8 text-muted-foreground" />
                       )}
                     </div>
 
@@ -341,15 +354,15 @@ const RescueRequestDetailPage = () => {
                         </div>
                       ) : (
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-0.5">
-                          <Lock className="size-3 text-amber-500 shrink-0" />
+                          <Lock className="size-3 text-muted-foreground shrink-0" />
                           <span>
                             <Link
-                              href={`/sign-in?redirect=/rescue-requests/${id}`}
-                              className="font-semibold text-emerald-600 underline"
+                              href={`/sign-in?returnUrl=/rescue-requests/${id}`}
+                              className="font-semibold text-foreground underline hover:text-primary"
                             >
                               Sign in
                             </Link>{' '}
-                            to view phone
+                              to view phone
                           </span>
                         </div>
                       )}

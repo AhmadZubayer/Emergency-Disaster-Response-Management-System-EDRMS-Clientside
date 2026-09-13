@@ -25,6 +25,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import MuiModal from '@/components/mui-modal';
+import { toast } from '@/components/ui/toast';
 import useAxiosSecure from '@/app/hooks/useAxiosSecure';
 import { publicApi } from '@/app/lib/public-api';
 import { Disaster } from '@/components/disaster/types';
@@ -64,6 +65,12 @@ const ManageDisasterAlertPage = () => {
     try {
       setActionLoading(true);
       await axiosSecure.patch(`/disaster/${confirmSafeTarget.id}/mark-safe`);
+      toast.add({
+        id: `disaster-safe-${confirmSafeTarget.id}`,
+        title: `Disaster alert "${confirmSafeTarget.disaster_name}" marked as safe.`,
+        type: 'success',
+        timeout: 4000,
+      });
       setConfirmSafeTarget(null);
       await fetchDisasters();
     } finally {
@@ -76,6 +83,12 @@ const ManageDisasterAlertPage = () => {
     try {
       setActionLoading(true);
       await axiosSecure.delete(`/disaster/${confirmDeleteTarget.id}`);
+      toast.add({
+        id: `disaster-delete-${confirmDeleteTarget.id}`,
+        title: `Disaster alert "${confirmDeleteTarget.disaster_name}" deleted.`,
+        type: 'success',
+        timeout: 4000,
+      });
       setConfirmDeleteTarget(null);
       await fetchDisasters();
     } finally {
@@ -180,9 +193,9 @@ const ManageDisasterAlertPage = () => {
                           {!d.is_verified && (
                             <DropdownMenuItem
                               onClick={() => setConfirmSafeTarget(d)}
-                              className="gap-2 cursor-pointer text-emerald-600 focus:text-emerald-600"
+                              className="gap-2 cursor-pointer"
                             >
-                              <ShieldCheck className="size-3.5" />
+                              <ShieldCheck className="size-3.5 text-muted-foreground" />
                               <span>Mark as Safe</span>
                             </DropdownMenuItem>
                           )}
@@ -240,7 +253,7 @@ const ManageDisasterAlertPage = () => {
         }
       >
         <div className="flex items-start gap-3 py-1">
-          <ShieldCheck className="size-5 text-emerald-600 shrink-0 mt-0.5" />
+          <ShieldCheck className="size-5 text-muted-foreground shrink-0 mt-0.5" />
           <p className="text-xs leading-relaxed text-muted-foreground">
             Are you sure you want to mark <strong>{confirmSafeTarget?.disaster_name}</strong> as safe?
           </p>
