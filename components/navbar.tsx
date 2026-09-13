@@ -168,6 +168,15 @@ const Navbar = () => {
                       <UserRound className="size-4 text-neutral-500" />
                       <span>View Profile</span>
                     </DropdownMenuItem>
+                    {user?.role?.toUpperCase() === 'ADMIN' && (
+                      <DropdownMenuItem
+                        className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-bold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
+                        render={<Link href="/admin" />}
+                      >
+                        <ShieldAlert className="size-4 text-emerald-600" />
+                        <span>Admin Panel</span>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
                       render={<Link href="/manage-donations" />}
