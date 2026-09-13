@@ -14,6 +14,16 @@ export const axiosSecure = axios.create({
   },
 });
 
+axiosSecure.interceptors.request.use((config) => {
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
+
 const useAxiosSecure = () => {
   const { user, logOut } = useAuth();
   const router = useRouter();
@@ -40,5 +50,3 @@ const useAxiosSecure = () => {
 };
 
 export default useAxiosSecure;
-
-
