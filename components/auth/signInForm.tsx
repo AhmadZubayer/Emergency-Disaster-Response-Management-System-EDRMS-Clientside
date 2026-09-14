@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,9 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import ModernButton from '@/components/modernBtn';
 import SignInSuccess from '@/components/auth/signInSuccess';
-import { toast } from '@/components/ui/toast';
 import { signInSchema } from '@/lib/validations/auth';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/app/hooks/useAuth';
 
 const GoogleIcon = () => (
   <svg className="size-4" viewBox="0 0 24 24">
@@ -36,9 +34,6 @@ const GoogleIcon = () => (
 );
 
 const SignInForm = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const returnUrl = searchParams.get('returnUrl') || searchParams.get('redirect') || searchParams.get('callbackUrl') || '/';
   const { user, signInUser } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -72,14 +67,7 @@ const SignInForm = () => {
     try {
       setLoading(true);
       await signInUser(email, password);
-      toast.add({
-        id: 'signin-toast',
-        title: 'Signed in successfully!',
-        type: 'success',
-        timeout: 3000,
-      });
       setSuccess(true);
-      router.push(returnUrl);
     } catch (err: any) {
       const message =
         err.response?.data?.message ||
@@ -91,11 +79,15 @@ const SignInForm = () => {
     }
   };
 
+  const handleGoogleSignIn = () => {
+    window.location.href = '/auth/google';
+  };
+
   return (
-    <Card className="w-full max-w-sm border">
+    <Card className="w-full max-w-sm rounded-2xl border border-border/50 bg-card/75 backdrop-blur-xl shadow-xl">
       <CardHeader className="space-y-1">
-        <CardTitle >Login to your account</CardTitle>
-        <CardDescription className="text-muted-foreground">
+        <CardTitle className="text-xl font-bold tracking-tight">Login to your account</CardTitle>
+        <CardDescription className="text-sm text-muted-foreground">
           Enter your email below to login to your account
         </CardDescription>
       </CardHeader>
@@ -119,7 +111,7 @@ const SignInForm = () => {
                 placeholder="m@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-
+                className="h-10 px-3 bg-background/50"
               />
               {errors.email && (
                 <p className="text-xs text-destructive">{errors.email}</p>
@@ -142,7 +134,7 @@ const SignInForm = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-
+                  className="h-10 pl-3 pr-10 bg-background/50"
                 />
                 <button
                   type="button"
@@ -166,7 +158,8 @@ const SignInForm = () => {
             <Button
               type="button"
               variant="outline"
-              className="w-full"
+              onClick={handleGoogleSignIn}
+              className="w-full h-10 rounded-full border-border/80 bg-background/50 hover:bg-muted font-medium"
             >
               <GoogleIcon />
               Login with Google
@@ -175,13 +168,10 @@ const SignInForm = () => {
         )}
       </CardContent>
 
-      <CardFooter className="justify-center">
+      <CardFooter className="justify-center pt-0">
         <p className="text-xs text-muted-foreground">
           Don&apos;t have an account?{' '}
-          <Link
-            href={`/sign-up${returnUrl && returnUrl !== '/' ? `?returnUrl=${encodeURIComponent(returnUrl)}` : ''}`}
-            className="text-foreground underline underline-offset-4 font-medium hover:text-primary"
-          >
+          <Link href="/sign-up" className="text-foreground underline underline-offset-4 font-medium hover:text-primary">
             Sign up
           </Link>
         </p>

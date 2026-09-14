@@ -294,7 +294,8 @@ export const getDashboardRoutesByRole = (
 
 export const getPrimaryProfileRoute = (role?: string | null): string => {
   const norm = normalizeRole(role);
-  if (norm === 'RELIEF_ORG' || norm === 'ADMIN') {
+  if (norm === 'ADMIN') return '/admin';
+  if (norm === 'RELIEF_ORG') {
     return '/relief-org/profile';
   }
   if (norm === 'VOLUNTEER') {

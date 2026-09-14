@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,9 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import ModernButton from '@/components/modernBtn';
-import { toast } from '@/components/ui/toast';
 import { signUpSchema } from '@/lib/validations/auth';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/app/hooks/useAuth';
 
 const GoogleIcon = () => (
   <svg className="size-4" viewBox="0 0 24 24">
@@ -36,7 +34,6 @@ const GoogleIcon = () => (
 );
 
 const SignUpForm = () => {
-  const router = useRouter();
   const { registerUser } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -71,14 +68,7 @@ const SignUpForm = () => {
     try {
       setLoading(true);
       await registerUser(name, email, password);
-      toast.add({
-        id: 'signup-toast',
-        title: 'Check your email and sign in again.',
-        type: 'success',
-        timeout: 5000,
-      });
       setSuccess(true);
-      router.push('/');
     } catch (err: any) {
       const message =
         err.response?.data?.message ||
@@ -91,11 +81,15 @@ const SignUpForm = () => {
   };
 
 
+  const handleGoogleSignIn = () => {
+    window.location.href = '/auth/google';
+  };
+
   return (
-    <Card className="w-full max-w-sm border">
+    <Card className="w-full max-w-sm rounded-2xl border border-border/50 bg-card/75 backdrop-blur-xl shadow-xl">
       <CardHeader className="space-y-1">
-        <CardTitle >Create an account</CardTitle>
-        <CardDescription className="text-muted-foreground">
+        <CardTitle className="text-xl font-bold tracking-tight">Create an account</CardTitle>
+        <CardDescription className="text-sm text-muted-foreground">
           Enter your details below to create your account
         </CardDescription>
       </CardHeader>
@@ -103,15 +97,15 @@ const SignUpForm = () => {
       <CardContent>
         {success ? (
           <div className="space-y-4 py-2">
-            <Alert className="text-emerald-600 dark:text-emerald-400">
-              <CheckCircle2 className="size-4 text-primary dark:text-primary" />
-              <AlertTitle >Sign up successful</AlertTitle>
-              <AlertDescription >
+            <Alert className="border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+              <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />
+              <AlertTitle className="font-semibold">Sign up successful</AlertTitle>
+              <AlertDescription className="text-xs">
                 Check your email for verification.
               </AlertDescription>
             </Alert>
             <div className="pt-2 text-center">
-              <Button render={<Link href="/sign-in" />} className="w-full">
+              <Button render={<Link href="/sign-in" />} className="w-full h-10 rounded-full font-medium">
                 Back to Sign In
               </Button>
             </div>
@@ -132,7 +126,7 @@ const SignUpForm = () => {
                 placeholder="John Doe"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-
+                className="h-10 px-3 bg-background/50"
               />
               {errors.name && (
                 <p className="text-xs text-destructive">{errors.name}</p>
@@ -147,7 +141,7 @@ const SignUpForm = () => {
                 placeholder="m@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-
+                className="h-10 px-3 bg-background/50"
               />
               {errors.email && (
                 <p className="text-xs text-destructive">{errors.email}</p>
@@ -162,7 +156,7 @@ const SignUpForm = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-
+                  className="h-10 pl-3 pr-10 bg-background/50"
                 />
                 <button
                   type="button"
@@ -185,7 +179,7 @@ const SignUpForm = () => {
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-
+                  className="h-10 pl-3 pr-10 bg-background/50"
                 />
                 <button
                   type="button"
@@ -209,7 +203,8 @@ const SignUpForm = () => {
             <Button
               type="button"
               variant="outline"
-              className="w-full"
+              onClick={handleGoogleSignIn}
+              className="w-full h-10 rounded-full border-border/80 bg-background/50 hover:bg-muted font-medium"
             >
               <GoogleIcon />
               Sign up with Google
@@ -218,7 +213,7 @@ const SignUpForm = () => {
         )}
       </CardContent>
 
-      <CardFooter className="justify-center">
+      <CardFooter className="justify-center pt-0">
         <p className="text-xs text-muted-foreground">
           Already have an account?{' '}
           <Link href="/sign-in" className="text-foreground underline underline-offset-4 font-medium hover:text-primary">

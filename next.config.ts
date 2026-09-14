@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   rewrites: async () => {
     return [
       {
+        source: '/auth/:path*',
+        destination: `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/auth/:path*`,
+      },
+      {
         source: '/api/:path*',
         destination: `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/:path*`,
       },
