@@ -1,21 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Upload, MapPin, Loader2 } from 'lucide-react';
+import { Upload, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Spinner } from '@/components/ui/spinner';
+import MuiSelect from '@/components/mui-select';
 import ModernButton from '@/components/modernBtn';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { rescueRequestSchema } from '@/app/lib/validations/rescue-request-form-schema';
+import { toast } from '@/components/ui/toast';
+import { axiosSecure } from '@/lib/api';
+import { rescueRequestSchema } from '@/lib/validations/rescue-request-form-schema';
 import { RescueRequest, UrgencyLevel } from './types';
 import MuiDrawer from '@/components/mui-drawer';
 
@@ -32,7 +28,6 @@ const AddRescueRequestDrawer = ({
   onSuccess,
   editRequest,
 }: AddRescueRequestDrawerProps) => {
-  const axiosSecure = useAxiosSecure();
 
   const [address, setAddress] = useState('');
   const [latitude, setLatitude] = useState('');
@@ -170,9 +165,21 @@ const AddRescueRequestDrawer = ({
         await axiosSecure.patch(`/rescue-requests/${editRequest.id}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
+        toast.add({
+          id: 'rescue-request-updated',
+          title: 'Rescue request updated successfully.',
+          type: 'success',
+          timeout: 4000,
+        });
       } else {
         await axiosSecure.post('/rescue-requests', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        toast.add({
+          id: 'rescue-request-created',
+          title: 'Emergency rescue alert submitted successfully.',
+          type: 'success',
+          timeout: 4000,
         });
       }
 
@@ -204,7 +211,7 @@ const AddRescueRequestDrawer = ({
         )}
 
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
             Coordinates
           </span>
           <Button
@@ -213,10 +220,10 @@ const AddRescueRequestDrawer = ({
             size="sm"
             onClick={handleDetectLocation}
             disabled={detectingLocation}
-            className="gap-1.5 h-8 text-xs font-semibold"
+
           >
             {detectingLocation ? (
-              <Loader2 className="size-3.5 animate-spin" />
+              <Spinner className="size-3.5" />
             ) : (
               <MapPin className="size-3.5" />
             )}
@@ -226,8 +233,8 @@ const AddRescueRequestDrawer = ({
 
         {locationMessage && (
           <p
-            className={`text-[11px] font-medium ${
-              isLocationError ? 'text-red-500' : 'text-emerald-600'
+            className={`text-xs font-medium ${
+              isLocationError ? 'text-red-500' : 'text-primary'
             }`}
           >
             {locationMessage}
@@ -236,7 +243,7 @@ const AddRescueRequestDrawer = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label htmlFor="latitude" className="text-xs font-semibold">
+            <Label htmlFor="latitude" >
               Latitude <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -246,15 +253,15 @@ const AddRescueRequestDrawer = ({
               placeholder="e.g. 23.8103"
               value={latitude}
               onChange={(e) => setLatitude(e.target.value)}
-              className="h-10 text-xs rounded-xl"
+
             />
             {errors.latitude && (
-              <p className="text-[11px] text-red-500 font-medium">{errors.latitude}</p>
+              <p className="text-xs text-red-500 font-medium">{errors.latitude}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="longitude" className="text-xs font-semibold">
+            <Label htmlFor="longitude" >
               Longitude <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -264,15 +271,15 @@ const AddRescueRequestDrawer = ({
               placeholder="e.g. 90.4125"
               value={longitude}
               onChange={(e) => setLongitude(e.target.value)}
-              className="h-10 text-xs rounded-xl"
+
             />
             {errors.longitude && (
-              <p className="text-[11px] text-red-500 font-medium">{errors.longitude}</p>
+              <p className="text-xs text-red-500 font-medium">{errors.longitude}</p>
             )}
           </div>
 
           <div className="space-y-1.5 col-span-1 sm:col-span-2">
-            <Label htmlFor="address" className="text-xs font-semibold">
+            <Label htmlFor="address" >
               Address / Landmark
             </Label>
             <Input
@@ -280,32 +287,30 @@ const AddRescueRequestDrawer = ({
               placeholder="e.g. House 12, Road 4, Sector 7, Uttara, Dhaka"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              className="h-10 text-xs rounded-xl"
+
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold">
+            <Label htmlFor="urgency" >
               Urgency Level <span className="text-red-500">*</span>
             </Label>
-            <Select
+            <MuiSelect
+              id="urgency"
               value={urgencyLevel}
-              onValueChange={(val) => setUrgencyLevel(val as UrgencyLevel)}
-            >
-              <SelectTrigger className="h-10 text-xs rounded-xl">
-                <SelectValue placeholder="Select urgency" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="LOW">LOW</SelectItem>
-                <SelectItem value="MEDIUM">MEDIUM</SelectItem>
-                <SelectItem value="HIGH">HIGH</SelectItem>
-                <SelectItem value="CRITICAL">CRITICAL</SelectItem>
-              </SelectContent>
-            </Select>
+              onChange={(val) => setUrgencyLevel(val as UrgencyLevel)}
+              placeholder="Select urgency"
+              options={[
+                { label: 'LOW', value: 'LOW' },
+                { label: 'MEDIUM', value: 'MEDIUM' },
+                { label: 'HIGH', value: 'HIGH' },
+                { label: 'CRITICAL', value: 'CRITICAL' },
+              ]}
+            />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="peopleCount" className="text-xs font-semibold">
+            <Label htmlFor="peopleCount" >
               People Count <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -314,15 +319,15 @@ const AddRescueRequestDrawer = ({
               min="1"
               value={peopleCount}
               onChange={(e) => setPeopleCount(e.target.value)}
-              className="h-10 text-xs rounded-xl"
+
             />
             {errors.peopleCount && (
-              <p className="text-[11px] text-red-500 font-medium">{errors.peopleCount}</p>
+              <p className="text-xs text-red-500 font-medium">{errors.peopleCount}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="contactPhone" className="text-xs font-semibold">
+            <Label htmlFor="contactPhone" >
               Contact Phone <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -331,15 +336,15 @@ const AddRescueRequestDrawer = ({
               placeholder="e.g. +8801700000000"
               value={contactPhone}
               onChange={(e) => setContactPhone(e.target.value)}
-              className="h-10 text-xs rounded-xl"
+
             />
             {errors.contactPhone && (
-              <p className="text-[11px] text-red-500 font-medium">{errors.contactPhone}</p>
+              <p className="text-xs text-red-500 font-medium">{errors.contactPhone}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="medicalNotes" className="text-xs font-semibold">
+            <Label htmlFor="medicalNotes" >
               Medical Notes (Optional)
             </Label>
             <Input
@@ -347,13 +352,13 @@ const AddRescueRequestDrawer = ({
               placeholder="e.g. 1 elderly person injured"
               value={medicalNotes}
               onChange={(e) => setMedicalNotes(e.target.value)}
-              className="h-10 text-xs rounded-xl"
+
             />
           </div>
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="description" className="text-xs font-semibold">
+          <Label htmlFor="description" >
             Situation Description <span className="text-red-500">*</span>
           </Label>
           <Textarea
@@ -362,19 +367,19 @@ const AddRescueRequestDrawer = ({
             placeholder="Describe the current emergency, water level, landmark, hazards..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="text-xs rounded-xl resize-none"
+            className="resize-none"
           />
           {errors.description && (
-            <p className="text-[11px] text-red-500 font-medium">{errors.description}</p>
+            <p className="text-xs text-red-500 font-medium">{errors.description}</p>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-xs font-semibold">Photo (Optional)</Label>
+          <Label >Photo (Optional)</Label>
           <div className="flex items-center gap-4">
             <label
               htmlFor="rescue-photo"
-              className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium border border-border/80 rounded-xl cursor-pointer hover:bg-muted/50 transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
             >
               <Upload className="size-4" />
               <span>Choose Photo</span>

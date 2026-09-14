@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { LifeBuoy } from 'lucide-react';
-import useAuth from '@/app/hooks/useAuth';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
+import { toast } from '@/components/ui/toast';
+import useAuth from '@/hooks/use-auth';
+import { axiosSecure } from '@/lib/api';
 import MuiDrawer from '@/components/mui-drawer';
 import { RescueRequest } from './types';
 
@@ -34,7 +35,6 @@ const RescueRequestDetailsDrawer = ({
   onRefresh,
 }: RescueRequestDetailsDrawerProps) => {
   const { user } = useAuth();
-  const axiosSecure = useAxiosSecure();
   const [cachedRequest, setCachedRequest] = useState<RescueRequest | null>(request);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState('');
@@ -63,6 +63,12 @@ const RescueRequestDetailsDrawer = ({
       await axiosSecure.patch(`/rescue-requests/${displayRequest.id}/status`, {
         status: 'RESCUED',
       });
+      toast.add({
+        id: 'rescue-request-rescued',
+        title: 'Status updated to Rescued.',
+        type: 'success',
+        timeout: 4000,
+      });
       onRefresh();
       onOpenChange(false);
     } catch (err: any) {
@@ -78,6 +84,12 @@ const RescueRequestDetailsDrawer = ({
       setActionLoading(true);
       setActionError('');
       await axiosSecure.delete(`/rescue-requests/${displayRequest.id}`);
+      toast.add({
+        id: 'rescue-request-deleted',
+        title: 'Rescue request moved to trash.',
+        type: 'success',
+        timeout: 4000,
+      });
       onRefresh();
       onOpenChange(false);
     } catch (err: any) {
@@ -101,7 +113,7 @@ const RescueRequestDetailsDrawer = ({
       width={460}
     >
       <div className="flex-1 overflow-y-auto p-5 space-y-5">
-        <div className="relative aspect-video w-full rounded-xl bg-gray-100 overflow-hidden border border-gray-200 flex items-center justify-center">
+        <div className="relative aspect-video w-full rounded-lg bg-muted overflow-hidden border border-border flex items-center justify-center">
           {displayRequest.photo_url ? (
             <img
               src={displayRequest.photo_url}
@@ -112,12 +124,12 @@ const RescueRequestDetailsDrawer = ({
               }}
             />
           ) : (
-            <LifeBuoy className="size-16 text-emerald-600/60" />
+            <LifeBuoy className="size-16 text-primary/60" />
           )}
           <div className="absolute top-3 right-3">
             <Badge
               variant={getStatusVariant(displayRequest.status)}
-              className="text-[10px] px-2 py-0.5 font-bold uppercase shadow-sm"
+              className="uppercase"
             >
               {displayRequest.status}
             </Badge>
@@ -125,44 +137,44 @@ const RescueRequestDetailsDrawer = ({
         </div>
 
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-gray-900">
+          <h2 className="text-sm font-medium tracking-tight text-foreground">
             {displayTitle}
           </h2>
         </div>
 
         <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-1">
           <div className="space-y-0.5">
-            <span className="text-[10px] font-semibold tracking-wider text-gray-500 uppercase block">
+            <span className="text-xs font-medium tracking-wider text-muted-foreground uppercase block">
               URGENCY LEVEL
             </span>
-            <span className="text-sm font-bold text-gray-900 uppercase block">
+            <span className="text-sm font-medium text-foreground uppercase block">
               {displayRequest.urgency_level}
             </span>
           </div>
 
           <div className="space-y-0.5">
-            <span className="text-[10px] font-semibold tracking-wider text-gray-500 uppercase block">
+            <span className="text-xs font-medium tracking-wider text-muted-foreground uppercase block">
               PEOPLE COUNT
             </span>
-            <span className="text-sm font-bold text-gray-900 block">
+            <span className="text-sm font-medium text-foreground block">
               {displayRequest.people_count} {displayRequest.people_count === 1 ? 'person' : 'people'}
             </span>
           </div>
 
           <div className="space-y-0.5">
-            <span className="text-[10px] font-semibold tracking-wider text-gray-500 uppercase block">
+            <span className="text-xs font-medium tracking-wider text-muted-foreground uppercase block">
               COORDINATES
             </span>
-            <span className="text-sm font-bold text-gray-900 block">
+            <span className="text-sm font-medium text-foreground block">
               {Number(displayRequest.latitude).toFixed(4)}, {Number(displayRequest.longitude).toFixed(4)}
             </span>
           </div>
 
           <div className="space-y-0.5">
-            <span className="text-[10px] font-semibold tracking-wider text-gray-500 uppercase block">
+            <span className="text-xs font-medium tracking-wider text-muted-foreground uppercase block">
               REPORTED
             </span>
-            <span className="text-sm font-bold text-gray-900 block">
+            <span className="text-sm font-medium text-foreground block">
               {displayRequest.created_at
                 ? new Date(displayRequest.created_at).toLocaleDateString()
                 : 'Recently'}
@@ -171,10 +183,10 @@ const RescueRequestDetailsDrawer = ({
 
           {displayRequest.medical_notes && (
             <div className="col-span-2 space-y-0.5">
-              <span className="text-[10px] font-semibold tracking-wider text-gray-500 uppercase block">
+              <span className="text-xs font-medium tracking-wider text-muted-foreground uppercase block">
                 MEDICAL NOTES
               </span>
-              <span className="text-xs font-medium text-gray-800 block">
+              <span className="text-xs font-medium text-foreground block">
                 {displayRequest.medical_notes}
               </span>
             </div>
@@ -182,10 +194,10 @@ const RescueRequestDetailsDrawer = ({
         </div>
 
         <div className="space-y-1 pt-1">
-          <span className="text-[10px] font-semibold tracking-wider text-gray-500 uppercase block">
+          <span className="text-xs font-medium tracking-wider text-muted-foreground uppercase block">
             DESCRIPTION
           </span>
-          <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap">
+          <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap">
             {displayRequest.description || 'No additional description provided.'}
           </p>
         </div>
@@ -197,7 +209,7 @@ const RescueRequestDetailsDrawer = ({
         )}
       </div>
 
-      <div className="p-4 border-t border-gray-200 bg-white shrink-0">
+      <div className="p-4 border-t border-border bg-background shrink-0">
         {isOwner ? (
           <div className="flex items-center gap-2">
             {!isRescued && (

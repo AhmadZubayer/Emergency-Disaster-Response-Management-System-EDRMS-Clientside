@@ -3,7 +3,7 @@
 import * as React from "react"
 import { cn } from "cn"
 
-function Label({ className, ...props }: React.ComponentProps<"label">) {
+const Label = ({ className, ...props }: React.ComponentProps<"label">) => {
   return (
     <label
       data-slot="label"
@@ -14,6 +14,6 @@ function Label({ className, ...props }: React.ComponentProps<"label">) {
       {...props}
     />
   )
-}
+};
 
 export { Label }

@@ -7,16 +7,34 @@ interface ModernButtonProps extends React.ComponentProps<'button'> {
   text?: string;
 }
 
-const ModernButton = ({ children, text, className, type = 'button', ...props }: ModernButtonProps) => {
+const ModernButton = ({
+  children,
+  text,
+  className = '',
+  type = 'button',
+  ...props
+}: ModernButtonProps) => {
   return (
     <StyledWrapper>
-      <button type={type} className={`animated-button ${className ?? ''}`} {...props}>
-        <svg xmlns="http://www.w3.org/2000/svg" className="arr-2" viewBox="0 0 24 24">
+      <button
+        type={type}
+        className={`animated-button ${className}`}
+        {...props}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="arr-2"
+          viewBox="0 0 24 24"
+        >
           <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z" />
         </svg>
         <span className="text">{children ?? text}</span>
         <span className="circle" />
-        <svg xmlns="http://www.w3.org/2000/svg" className="arr-1" viewBox="0 0 24 24">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="arr-1"
+          viewBox="0 0 24 24"
+        >
           <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z" />
         </svg>
       </button>
@@ -25,22 +43,22 @@ const ModernButton = ({ children, text, className, type = 'button', ...props }: 
 };
 
 const StyledWrapper = styled.div`
-  width: 100%;
-  display: flex;
+  display: inline-flex;
   justify-content: center;
   align-items: center;
+  margin: 4px 0;
 
   .animated-button {
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    padding: 10px 22px;
+    gap: 6px;
+    padding: 10px 26px;
     border: 3px solid transparent;
     font-size: 13.5px;
     background-color: transparent;
-    border-radius: 100px;
+    border-radius: 9999px;
     font-weight: 600;
     color: #1e1e1e;
     box-shadow: 0 0 0 2px #1e1e1e;
@@ -52,10 +70,11 @@ const StyledWrapper = styled.div`
   .animated-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    pointer-events: none;
   }
 
   .animated-button:focus-visible {
-    outline: 2px solid #0F825F;
+    outline: 2px solid #059669;
     outline-offset: 3px;
   }
 
@@ -68,7 +87,7 @@ const StyledWrapper = styled.div`
   }
 
   .animated-button .arr-1 {
-    right: 12px;
+    right: 14px;
   }
 
   .animated-button .arr-2 {
@@ -82,7 +101,7 @@ const StyledWrapper = styled.div`
     transform: translate(-50%, -50%);
     width: 14px;
     height: 14px;
-    background-color: #0F825F;
+    background-color: #059669;
     border-radius: 50%;
     opacity: 0;
     transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
@@ -93,12 +112,13 @@ const StyledWrapper = styled.div`
     z-index: 1;
     transform: translateX(-8px);
     transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    white-space: nowrap;
   }
 
   .animated-button:hover {
     box-shadow: 0 0 0 10px transparent;
     color: #ffffff;
-    border-radius: 10px;
+    border-radius: 12px;
   }
 
   .animated-button:hover .arr-1 {
@@ -106,7 +126,7 @@ const StyledWrapper = styled.div`
   }
 
   .animated-button:hover .arr-2 {
-    left: 12px;
+    left: 14px;
   }
 
   .animated-button:hover .text {
@@ -119,12 +139,12 @@ const StyledWrapper = styled.div`
 
   .animated-button:active {
     scale: 0.95;
-    box-shadow: 0 0 0 3px #0F825F;
+    box-shadow: 0 0 0 3px #059669;
   }
 
   .animated-button:hover .circle {
-    width: 220px;
-    height: 220px;
+    width: 280px;
+    height: 280px;
     opacity: 1;
   }
 

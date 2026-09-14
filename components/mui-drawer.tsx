@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import { X } from 'lucide-react';
 
@@ -12,6 +11,7 @@ interface MuiDrawerProps {
   subtitle?: string;
   children: React.ReactNode;
   width?: number | string;
+  anchor?: 'left' | 'right';
 }
 
 const MuiDrawer = ({
@@ -21,6 +21,7 @@ const MuiDrawer = ({
   subtitle,
   children,
   width = 460,
+  anchor = 'right',
 }: MuiDrawerProps) => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -35,11 +36,13 @@ const MuiDrawer = ({
 
   return (
     <SwipeableDrawer
-      anchor={isMobile ? 'bottom' : 'right'}
+      anchor={isMobile ? 'bottom' : anchor}
       open={open}
       onClose={onClose}
       onOpen={() => {}}
       disableEnforceFocus={true}
+      disableAutoFocus={true}
+      disableRestoreFocus={true}
       disableBackdropTransition={false}
       slotProps={{
         paper: {

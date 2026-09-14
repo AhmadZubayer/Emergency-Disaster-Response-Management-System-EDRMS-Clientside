@@ -23,6 +23,7 @@ import Navbar from '@/components/navbar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -32,10 +33,10 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import MuiModal from '@/components/mui-modal';
+import { toast } from '@/components/ui/toast';
 import LeafletMap from '@/components/leaflet-map';
-import { publicApi } from '@/app/lib/public-api';
-import useAuth from '@/app/hooks/useAuth';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
+import { axiosSecure, publicApi } from '@/lib/api';
+import useAuth from '@/hooks/use-auth';
 import { RescueRequest } from '@/components/rescue-requests/types';
 import AddRescueRequestDrawer from '@/components/rescue-requests/add-rescue-request-drawer';
 
@@ -57,7 +58,6 @@ const RescueRequestDetailPage = () => {
   const params = useParams();
   const router = useRouter();
   const { user } = useAuth();
-  const axiosSecure = useAxiosSecure();
 
   const id = params?.id as string;
 
@@ -104,6 +104,12 @@ const RescueRequestDetailPage = () => {
       await axiosSecure.patch(`/rescue-requests/${request.id}/status`, {
         status: newStatus,
       });
+      toast.add({
+        id: `rescue-status-${request.id}`,
+        title: `Rescue request marked as ${newStatus}.`,
+        type: 'success',
+        timeout: 4000,
+      });
       await fetchRequest();
     } finally {
       setActionLoading(false);
@@ -116,6 +122,12 @@ const RescueRequestDetailPage = () => {
     try {
       setActionLoading(true);
       await axiosSecure.delete(`/rescue-requests/${request.id}`);
+      toast.add({
+        id: `rescue-delete-${request.id}`,
+        title: 'Rescue request moved to trash.',
+        type: 'success',
+        timeout: 4000,
+      });
       router.push('/rescue-requests');
     } finally {
       setActionLoading(false);
@@ -154,18 +166,37 @@ const RescueRequestDetailPage = () => {
           </Breadcrumb>
 
           {loading ? (
-            <div className="space-y-6 animate-pulse">
-              <div className="h-32 rounded-lg bg-muted/40" />
-              <div className="space-y-3">
-                <div className="h-8 w-1/3 bg-muted/40 rounded" />
-                <div className="h-4 w-1/2 bg-muted/30 rounded" />
-                <div className="h-24 w-full bg-muted/20 rounded" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              <div className="space-y-6">
+                <div className="flex items-center gap-4 pb-5 border-b border-border">
+                  <Skeleton className="size-20 sm:size-24 shrink-0" />
+                  <div className="space-y-2 flex-1">
+                    <Skeleton className="h-8 w-2/3" />
+                    <div className="flex gap-2">
+                      <Skeleton className="h-5 w-16" />
+                      <Skeleton className="h-5 w-16" />
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <Skeleton className="h-6 w-32" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full col-span-2" />
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full" />
+                  </div>
+                </div>
+              </div>
+              <div className="w-full">
+                <Skeleton className="h-[460px] w-full" />
               </div>
             </div>
           ) : !request ? (
             <div className="py-16 text-center space-y-4">
               <AlertCircle className="size-12 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-bold text-foreground">
+              <h2 className="text-sm font-medium text-foreground">
                 Rescue Request Not Found
               </h2>
               <p className="text-xs text-muted-foreground max-w-md mx-auto">
@@ -182,12 +213,12 @@ const RescueRequestDetailPage = () => {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-5 border-b border-border/40">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-5 border-b border-border">
                   <div className="flex items-center gap-4">
                     <div
                       onClick={() => request.photo_url && setIsPhotoModalOpen(true)}
-                      className={`relative group size-20 sm:size-24 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center overflow-hidden shrink-0 ${
-                        request.photo_url ? 'cursor-pointer hover:border-emerald-500 transition-all shadow-sm' : ''
+                      className={`relative group size-20 sm:size-24 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden shrink-0 ${
+                        request.photo_url ? 'cursor-pointer hover:border-primary transition-all shadow-sm' : ''
                       }`}
                     >
                       {request.photo_url ? (
@@ -202,24 +233,24 @@ const RescueRequestDetailPage = () => {
                           </div>
                         </>
                       ) : (
-                        <LifeBuoy className="size-8 text-emerald-600" />
+                        <LifeBuoy className="size-8 text-muted-foreground" />
                       )}
                     </div>
 
                     <div className="space-y-1.5">
-                      <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                      <h1 className="text-xl sm:text-2xl font-medium tracking-tight text-foreground">
                         {request.address || `Emergency Alert #${request.id.slice(0, 8)}`}
                       </h1>
                       <div className="flex items-center gap-2">
                         <Badge
                           variant={getStatusVariant(request.status)}
-                          className="text-[10px] px-2 py-0.5 uppercase font-bold"
+                          className="uppercase"
                         >
                           {request.status}
                         </Badge>
                         <Badge
                           variant={getUrgencyVariant(request.urgency_level)}
-                          className="text-[10px] px-2 py-0.5 uppercase font-bold"
+                          className="uppercase"
                         >
                           {request.urgency_level}
                         </Badge>
@@ -234,7 +265,7 @@ const RescueRequestDetailPage = () => {
                         size="sm"
                         onClick={handleToggleRescued}
                         disabled={actionLoading}
-                        className="h-8 text-xs gap-1 font-semibold w-full sm:w-32"
+                        className="w-full sm:w-32"
                       >
                         <CheckCircle2 className="size-3" />
                         {isRescued ? 'Mark Pending' : 'Mark Rescued'}
@@ -245,7 +276,7 @@ const RescueRequestDetailPage = () => {
                         size="sm"
                         onClick={() => setIsEditOpen(true)}
                         disabled={actionLoading}
-                        className="h-8 text-xs gap-1 font-semibold w-full sm:w-32"
+                        className="w-full sm:w-32"
                       >
                         <FileEdit className="size-3" />
                         Edit
@@ -256,7 +287,7 @@ const RescueRequestDetailPage = () => {
                         size="sm"
                         onClick={handleDelete}
                         disabled={actionLoading}
-                        className="h-8 text-xs gap-1 font-semibold w-full sm:w-32"
+                        className="w-full sm:w-32"
                       >
                         <Trash2 className="size-3" />
                         Delete
@@ -266,49 +297,49 @@ const RescueRequestDetailPage = () => {
                 </div>
 
                 <div>
-                  <h2 className="text-lg font-bold tracking-tight text-foreground mb-4">
+                  <h2 className="text-sm font-medium tracking-tight text-foreground mb-4">
                     Details
                   </h2>
 
                   <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
                     <div className="space-y-0.5">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                      <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                         People Count
                       </span>
-                      <span className="text-foreground font-semibold block">
+                      <span className="text-foreground font-medium block">
                         {request.people_count} {request.people_count === 1 ? 'Person' : 'People'}
                       </span>
                     </div>
 
                     <div className="space-y-0.5">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                      <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                         Urgency Level
                       </span>
-                      <span className="text-foreground font-semibold block">
+                      <span className="text-foreground font-medium block">
                         {request.urgency_level || 'Normal'}
                       </span>
                     </div>
 
                     <div className="space-y-0.5 col-span-2">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                      <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                         Location / Address
                       </span>
-                      <span className="text-foreground font-semibold block">
+                      <span className="text-foreground font-medium block">
                         {request.address || 'Address not provided'}
                       </span>
                     </div>
 
                     <div className="space-y-0.5">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                      <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                         Status
                       </span>
-                      <span className="text-foreground font-semibold block">
+                      <span className="text-foreground font-medium block">
                         {request.status}
                       </span>
                     </div>
 
                     <div className="space-y-0.5">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                      <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                         Reported At
                       </span>
                       <span className="text-foreground font-medium block text-xs">
@@ -319,12 +350,12 @@ const RescueRequestDetailPage = () => {
                     </div>
 
                     <div className="space-y-0.5 col-span-2">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                      <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                         Emergency Contact
                       </span>
                       {user ? (
                         <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                          <span className="text-foreground font-semibold text-sm">
+                          <span className="text-foreground font-medium text-sm">
                             {request.contact_phone || 'No phone provided'}
                           </span>
                           {request.contact_phone && (
@@ -332,7 +363,7 @@ const RescueRequestDetailPage = () => {
                               render={<a href={`tel:${request.contact_phone}`} />}
                               size="sm"
                               variant="outline"
-                              className="h-6 text-xs px-2 gap-1"
+
                             >
                               <Phone className="size-3" />
                               Call
@@ -341,15 +372,15 @@ const RescueRequestDetailPage = () => {
                         </div>
                       ) : (
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-0.5">
-                          <Lock className="size-3 text-amber-500 shrink-0" />
+                          <Lock className="size-3 text-muted-foreground shrink-0" />
                           <span>
                             <Link
-                              href={`/sign-in?redirect=/rescue-requests/${id}`}
-                              className="font-semibold text-emerald-600 underline"
+                              href={`/sign-in?returnUrl=/rescue-requests/${id}`}
+                              className="font-medium text-foreground underline hover:text-primary"
                             >
                               Sign in
                             </Link>{' '}
-                            to view phone
+                              to view phone
                           </span>
                         </div>
                       )}
@@ -357,11 +388,11 @@ const RescueRequestDetailPage = () => {
 
                     {request.latitude && request.longitude && (
                       <div className="space-y-0.5 col-span-2">
-                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                        <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                           GPS Coordinates
                         </span>
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-semibold text-foreground">
+                          <span className="font-mono text-xs font-medium text-foreground">
                             {Number(request.latitude).toFixed(5)}, {Number(request.longitude).toFixed(5)}
                           </span>
                           {googleMapsUrl && (
@@ -369,7 +400,7 @@ const RescueRequestDetailPage = () => {
                               href={googleMapsUrl}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:underline"
+                              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                             >
                               <ExternalLink className="size-3" />
                               Google Maps
@@ -383,7 +414,7 @@ const RescueRequestDetailPage = () => {
 
                 {request.description && (
                   <div className="space-y-1.5 pt-1">
-                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                       Situation & Description
                     </span>
                     <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">
@@ -394,7 +425,7 @@ const RescueRequestDetailPage = () => {
 
                 {request.medical_notes && (
                   <div className="space-y-1.5 pt-1">
-                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                       Medical Notes
                     </span>
                     <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">
@@ -403,12 +434,12 @@ const RescueRequestDetailPage = () => {
                   </div>
                 )}
 
-                <div className="pt-4 border-t border-border/50">
+                <div className="pt-4 border-t border-border">
                   <Button
                     render={<Link href="/rescue-requests" />}
                     variant="outline"
                     size="sm"
-                    className="text-xs"
+
                   >
                     <ArrowLeft className="size-3.5 mr-1" />
                     All Rescue Requests
@@ -417,7 +448,7 @@ const RescueRequestDetailPage = () => {
               </div>
 
               <div className="w-full">
-                <Card className="overflow-hidden p-0 border border-border/60">
+                <Card className="overflow-hidden border">
                   {request.latitude && request.longitude ? (
                     <div className="h-[460px] w-full">
                       <LeafletMap
@@ -449,18 +480,18 @@ const RescueRequestDetailPage = () => {
             variant="outline"
             size="sm"
             onClick={() => setIsPhotoModalOpen(false)}
-            className="rounded-xl text-xs"
+
           >
             Close
           </Button>
         }
       >
         {request?.photo_url && (
-          <div className="w-full flex items-center justify-center overflow-hidden rounded-xl bg-black/5">
+          <div className="w-full flex items-center justify-center overflow-hidden rounded-lg bg-black/5">
             <img
               src={request.photo_url}
               alt="Rescue Scene"
-              className="max-h-[75vh] w-auto object-contain rounded-xl"
+              className="max-h-[75vh] w-auto object-contain rounded-lg"
             />
           </div>
         )}

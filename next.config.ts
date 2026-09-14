@@ -1,20 +1,19 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  async rewrites() {
-    const backend = process.env.BACKEND_URL || 'http://localhost:3000';
+  rewrites: async () => {
     return [
       {
         source: '/auth/:path*',
-        destination: `${backend}/api/auth/:path*`,
+        destination: `${process.env.BACKEND_URL || 'http://127.0.0.1:5000'}/api/auth/:path*`,
       },
       {
         source: '/api/:path*',
-        destination: `${backend}/api/:path*`,
+        destination: `${process.env.BACKEND_URL || 'http://127.0.0.1:5000'}/api/:path*`,
       },
       {
         source: '/user-files/:path*',
-        destination: `${backend}/user-files/:path*`,
+        destination: `${process.env.BACKEND_URL || 'http://127.0.0.1:5000'}/user-files/:path*`,
       },
     ];
   },

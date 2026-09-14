@@ -1,14 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Upload, MapPin, Loader2 } from 'lucide-react';
+import { Upload, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import ModernButton from '@/components/modernBtn';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { userProfileSchema } from '@/app/lib/validations/user-profile-schema';
+import { toast } from '@/components/ui/toast';
+import { axiosSecure } from '@/lib/api';
+import { userProfileSchema } from '@/lib/validations/user-profile-schema';
 import MuiDrawer from '@/components/mui-drawer';
 
 export interface UserProfileData {
@@ -48,7 +50,6 @@ const EditProfileDrawer = ({
   onSuccess,
   profile,
 }: EditProfileDrawerProps) => {
-  const axiosSecure = useAxiosSecure();
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -175,6 +176,13 @@ const EditProfileDrawer = ({
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
+      toast.add({
+        id: 'profile-update-success',
+        title: 'Profile updated successfully!',
+        type: 'success',
+        timeout: 4000,
+      });
+
       onSuccess();
       onOpenChange(false);
     } catch (err: any) {
@@ -203,7 +211,7 @@ const EditProfileDrawer = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label htmlFor="profile-name" className="text-xs font-semibold">
+            <Label htmlFor="profile-name" >
               Full Name <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -211,15 +219,15 @@ const EditProfileDrawer = ({
               placeholder="e.g. Ahmad Zubayer"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="h-10 text-xs rounded-xl"
+
             />
             {errors.name && (
-              <p className="text-[11px] text-red-500 font-medium">{errors.name}</p>
+              <p className="text-xs text-red-500 font-medium">{errors.name}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="profile-phone" className="text-xs font-semibold">
+            <Label htmlFor="profile-phone" >
               Phone Number
             </Label>
             <Input
@@ -228,19 +236,19 @@ const EditProfileDrawer = ({
               placeholder="e.g. +8801700000000"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="h-10 text-xs rounded-xl"
+
             />
           </div>
         </div>
 
         <div className="space-y-3 pt-1 border-t">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider block">
             Address Details
           </span>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5 col-span-1 sm:col-span-2">
-              <Label htmlFor="profile-house" className="text-xs font-semibold">
+              <Label htmlFor="profile-house" >
                 House / Street Address
               </Label>
               <Input
@@ -248,12 +256,12 @@ const EditProfileDrawer = ({
                 placeholder="e.g. House 12, Road 4, Sector 7"
                 value={house}
                 onChange={(e) => setHouse(e.target.value)}
-                className="h-10 text-xs rounded-xl"
+
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="profile-city" className="text-xs font-semibold">
+              <Label htmlFor="profile-city" >
                 City / Area
               </Label>
               <Input
@@ -261,12 +269,12 @@ const EditProfileDrawer = ({
                 placeholder="e.g. Uttara"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="h-10 text-xs rounded-xl"
+
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="profile-district" className="text-xs font-semibold">
+              <Label htmlFor="profile-district" >
                 District / State
               </Label>
               <Input
@@ -274,12 +282,12 @@ const EditProfileDrawer = ({
                 placeholder="e.g. Dhaka"
                 value={district}
                 onChange={(e) => setDistrict(e.target.value)}
-                className="h-10 text-xs rounded-xl"
+
               />
             </div>
 
             <div className="space-y-1.5 col-span-1 sm:col-span-2">
-              <Label htmlFor="profile-country" className="text-xs font-semibold">
+              <Label htmlFor="profile-country" >
                 Country
               </Label>
               <Input
@@ -287,7 +295,7 @@ const EditProfileDrawer = ({
                 placeholder="e.g. Bangladesh"
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
-                className="h-10 text-xs rounded-xl"
+
               />
             </div>
           </div>
@@ -295,7 +303,7 @@ const EditProfileDrawer = ({
 
         <div className="space-y-3 pt-1 border-t">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               GPS Coordinates
             </span>
             <Button
@@ -304,10 +312,10 @@ const EditProfileDrawer = ({
               size="sm"
               onClick={handleDetectLocation}
               disabled={detectingLocation}
-              className="gap-1.5 h-8 text-xs font-semibold"
+
             >
               {detectingLocation ? (
-                <Loader2 className="size-3.5 animate-spin" />
+                <Spinner className="size-3.5" />
               ) : (
                 <MapPin className="size-3.5" />
               )}
@@ -317,8 +325,8 @@ const EditProfileDrawer = ({
 
           {locationMessage && (
             <p
-              className={`text-[11px] font-medium ${
-                isLocationError ? 'text-red-500' : 'text-emerald-600'
+              className={`text-xs font-medium ${
+                isLocationError ? 'text-red-500' : 'text-primary'
               }`}
             >
               {locationMessage}
@@ -327,7 +335,7 @@ const EditProfileDrawer = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="profile-lat" className="text-xs font-semibold">
+              <Label htmlFor="profile-lat" >
                 Latitude
               </Label>
               <Input
@@ -337,15 +345,15 @@ const EditProfileDrawer = ({
                 placeholder="e.g. 23.8103"
                 value={gpsLat}
                 onChange={(e) => setGpsLat(e.target.value)}
-                className="h-10 text-xs rounded-xl"
+
               />
               {errors.gps_lat && (
-                <p className="text-[11px] text-red-500 font-medium">{errors.gps_lat}</p>
+                <p className="text-xs text-red-500 font-medium">{errors.gps_lat}</p>
               )}
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="profile-lng" className="text-xs font-semibold">
+              <Label htmlFor="profile-lng" >
                 Longitude
               </Label>
               <Input
@@ -355,22 +363,22 @@ const EditProfileDrawer = ({
                 placeholder="e.g. 90.4125"
                 value={gpsLng}
                 onChange={(e) => setGpsLng(e.target.value)}
-                className="h-10 text-xs rounded-xl"
+
               />
               {errors.gps_lng && (
-                <p className="text-[11px] text-red-500 font-medium">{errors.gps_lng}</p>
+                <p className="text-xs text-red-500 font-medium">{errors.gps_lng}</p>
               )}
             </div>
           </div>
         </div>
 
         <div className="space-y-4 pt-1 border-t">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider block">
             Emergency & Medical Notes
           </span>
 
           <div className="space-y-1.5">
-            <Label htmlFor="profile-emergency" className="text-xs font-semibold">
+            <Label htmlFor="profile-emergency" >
               Emergency Message
             </Label>
             <Textarea
@@ -379,12 +387,12 @@ const EditProfileDrawer = ({
               placeholder="e.g. In case of emergency, contact my brother at +8801800000000"
               value={emergencyMessage}
               onChange={(e) => setEmergencyMessage(e.target.value)}
-              className="text-xs rounded-xl resize-none"
+              className="resize-none"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="profile-medical" className="text-xs font-semibold">
+            <Label htmlFor="profile-medical" >
               Medical Information
             </Label>
             <Textarea
@@ -393,17 +401,17 @@ const EditProfileDrawer = ({
               placeholder="e.g. Blood group A+, allergic to penicillin, diabetic"
               value={medicalInformation}
               onChange={(e) => setMedicalInformation(e.target.value)}
-              className="text-xs rounded-xl resize-none"
+              className="resize-none"
             />
           </div>
         </div>
 
         <div className="space-y-1.5 pt-1 border-t">
-          <Label className="text-xs font-semibold">Profile Photo</Label>
+          <Label >Profile Photo</Label>
           <div className="flex items-center gap-4">
             <label
               htmlFor="user-profile-photo"
-              className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium border border-border/80 rounded-xl cursor-pointer hover:bg-muted/50 transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
             >
               <Upload className="size-4" />
               <span>Choose Photo</span>

@@ -20,11 +20,11 @@ export default function DashboardRedirectPage() {
     if (role === 'ADMIN') {
       router.push('/admin');
     } else if (role === 'RELIEF_ORG') {
-      router.push('/manage-disaster');
+      router.push('/relief-org/manage-disaster');
     } else if (role === 'VOLUNTEER') {
-      router.push('/manage-volunteers');
+      router.push('/volunteer/profile');
     } else {
-      router.push('/profile');
+      router.push('/user/profile');
     }
   }, [user, loading, router]);
 

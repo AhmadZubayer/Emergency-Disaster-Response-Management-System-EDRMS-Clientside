@@ -35,7 +35,7 @@ import MuiDrawer from '@/components/mui-drawer';
 import MuiTabs from '@/components/mui-tabs';
 import MuiModal from '@/components/mui-modal';
 import ModernButton from '@/components/modernBtn';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
+import { axiosSecure } from '@/lib/api';
 import {
   DonationCampaign,
   DonationApplication,
@@ -62,7 +62,6 @@ const CampaignProgressDrawer = ({
   campaign,
   onCampaignUpdated,
 }: CampaignProgressDrawerProps) => {
-  const axiosSecure = useAxiosSecure();
 
   const [transactions, setTransactions] = useState<DonationTransaction[]>([]);
   const [applications, setApplications] = useState<DonationApplication[]>([]);
@@ -199,8 +198,8 @@ const CampaignProgressDrawer = ({
       label: 'Donation Progress',
       content: (
         <div className="space-y-6 pb-6">
-          <div className="p-4 rounded-xl border border-border/70 bg-card shadow-sm space-y-3">
-            <h3 className="text-sm font-bold text-foreground">
+          <div className="p-4 rounded-lg border border-border bg-card space-y-3">
+            <h3 className="text-sm font-medium text-foreground">
               Fundraising Overview & Goals
             </h3>
             <ChartContainer config={chartConfig} className="h-44 w-full">
@@ -233,35 +232,35 @@ const CampaignProgressDrawer = ({
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3.5 rounded-xl border border-border/70 bg-card">
-              <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+            <div className="p-3.5 rounded-lg border border-border bg-card">
+              <span className="text-xs uppercase font-medium text-muted-foreground block">
                 Target Goal
               </span>
-              <span className="text-base font-bold text-foreground mt-1 block">
+              <span className="text-base font-medium text-foreground mt-1 block">
                 ${target.toLocaleString()}
               </span>
             </div>
-            <div className="p-3.5 rounded-xl border border-border/70 bg-card">
-              <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+            <div className="p-3.5 rounded-lg border border-border bg-card">
+              <span className="text-xs uppercase font-medium text-muted-foreground block">
                 Total Raised
               </span>
-              <span className="text-base font-bold text-emerald-600 dark:text-emerald-400 mt-1 block">
+              <span className="text-base font-medium text-primary dark:text-primary mt-1 block">
                 ${collected.toLocaleString()}
               </span>
             </div>
-            <div className="p-3.5 rounded-xl border border-border/70 bg-card">
-              <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+            <div className="p-3.5 rounded-lg border border-border bg-card">
+              <span className="text-xs uppercase font-medium text-muted-foreground block">
                 Remaining
               </span>
-              <span className="text-base font-bold text-muted-foreground mt-1 block">
+              <span className="text-base font-medium text-muted-foreground mt-1 block">
                 ${remaining.toLocaleString()}
               </span>
             </div>
-            <div className="p-3.5 rounded-xl border border-border/70 bg-card">
-              <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+            <div className="p-3.5 rounded-lg border border-border bg-card">
+              <span className="text-xs uppercase font-medium text-muted-foreground block">
                 Total Donors
               </span>
-              <span className="text-base font-bold text-foreground mt-1 block">
+              <span className="text-base font-medium text-foreground mt-1 block">
                 {donorsCount}
               </span>
             </div>
@@ -269,7 +268,7 @@ const CampaignProgressDrawer = ({
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-foreground">
+              <h3 className="text-sm font-medium text-foreground">
                 Donation Transaction History
               </h3>
               <span className="text-xs text-muted-foreground">
@@ -277,15 +276,15 @@ const CampaignProgressDrawer = ({
               </span>
             </div>
 
-            <div className="rounded-xl border border-border/70 bg-card overflow-hidden shadow-sm">
+            <div className="rounded-lg border border-border bg-card overflow-hidden">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-muted/40 text-xs">
-                    <TableHead className="font-bold text-foreground">Participant</TableHead>
-                    <TableHead className="font-bold text-foreground">Type</TableHead>
-                    <TableHead className="font-bold text-foreground">Amount</TableHead>
-                    <TableHead className="font-bold text-foreground">Date</TableHead>
-                    <TableHead className="text-right font-bold text-foreground">Status</TableHead>
+                  <TableRow >
+                    <TableHead className="text-foreground">Participant</TableHead>
+                    <TableHead className="text-foreground">Type</TableHead>
+                    <TableHead className="text-foreground">Amount</TableHead>
+                    <TableHead className="text-foreground">Date</TableHead>
+                    <TableHead className="text-right text-foreground">Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -293,7 +292,7 @@ const CampaignProgressDrawer = ({
                     <TableRow>
                       <TableCell
                         colSpan={5}
-                        className="h-28 text-center text-xs text-muted-foreground"
+                        className="h-28 text-center text-muted-foreground"
                       >
                         Loading transactions...
                       </TableCell>
@@ -302,36 +301,36 @@ const CampaignProgressDrawer = ({
                     <TableRow>
                       <TableCell
                         colSpan={5}
-                        className="h-28 text-center text-xs text-muted-foreground"
+                        className="h-28 text-center text-muted-foreground"
                       >
                         No donation transactions recorded for this campaign yet.
                       </TableCell>
                     </TableRow>
                   ) : (
                     transactions.map((tx) => (
-                      <TableRow key={tx.id} className="text-xs">
+                      <TableRow key={tx.id} >
                         <TableCell>
-                          <div className="font-semibold text-foreground">
+                          <div className="font-medium text-foreground">
                             {tx.user_name}
                           </div>
                           {tx.user_email && (
-                            <div className="text-[11px] text-muted-foreground">
+                            <div className="text-xs text-muted-foreground">
                               {tx.user_email}
                             </div>
                           )}
                         </TableCell>
                         <TableCell>
                           <span
-                            className={`text-[10px] font-bold uppercase tracking-wider ${
+                            className={`text-xs font-medium uppercase tracking-wider ${
                               String(tx.transaction_type).toUpperCase() === 'DONATE'
-                                ? 'text-emerald-600 dark:text-emerald-400'
+                                ? 'text-primary dark:text-primary'
                                 : 'text-blue-600 dark:text-blue-400'
                             }`}
                           >
                             {tx.transaction_type}
                           </span>
                         </TableCell>
-                        <TableCell className="font-bold text-foreground">
+                        <TableCell className="text-foreground">
                           ${Number(tx.amount).toLocaleString()}
                         </TableCell>
                         <TableCell className="text-muted-foreground">
@@ -344,7 +343,7 @@ const CampaignProgressDrawer = ({
                             : 'N/A'}
                         </TableCell>
                         <TableCell className="text-right">
-                          <span className="text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400">
+                          <span className="text-xs font-medium uppercase text-primary dark:text-primary">
                             {tx.status}
                           </span>
                         </TableCell>
@@ -363,7 +362,7 @@ const CampaignProgressDrawer = ({
       content: (
         <div className="space-y-4 pb-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-foreground">
+            <h3 className="text-sm font-medium text-foreground">
               Applications ({applications.length})
             </h3>
             <span className="text-xs text-muted-foreground">
@@ -372,32 +371,32 @@ const CampaignProgressDrawer = ({
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-3.5 rounded-xl border border-border/70 bg-card">
-              <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+            <div className="p-3.5 rounded-lg border border-border bg-card">
+              <span className="text-xs uppercase font-medium text-muted-foreground block">
                 Approved Amount
               </span>
-              <span className="text-base font-bold text-emerald-600 dark:text-emerald-400 mt-1 block">
+              <span className="text-base font-medium text-primary dark:text-primary mt-1 block">
                 ${totalApproved.toLocaleString()}
               </span>
             </div>
-            <div className="p-3.5 rounded-xl border border-border/70 bg-card">
-              <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+            <div className="p-3.5 rounded-lg border border-border bg-card">
+              <span className="text-xs uppercase font-medium text-muted-foreground block">
                 Available Amount
               </span>
-              <span className="text-base font-bold text-foreground mt-1 block">
+              <span className="text-base font-medium text-foreground mt-1 block">
                 ${availableAmount.toLocaleString()}
               </span>
             </div>
           </div>
 
-          <div className="rounded-xl border border-border/70 bg-card overflow-hidden shadow-sm">
+          <div className="rounded-lg border border-border bg-card overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/40 text-xs">
-                  <TableHead className="font-bold text-foreground">Name</TableHead>
-                  <TableHead className="font-bold text-foreground">Email</TableHead>
-                  <TableHead className="font-bold text-foreground">Status</TableHead>
-                  <TableHead className="text-right font-bold text-foreground">Action</TableHead>
+                <TableRow >
+                  <TableHead className="text-foreground">Name</TableHead>
+                  <TableHead className="text-foreground">Email</TableHead>
+                  <TableHead className="text-foreground">Status</TableHead>
+                  <TableHead className="text-right text-foreground">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -405,7 +404,7 @@ const CampaignProgressDrawer = ({
                   <TableRow>
                     <TableCell
                       colSpan={4}
-                      className="h-28 text-center text-xs text-muted-foreground"
+                      className="h-28 text-center text-muted-foreground"
                     >
                       Loading applications...
                     </TableCell>
@@ -414,15 +413,15 @@ const CampaignProgressDrawer = ({
                   <TableRow>
                     <TableCell
                       colSpan={4}
-                      className="h-28 text-center text-xs text-muted-foreground"
+                      className="h-28 text-center text-muted-foreground"
                     >
                       No aid applications submitted for this campaign yet.
                     </TableCell>
                   </TableRow>
                 ) : (
                   applications.map((app) => (
-                    <TableRow key={app.id} className="text-xs">
-                      <TableCell className="font-semibold text-foreground">
+                    <TableRow key={app.id} >
+                      <TableCell className="text-foreground">
                         {app.applicant_name}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
@@ -430,9 +429,9 @@ const CampaignProgressDrawer = ({
                       </TableCell>
                       <TableCell>
                         <span
-                          className={`text-xs font-bold uppercase ${
+                          className={`text-xs font-medium uppercase ${
                             isAppApproved(app.status)
-                              ? 'text-emerald-600 dark:text-emerald-400'
+                              ? 'text-primary dark:text-primary'
                               : isAppRejected(app.status)
                               ? 'text-destructive'
                               : 'text-amber-600 dark:text-amber-400'
@@ -446,7 +445,7 @@ const CampaignProgressDrawer = ({
                           variant="outline"
                           size="sm"
                           onClick={() => handleOpenApplicationModal(app)}
-                          className="text-xs h-7 px-2.5 font-semibold"
+
                         >
                           View Details
                         </Button>
@@ -482,7 +481,7 @@ const CampaignProgressDrawer = ({
         maxWidth="sm"
       >
         <div className="space-y-5">
-          <div className="flex items-center justify-between border-b border-border/60 pb-3">
+          <div className="flex items-center justify-between border-b border-border pb-3">
             <button
               type="button"
               onClick={handleCloseApplicationModal}
@@ -490,7 +489,7 @@ const CampaignProgressDrawer = ({
             >
               <X className="size-4" />
             </button>
-            <h2 className="text-base font-bold text-foreground">
+            <h2 className="text-sm font-medium text-foreground">
               Donation Aid Application
             </h2>
             <div className="w-8" />
@@ -498,50 +497,50 @@ const CampaignProgressDrawer = ({
 
           {selectedApplication && (
             <div className="space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-3 bg-muted/30 p-3 rounded-xl border border-border/50">
+              <div className="grid grid-cols-2 gap-3 bg-muted/30 p-3 rounded-lg border border-border">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+                  <span className="text-xs uppercase font-medium text-muted-foreground block">
                     Applicant Name
                   </span>
-                  <span className="font-semibold text-foreground block mt-0.5">
+                  <span className="font-medium text-foreground block mt-0.5">
                     {selectedApplication.applicant_name}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+                  <span className="text-xs uppercase font-medium text-muted-foreground block">
                     Email Address
                   </span>
-                  <span className="font-semibold text-foreground block mt-0.5">
+                  <span className="font-medium text-foreground block mt-0.5">
                     {selectedApplication.applicant_email || 'N/A'}
                   </span>
                 </div>
               </div>
 
               <div>
-                <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+                <span className="text-xs uppercase font-medium text-muted-foreground block">
                   Payout Method & Details
                 </span>
-                <p className="mt-1 p-2.5 rounded-lg bg-muted/20 border border-border/50 text-foreground font-mono text-xs">
+                <p className="mt-1 p-2.5 rounded-lg bg-muted/20 border border-border text-foreground font-mono text-xs">
                   {selectedApplication.payout_details}
                 </p>
               </div>
 
               <div>
-                <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+                <span className="text-xs uppercase font-medium text-muted-foreground block">
                   Situation & Loss Details
                 </span>
-                <p className="mt-1 p-3 rounded-lg bg-muted/20 border border-border/50 text-muted-foreground leading-relaxed whitespace-pre-line">
+                <p className="mt-1 p-3 rounded-lg bg-muted/20 border border-border text-muted-foreground leading-relaxed whitespace-pre-line">
                   {selectedApplication.reason}
                 </p>
               </div>
 
               {selectedApplication.proof_document_url && (
                 <div className="space-y-1.5">
-                  <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+                  <span className="text-xs uppercase font-medium text-muted-foreground block">
                     Attached Verification Documents
                   </span>
                   {isImageFile(selectedApplication.proof_document_url) ? (
-                    <div className="border border-border/60 rounded-xl overflow-hidden max-h-48 bg-muted/20 flex items-center justify-center">
+                    <div className="border border-border rounded-lg overflow-hidden max-h-48 bg-muted/20 flex items-center justify-center">
                       <img
                         src={`${backendUrl}${selectedApplication.proof_document_url}`}
                         alt="Proof Document"
@@ -553,7 +552,7 @@ const CampaignProgressDrawer = ({
                     href={`${backendUrl}${selectedApplication.proof_document_url}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline pt-1"
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-primary dark:text-primary hover:underline pt-1"
                   >
                     <FileText className="size-3.5" />
                     View / Download Full Document
@@ -563,21 +562,21 @@ const CampaignProgressDrawer = ({
               )}
 
               {isAppApproved(selectedApplication.status) ? (
-                <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex items-start gap-2.5">
-                  <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <div className="p-3.5 rounded-lg bg-primary/10 dark:bg-primary/40 border border-primary dark:border-primary flex items-start gap-2.5">
+                  <CheckCircle2 className="size-4 text-primary dark:text-primary shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-emerald-800 dark:text-emerald-300 block">
+                    <span className="font-medium text-primary dark:text-primary block">
                       Aid Approved & Sent
                     </span>
-                    <span className="text-xs text-emerald-700 dark:text-emerald-400 block mt-0.5">
+                    <span className="text-xs text-primary dark:text-primary block mt-0.5">
                       Approved Amount: ${Number(selectedApplication.approved_amount || 0).toLocaleString()} USD
                     </span>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-3 pt-2 border-t border-border/50">
+                <div className="space-y-3 pt-2 border-t border-border">
                   <div className="space-y-1.5">
-                    <Label htmlFor="aid-amount-input" className="text-xs font-bold text-foreground">
+                    <Label htmlFor="aid-amount-input" >
                       Enter Amount ($ USD)
                     </Label>
                     <Input
@@ -591,10 +590,10 @@ const CampaignProgressDrawer = ({
                         setAidAmount(e.target.value);
                         setAidAmountError('');
                       }}
-                      className="text-xs h-9"
+
                     />
                     {aidAmountError && (
-                      <p className="text-[11px] text-destructive flex items-center gap-1">
+                      <p className="text-xs text-destructive flex items-center gap-1">
                         <AlertCircle className="size-3 shrink-0" />
                         {aidAmountError}
                       </p>

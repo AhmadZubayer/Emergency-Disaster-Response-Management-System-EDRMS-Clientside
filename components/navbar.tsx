@@ -2,26 +2,26 @@
 
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   ChevronDown,
   UserRound,
   LogOut,
   Menu,
   X,
-  HeartHandshake,
   Users,
-  ShieldAlert,
-  Coins,
+  Building2,
 } from 'lucide-react';
+import ChatbotIcon from '@/chatbot/chatbot-icon';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/app/hooks/useAuth';
-import RequestAsVolunteerModal from '@/components/volunteers/request-as-volunteer-modal';
+import { toast } from '@/components/ui/toast';
+import { useAuth } from '@/hooks/use-auth';
+import { getPrimaryProfileRoute } from '@/lib/dashboard-routes';
 
 const navItems = [
   { label: 'Disasters', href: '/disaster' },
@@ -33,17 +33,14 @@ const navItems = [
 
 const Navbar = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logOut } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [contributeOpen, setContributeOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const [volunteerModalOpen, setVolunteerModalOpen] = useState(false);
 
   const contributeTimerRef = useRef<NodeJS.Timeout | null>(null);
   const accountTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  const userRole = user?.role?.toUpperCase();
-  const isOrgOrAdmin = userRole === 'RELIEF_ORG' || userRole === 'ADMIN';
 
   const handleContributeMouseEnter = () => {
     if (contributeTimerRef.current) clearTimeout(contributeTimerRef.current);
@@ -68,9 +65,9 @@ const Navbar = () => {
   };
 
   return (
-    <>
-      <header className="sticky top-4 z-50 w-full px-4 sm:px-6 pointer-events-none">
-        <div className="max-w-fit mx-auto pointer-events-auto">
+    <header className="sticky top-4 z-50 w-full px-4 sm:px-6 pointer-events-none">
+      <div className="max-w-fit mx-auto pointer-events-auto flex flex-col items-center">
+        <div className="flex items-center gap-2 sm:gap-2.5">
           <nav className="flex items-center gap-1.5 bg-white/95 text-neutral-900 rounded-full py-2 px-3.5 shadow-xl shadow-emerald-950/5 backdrop-blur-xl border border-emerald-600/15 transition-all">
             <Link
               href="/"
@@ -122,32 +119,19 @@ const Navbar = () => {
                     onMouseLeave={handleContributeMouseLeave}
                     className="w-52 bg-white/95 text-neutral-900 border border-emerald-600/15 shadow-2xl backdrop-blur-xl rounded-2xl p-1.5"
                   >
-                    {isOrgOrAdmin ? (
-                      <DropdownMenuItem
-                        className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                        render={<Link href="/manage-volunteers" />}
-                      >
-                        <Users className="size-4 text-emerald-600" />
-                        <span>Manage Volunteers</span>
-                      </DropdownMenuItem>
-                    ) : (
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setContributeOpen(false);
-                          setVolunteerModalOpen(true);
-                        }}
-                        className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                      >
-                        <Users className="size-4 text-emerald-600" />
-                        <span>Request as Volunteer</span>
-                      </DropdownMenuItem>
-                    )}
                     <DropdownMenuItem
                       className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                      render={<Link href="/donations" />}
+                      render={<Link href="/volunteer-registration-form" />}
                     >
-                      <HeartHandshake className="size-4 text-emerald-600" />
-                      <span>Contribute as Donor</span>
+                      <Users className="size-4" />
+                      <span>Contribute as Volunteer</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
+                      render={<Link href="/signup-as-relief-org" />}
+                    >
+                      <Building2 className="size-4" />
+                      <span>Contribute as Relief Org</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -178,68 +162,33 @@ const Navbar = () => {
                       sideOffset={8}
                       onMouseEnter={handleAccountMouseEnter}
                       onMouseLeave={handleAccountMouseLeave}
-                      className="w-52 bg-white/95 text-neutral-900 border border-emerald-600/15 shadow-2xl backdrop-blur-xl rounded-2xl p-1.5"
+                      className="w-48 bg-white/95 text-neutral-900 border border-emerald-600/15 shadow-2xl backdrop-blur-xl rounded-2xl p-1.5"
                     >
                       <DropdownMenuItem
                         className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                        render={<Link href="/profile" />}
+                        render={
+                          <Link href={getPrimaryProfileRoute(user.role)} />
+                        }
                       >
-                        <UserRound className="size-4 text-neutral-500" />
-                        <span>View Profile</span>
+                        <UserRound className="size-4" />
+                        <span>Your Profile</span>
                       </DropdownMenuItem>
-                      {userRole === 'ADMIN' && (
-                        <DropdownMenuItem
-                          className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-bold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                          render={<Link href="/admin" />}
-                        >
-                          <ShieldAlert className="size-4 text-emerald-600" />
-                          <span>Admin Panel</span>
-                        </DropdownMenuItem>
-                      )}
-                      {isOrgOrAdmin && (
-                        <>
-                          <DropdownMenuItem
-                            className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                            render={<Link href="/manage-donations" />}
-                          >
-                            <Coins className="size-4 text-emerald-600" />
-                            <span>Manage Donations</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                            render={<Link href="/manage-disaster" />}
-                          >
-                            <ShieldAlert className="size-4 text-amber-600" />
-                            <span>Manage Disasters</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                            render={<Link href="/manage-volunteers" />}
-                          >
-                            <Users className="size-4 text-blue-600" />
-                            <span>Manage Volunteers</span>
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                      {!isOrgOrAdmin && (
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setAccountOpen(false);
-                            setVolunteerModalOpen(true);
-                          }}
-                          className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                        >
-                          <Users className="size-4 text-blue-600" />
-                          <span>Request as Volunteer</span>
-                        </DropdownMenuItem>
-                      )}
                       <DropdownMenuItem
                         variant="destructive"
-                        onClick={() => logOut()}
+                        onClick={async () => {
+                          await logOut();
+                          toast.add({
+                            id: 'logout-toast',
+                            title: 'Signed out successfully',
+                            type: 'success',
+                            timeout: 3000,
+                          });
+                          router.push('/');
+                        }}
                         className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 focus:bg-red-50 rounded-xl mt-1 border-t border-neutral-100 transition-colors"
                       >
-                        <LogOut className="size-4" />
-                        <span>Logout</span>
+                        <LogOut className="size-4 text-red-600" />
+                        <span>Log out</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -264,68 +213,64 @@ const Navbar = () => {
             </div>
           </nav>
 
-          {mobileOpen && (
-            <div className="md:hidden mt-2 p-3 bg-white/95 text-neutral-900 rounded-2xl border border-emerald-600/15 shadow-2xl backdrop-blur-xl flex flex-col gap-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-colors ${
-                    pathname === item.href
-                      ? 'text-emerald-700 underline underline-offset-4 decoration-2 decoration-emerald-600'
-                      : 'text-neutral-600 hover:text-neutral-900'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
-
-              <div className="pt-2 border-t border-neutral-100 mt-1 flex flex-col gap-1">
-                <span className="text-xs uppercase font-bold text-neutral-400 px-3.5">
-                  Contribute
-                </span>
-                {isOrgOrAdmin ? (
-                  <Link
-                    href="/manage-volunteers"
-                    onClick={() => setMobileOpen(false)}
-                    className="px-3.5 py-2 rounded-xl text-sm font-medium text-neutral-600 hover:text-neutral-900 flex items-center gap-2"
-                  >
-                    <Users className="size-4 text-emerald-600" />
-                    <span>Manage Volunteers</span>
-                  </Link>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileOpen(false);
-                      setVolunteerModalOpen(true);
-                    }}
-                    className="px-3.5 py-2 rounded-xl text-sm font-medium text-neutral-600 hover:text-neutral-900 flex items-center gap-2 text-left w-full"
-                  >
-                    <Users className="size-4 text-emerald-600" />
-                    <span>Request as Volunteer</span>
-                  </button>
-                )}
-                <Link
-                  href="/donations"
-                  onClick={() => setMobileOpen(false)}
-                  className="px-3.5 py-2 rounded-xl text-sm font-medium text-neutral-600 hover:text-neutral-900 flex items-center gap-2"
-                >
-                  <HeartHandshake className="size-4 text-emerald-600" />
-                  <span>Contribute as Donor</span>
-                </Link>
-              </div>
-            </div>
-          )}
+          {/* Detached Circular Chatbot Button with Uiverse Spinner */}
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('open-edrms-chatbot'));
+              }
+            }}
+            aria-label="Open AI Assistant"
+            title="Open EDRMS AI Assistant"
+            className="size-[42px] sm:size-[44px] rounded-full bg-[#1c1c22] hover:bg-[#15151a] active:bg-[#0f0f13] text-white shadow-xl shadow-purple-950/20 backdrop-blur-xl border border-purple-500/30 flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer relative shrink-0 group overflow-hidden"
+          >
+            <ChatbotIcon size={26} />
+          </button>
         </div>
-      </header>
 
-      <RequestAsVolunteerModal
-        open={volunteerModalOpen}
-        onClose={() => setVolunteerModalOpen(false)}
-      />
-    </>
+        {mobileOpen && (
+          <div className="w-full md:hidden mt-2 p-3 bg-white/95 text-neutral-900 rounded-2xl border border-emerald-600/15 shadow-2xl backdrop-blur-xl flex flex-col gap-1">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                  pathname === item.href
+                    ? 'text-emerald-700 underline underline-offset-4 decoration-2 decoration-emerald-600'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+
+            <div className="pt-2 border-t border-neutral-100 mt-1 flex flex-col gap-1">
+              <span className="text-xs uppercase font-bold text-neutral-400 px-3.5">
+                Contribute
+              </span>
+              <Link
+                href="/volunteer-profile"
+                onClick={() => setMobileOpen(false)}
+                className="px-3.5 py-2 rounded-xl text-sm font-medium text-neutral-600 hover:text-neutral-900 flex items-center gap-2"
+              >
+                <Users className="size-4" />
+                <span>Contribute as Volunteer</span>
+              </Link>
+              <Link
+                href="/signup-as-relief-org"
+                onClick={() => setMobileOpen(false)}
+                className="px-3.5 py-2 rounded-xl text-sm font-medium text-neutral-600 hover:text-neutral-900 flex items-center gap-2"
+              >
+                <Building2 className="size-4" />
+                <span>Contribute as Relief Org</span>
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
+    </header>
   );
 };
 

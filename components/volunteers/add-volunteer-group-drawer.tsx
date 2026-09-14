@@ -5,20 +5,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import MuiSelect from '@/components/mui-select';
 import ModernButton from '@/components/modernBtn';
 import MuiDrawer from '@/components/mui-drawer';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { publicApi } from '@/app/lib/public-api';
-import { volunteerGroupSchema } from '@/app/lib/validations/volunteer-group-schema';
+import { toast } from '@/components/ui/toast';
+import { axiosSecure, publicApi } from '@/lib/api';
+import { volunteerGroupSchema } from '@/lib/validations/volunteer-group-schema';
 import { VolunteerGroup } from './types';
 import { Disaster } from '@/components/disaster/types';
+import { getApiErrorMessage } from '@/utils/api-error';
 
 interface AddVolunteerGroupDrawerProps {
   open: boolean;
@@ -33,8 +28,6 @@ const AddVolunteerGroupDrawer = ({
   onSuccess,
   editGroup,
 }: AddVolunteerGroupDrawerProps) => {
-  const axiosSecure = useAxiosSecure();
-
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
@@ -73,7 +66,7 @@ const AddVolunteerGroupDrawer = ({
       setRequiredSkills(
         Array.isArray(editGroup.required_skills)
           ? editGroup.required_skills.join(', ')
-          : ''
+          : '',
       );
       setDisasterName(editGroup.disaster_name || 'none');
       setAcceptingRequests(editGroup.status === 'open');
@@ -139,7 +132,7 @@ const AddVolunteerGroupDrawer = ({
         description,
         location,
         needed_volunteers: Number(neededVolunteers),
-        required_skills: skillsArray.length > 0 ? skillsArray : ['First Aid', 'Search and Rescue'],
+        required_skills: skillsArray,
         disaster_name: disasterName === 'none' ? null : disasterName,
         status: acceptingRequests ? 'open' : 'closed',
       };
@@ -147,17 +140,32 @@ const AddVolunteerGroupDrawer = ({
       if (editGroup) {
         await axiosSecure.patch(
           `/volunteers/organization-requests/${editGroup.id}`,
-          payload
+          payload,
         );
+        toast.add({
+          id: 'volunteer-group-updated',
+          title: 'Volunteer group updated successfully!',
+          type: 'success',
+          timeout: 4000,
+        });
       } else {
         await axiosSecure.post('/volunteers/organization-requests', payload);
+        toast.add({
+          id: 'volunteer-group-created',
+          title: 'Volunteer group created successfully!',
+          type: 'success',
+          timeout: 4000,
+        });
       }
 
       onSuccess();
       onOpenChange(false);
-    } catch (err: any) {
+    } catch (err) {
       setServerError(
-        err?.response?.data?.message || 'Failed to save volunteer group. Please try again.'
+        getApiErrorMessage(
+          err,
+          'Failed to save volunteer group. Please try again.',
+        ),
       );
     } finally {
       setLoading(false);
@@ -184,63 +192,50 @@ const AddVolunteerGroupDrawer = ({
         )}
 
         <div className="space-y-1.5">
-          <Label htmlFor="title" className="text-xs font-semibold">
-            Group Title / Number *
-          </Label>
+          <Label htmlFor="title">Group Title / Number *</Label>
           <Input
             id="title"
             placeholder="e.g. Rapid Rescue Unit Alpha"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="text-xs"
           />
           {errors.title && (
-            <p className="text-[11px] text-destructive">{errors.title}</p>
+            <p className="text-xs text-destructive">{errors.title}</p>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="disaster" className="text-xs font-semibold">
-            Assigned Disaster Alert
-          </Label>
-          <Select
+          <Label htmlFor="disaster">Assigned Disaster Alert</Label>
+          <MuiSelect
+            id="disaster"
             value={disasterName}
-            onValueChange={(val) => setDisasterName(val || 'none')}
-          >
-            <SelectTrigger id="disaster" className="w-full text-xs">
-              <SelectValue placeholder="Select assigned disaster" />
-            </SelectTrigger>
-            <SelectContent className="max-h-60">
-              <SelectItem value="none" className="text-xs">
-                None / General Deployment
-              </SelectItem>
-              {disasters.map((d) => (
-                <SelectItem key={d.id} value={d.disaster_name} className="text-xs">
-                  {d.disaster_name} ({d.type})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            onChange={(val) => setDisasterName(val || 'none')}
+            placeholder="Select assigned disaster"
+            options={[
+              { label: 'None / General Deployment', value: 'none' },
+              ...disasters.map((d) => ({
+                label: `${d.disaster_name} (${d.type})`,
+                value: d.disaster_name,
+              })),
+            ]}
+          />
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="location" className="text-xs font-semibold">
-            Deployment Location *
-          </Label>
+          <Label htmlFor="location">Deployment Location *</Label>
           <Input
             id="location"
             placeholder="e.g. Cox's Bazar Sadar Zone"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="text-xs"
           />
           {errors.location && (
-            <p className="text-[11px] text-destructive">{errors.location}</p>
+            <p className="text-xs text-destructive">{errors.location}</p>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="neededVolunteers" className="text-xs font-semibold">
+          <Label htmlFor="neededVolunteers">
             Number of Volunteers Required *
           </Label>
           <Input
@@ -249,15 +244,16 @@ const AddVolunteerGroupDrawer = ({
             min={1}
             value={neededVolunteers}
             onChange={(e) => setNeededVolunteers(Number(e.target.value))}
-            className="text-xs"
           />
           {errors.neededVolunteers && (
-            <p className="text-[11px] text-destructive">{errors.neededVolunteers}</p>
+            <p className="text-xs text-destructive">
+              {errors.neededVolunteers}
+            </p>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="requiredSkills" className="text-xs font-semibold">
+          <Label htmlFor="requiredSkills">
             Required Skills (comma separated)
           </Label>
           <Input
@@ -265,33 +261,29 @@ const AddVolunteerGroupDrawer = ({
             placeholder="e.g. First Aid, Boat Navigation, Medical Support"
             value={requiredSkills}
             onChange={(e) => setRequiredSkills(e.target.value)}
-            className="text-xs"
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="description" className="text-xs font-semibold">
-            Mission Description *
-          </Label>
+          <Label htmlFor="description">Mission Description *</Label>
           <Textarea
             id="description"
             rows={3}
             placeholder="Provide duty requirements, rendezvous points, and specific instructions..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="text-xs"
           />
           {errors.description && (
-            <p className="text-[11px] text-destructive">{errors.description}</p>
+            <p className="text-xs text-destructive">{errors.description}</p>
           )}
         </div>
 
-        <div className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-muted/20">
+        <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/20">
           <div className="space-y-0.5">
-            <Label htmlFor="acceptToggle" className="text-xs font-semibold cursor-pointer">
+            <Label htmlFor="acceptToggle" className="cursor-pointer">
               Accept Volunteer Requests
             </Label>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {acceptingRequests
                 ? 'Volunteers can submit join requests to this unit.'
                 : 'Unit is locked. No new volunteer join requests are accepted.'}
@@ -304,13 +296,13 @@ const AddVolunteerGroupDrawer = ({
           />
         </div>
 
-        <div className="pt-4 border-t border-border/50 flex items-center justify-start">
+        <div className="pt-4 border-t border-border flex items-center justify-start">
           <ModernButton type="submit" disabled={loading}>
             {loading
               ? 'Processing...'
               : editGroup
-              ? 'Update Volunteer Group'
-              : 'Create Volunteer Group'}
+                ? 'Update Volunteer Group'
+                : 'Create Volunteer Group'}
           </ModernButton>
         </div>
       </form>

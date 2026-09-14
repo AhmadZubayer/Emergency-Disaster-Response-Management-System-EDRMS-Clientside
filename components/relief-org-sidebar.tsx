@@ -3,7 +3,13 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { User, AlertTriangle, Users, HeartHandshake } from 'lucide-react';
+import {
+  User,
+  AlertTriangle,
+  Users,
+  HeartHandshake,
+  FileWarning,
+} from 'lucide-react';
 
 const navItems = [
   {
@@ -22,6 +28,11 @@ const navItems = [
     icon: Users,
   },
   {
+    label: 'Volunteer Reports',
+    href: '/relief-org/volunteer-reports',
+    icon: FileWarning,
+  },
+  {
     label: 'Donations',
     href: '/manage-donations',
     icon: HeartHandshake,
@@ -33,7 +44,7 @@ const ReliefOrgSidebar = () => {
 
   return (
     <aside className="w-full md:w-60 shrink-0">
-      <div className="bg-card border border-border/60 rounded-xl p-1.5 shadow-sm space-y-1">
+      <div className="bg-card border border-border rounded-lg p-1.5 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
@@ -44,19 +55,13 @@ const ReliefOrgSidebar = () => {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all ${
                 isActive
-                  ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400 font-bold'
+                  ? 'bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary font-medium'
                   : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'
               }`}
             >
-              <Icon
-                className={`size-4 shrink-0 ${
-                  isActive
-                    ? 'text-emerald-600 dark:text-emerald-400'
-                    : 'text-muted-foreground'
-                }`}
-              />
+              <Icon className="size-4 shrink-0" />
               <span>{item.label}</span>
             </Link>
           );

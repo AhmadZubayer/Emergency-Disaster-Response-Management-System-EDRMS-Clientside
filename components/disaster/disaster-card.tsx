@@ -30,7 +30,7 @@ const DisasterCard = ({ disaster, onClick }: DisasterCardProps) => {
               <h3 className="card__title">{disaster.disaster_name}</h3>
               <Badge
                 variant={isSafe ? 'default' : 'destructive'}
-                className="text-[10px] px-2 py-0 font-bold uppercase tracking-wide shrink-0"
+                className="uppercase shrink-0"
               >
                 {isSafe ? 'Safe' : 'Active Warning'}
               </Badge>
@@ -52,7 +52,7 @@ const DisasterCard = ({ disaster, onClick }: DisasterCardProps) => {
           </div>
 
           <div className="card__footer">
-            <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400">
+            <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
               View Warning Details &rarr;
             </span>
           </div>

@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import ModernButton from '@/components/modernBtn';
 import SignInSuccess from '@/components/auth/signInSuccess';
-import { signInSchema } from '@/app/lib/validations/auth';
+import { signInSchema } from '@/lib/validations/auth';
 import { useAuth } from '@/app/hooks/useAuth';
 
 const GoogleIcon = () => (

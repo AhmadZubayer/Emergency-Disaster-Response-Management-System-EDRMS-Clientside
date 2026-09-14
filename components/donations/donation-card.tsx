@@ -27,7 +27,7 @@ const DonationCard = ({ campaign, onClick }: DonationCardProps) => {
               <h3 className="card__title">{campaign.title}</h3>
               <Badge
                 variant={isActive ? 'default' : 'secondary'}
-                className="text-[10px] px-2 py-0 font-bold uppercase tracking-wide shrink-0"
+                className="uppercase shrink-0"
               >
                 {campaign.status}
               </Badge>
@@ -40,26 +40,26 @@ const DonationCard = ({ campaign, onClick }: DonationCardProps) => {
 
           <div className="card__progress-container">
             <div className="flex items-center justify-between text-xs mb-1">
-              <span className="font-bold text-emerald-600 dark:text-emerald-400">
+              <span className="font-medium text-primary dark:text-primary">
                 ${collected.toLocaleString()} raised
               </span>
-              <span className="text-muted-foreground text-[11px]">
+              <span className="text-muted-foreground text-xs">
                 Target: ${target.toLocaleString()}
               </span>
             </div>
             <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
               <div
-                className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                className="h-full bg-primary rounded-full transition-all duration-500"
                 style={{ width: `${progressPct}%` }}
               />
             </div>
           </div>
 
           <div className="card__footer">
-            <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+            <span className="text-xs font-medium text-primary dark:text-primary">
               {progressPct}% Funded
             </span>
-            <span className="text-[11px] font-medium text-muted-foreground group-hover:text-emerald-600 transition-colors">
+            <span className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">
               Donate & View Details &rarr;
             </span>
           </div>

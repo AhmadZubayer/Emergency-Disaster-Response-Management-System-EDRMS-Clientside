@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 import Navbar from '@/components/navbar';
 import { Button } from '@/components/ui/button';
-import { publicApi } from '@/app/lib/public-api';
+import { publicApi } from '@/lib/api';
 
 const PaymentCancelContent = () => {
   const searchParams = useSearchParams();
@@ -19,18 +19,18 @@ const PaymentCancelContent = () => {
   }, [txId]);
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-center max-w-md mx-auto my-16 bg-card border border-border/60 rounded-2xl shadow-sm space-y-4">
+    <div className="flex flex-col items-center justify-center p-4 text-center max-w-md mx-auto my-16 bg-card border border-border rounded-lg space-y-4">
       <div className="size-16 rounded-full bg-destructive/10 border border-destructive/20 flex items-center justify-center text-destructive">
         <AlertCircle className="size-8" />
       </div>
-      <h1 className="text-2xl font-bold tracking-tight text-foreground">
+      <h1 className="text-2xl font-medium tracking-tight text-foreground">
         Donation Cancelled
       </h1>
       <p className="text-xs text-muted-foreground leading-relaxed">
         The payment session was cancelled. No charges were made to your account.
       </p>
       <div className="pt-2">
-        <Button render={<Link href="/donations" />} variant="outline" className="gap-2">
+        <Button render={<Link href="/donations" />} variant="outline" >
           <ArrowLeft className="size-4" />
           <span>Back to All Campaigns</span>
         </Button>

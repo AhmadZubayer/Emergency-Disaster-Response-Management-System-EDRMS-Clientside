@@ -43,6 +43,9 @@ const MuiModal = ({
         transition: Transition,
       }}
       keepMounted
+      disableEnforceFocus={true}
+      disableAutoFocus={true}
+      disableRestoreFocus={true}
       onClose={onClose}
       maxWidth={maxWidth}
       fullWidth={fullWidth}

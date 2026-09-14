@@ -1,14 +1,16 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist_Mono, Inter } from 'next/font/google';
 
-import { AuthProvider } from '@/app/contexts/AuthProvider';
+import { AuthProvider } from '@/contexts/auth-provider';
+import Footer from '@/components/footer';
+import ChatbotUI from '@/chatbot/chat-ui';
 import { Toaster } from '@/components/ui/toast';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 import './globals.css';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin'],
 });
 
@@ -30,13 +32,19 @@ const RootLayout = ({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${geistMono.variable} h-full font-sans antialiased`}
     >
       <body className="min-h-full">
         <AuthProvider>
-          <Toaster>
-            {children}
-          </Toaster>
+          <TooltipProvider>
+            <Toaster>
+              <div className="flex min-h-screen flex-col">
+                <div className="flex-1">{children}</div>
+                <Footer />
+                <ChatbotUI />
+              </div>
+            </Toaster>
+          </TooltipProvider>
         </AuthProvider>
       </body>
     </html>
@@ -44,5 +52,3 @@ const RootLayout = ({
 };
 
 export default RootLayout;
-
-

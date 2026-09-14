@@ -54,7 +54,7 @@ const SleekCard = ({ person, onClick }: SleekCardProps) => {
             <div className="card__footer">
               <Badge
                 variant={isMissing ? 'destructive' : 'default'}
-                className="text-[10px] px-2 py-0 font-bold uppercase tracking-wide"
+                className="uppercase"
               >
                 {person.status}
               </Badge>
@@ -71,7 +71,7 @@ const SleekCard = ({ person, onClick }: SleekCardProps) => {
                   onError={() => setImgError(true)}
                 />
               ) : (
-                <User className="size-8 text-emerald-600/70 dark:text-emerald-400/70" />
+                <User className="size-8 text-muted-foreground/60" />
               )}
             </div>
           </div>

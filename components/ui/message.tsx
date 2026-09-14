@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cn } from "cn"
 
-function MessageGroup({ className, ...props }: React.ComponentProps<"div">) {
+const MessageGroup = ({ className, ...props }: React.ComponentProps<"div">) => {
   return (
     <div
       data-slot="message-group"
@@ -9,13 +9,13 @@ function MessageGroup({ className, ...props }: React.ComponentProps<"div">) {
       {...props}
     />
   )
-}
+};
 
-function Message({
+const Message = ({
   className,
   align = "start",
   ...props
-}: React.ComponentProps<"div"> & { align?: "start" | "end" }) {
+}: React.ComponentProps<"div"> & { align?: "start" | "end" }) => {
   return (
     <div
       data-slot="message"
@@ -27,9 +27,9 @@ function Message({
       {...props}
     />
   )
-}
+};
 
-function MessageAvatar({ className, ...props }: React.ComponentProps<"div">) {
+const MessageAvatar = ({ className, ...props }: React.ComponentProps<"div">) => {
   return (
     <div
       data-slot="message-avatar"
@@ -40,9 +40,9 @@ function MessageAvatar({ className, ...props }: React.ComponentProps<"div">) {
       {...props}
     />
   )
-}
+};
 
-function MessageContent({ className, ...props }: React.ComponentProps<"div">) {
+const MessageContent = ({ className, ...props }: React.ComponentProps<"div">) => {
   return (
     <div
       data-slot="message-content"
@@ -53,9 +53,9 @@ function MessageContent({ className, ...props }: React.ComponentProps<"div">) {
       {...props}
     />
   )
-}
+};
 
-function MessageHeader({ className, ...props }: React.ComponentProps<"div">) {
+const MessageHeader = ({ className, ...props }: React.ComponentProps<"div">) => {
   return (
     <div
       data-slot="message-header"
@@ -66,9 +66,9 @@ function MessageHeader({ className, ...props }: React.ComponentProps<"div">) {
       {...props}
     />
   )
-}
+};
 
-function MessageFooter({ className, ...props }: React.ComponentProps<"div">) {
+const MessageFooter = ({ className, ...props }: React.ComponentProps<"div">) => {
   return (
     <div
       data-slot="message-footer"
@@ -79,7 +79,7 @@ function MessageFooter({ className, ...props }: React.ComponentProps<"div">) {
       {...props}
     />
   )
-}
+};
 
 export {
   MessageGroup,

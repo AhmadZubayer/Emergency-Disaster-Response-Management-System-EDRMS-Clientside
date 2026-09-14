@@ -1,451 +1,217 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { Plus, MessageSquarePlus } from 'lucide-react';
 import Navbar from '@/components/navbar';
-import {
-  MessageSquare,
-  Heart,
-  Plus,
-  Search,
-  Send,
-  Flag,
-  Calendar,
-  User,
-  CheckCircle2,
-  AlertCircle,
-  Share2,
-} from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import SearchBar from '@/components/searchbar';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import MuiModal from '@/components/mui-modal';
-import { useAuth } from '@/app/hooks/useAuth';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { publicApi } from '@/app/lib/public-api';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import useAuth from '@/hooks/use-auth';
+import { publicApi } from '@/lib/api';
+import { CommunityPost } from '@/components/community/types';
+import CommunityPostCard from '@/components/community/community-post-card';
+import AddCommunityPostDrawer from '@/components/community/add-community-post-drawer';
 
-interface Comment {
-  id: string;
-  content: string;
-  created_at: string;
-  user?: {
-    id: string;
-    name?: string;
-  };
-}
-
-interface Post {
-  id: string;
-  title: string;
-  body: string;
-  author_id?: string;
-  author?: {
-    id: string;
-    name?: string;
-  };
-  reactions_count?: number;
-  comments_count?: number;
-  created_at: string;
-}
-
-export default function CommunityPage() {
+const CommunityPage = () => {
+  const router = useRouter();
   const { user } = useAuth();
-  const axiosSecure = useAxiosSecure();
 
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortOption, setSortOption] = useState('desc');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  // Create Post Modal
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-  const [newBody, setNewBody] = useState('');
-  const [createLoading, setCreateLoading] = useState(false);
-
-  // Active Post Comments
-  const [activeCommentPostId, setActiveCommentPostId] = useState<string | null>(null);
-  const [commentsMap, setCommentsMap] = useState<Record<string, Comment[]>>({});
-  const [commentInput, setCommentInput] = useState<Record<string, string>>({});
-  const [commentLoading, setCommentLoading] = useState<Record<string, boolean>>({});
-
-  // Toast message
-  const [toastMsg, setToastMsg] = useState<string | null>(null);
-
-  const fetchPosts = useCallback(async () => {
-    setLoading(true);
+  const fetchPosts = useCallback(async (search?: string, sortVal: string = 'desc') => {
     try {
-      const res = await publicApi.get('/community-posts', {
-        params: { search: searchQuery || undefined },
-      });
-      const data = res.data?.data || res.data || [];
-      setPosts(Array.isArray(data) ? data : []);
+      setLoading(true);
+
+      const params = new URLSearchParams();
+      if (search?.trim()) {
+        params.append('search', search.trim());
+      }
+
+      if (sortVal === 'asc' || sortVal === 'desc') {
+        params.append('sort', sortVal);
+      }
+
+      const queryString = params.toString();
+      const url = queryString ? `/community-posts?${queryString}` : '/community-posts';
+
+      const res = await publicApi.get(url);
+      const rawData = res.data?.data || res.data || [];
+      let list: CommunityPost[] = Array.isArray(rawData) ? rawData : [];
+
+      if (sortVal === 'posted_by_you') {
+        list = list.filter(
+          (p) =>
+            (user?.id && p.author_id === user.id) ||
+            (user?.name && p.postedBy?.name === user.name)
+        );
+      } else if (sortVal === 'posted_by_volunteers') {
+        list = list.filter(
+          (p) => p.postedBy?.role?.toLowerCase() === 'volunteer'
+        );
+      } else if (sortVal === 'posted_by_relief_org') {
+        list = list.filter(
+          (p) =>
+            p.postedBy?.role?.toLowerCase() === 'relief_org' ||
+            p.postedBy?.role?.toLowerCase() === 'organization'
+        );
+      } else if (sortVal === 'posted_by_admin') {
+        list = list.filter(
+          (p) => p.postedBy?.role?.toLowerCase() === 'admin'
+        );
+      }
+
+      setPosts(list);
     } catch {
       setPosts([]);
     } finally {
       setLoading(false);
     }
-  }, [searchQuery]);
+  }, [user]);
 
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    fetchPosts(searchQuery, sortOption);
+  }, [fetchPosts, sortOption]);
 
-  const handleCreatePost = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) {
-      setToastMsg('Please sign in to publish a post.');
-      return;
-    }
-
-    if (!newTitle.trim() || !newBody.trim()) return;
-
-    setCreateLoading(true);
-    try {
-      await axiosSecure.post('/community-posts', {
-        title: newTitle.trim(),
-        body: newBody.trim(),
-      });
-      setNewTitle('');
-      setNewBody('');
-      setCreateModalOpen(false);
-      setToastMsg('Post published successfully!');
-      fetchPosts();
-      setTimeout(() => setToastMsg(null), 3000);
-    } catch (err: any) {
-      const msg = err.response?.data?.message || 'Failed to publish post.';
-      setToastMsg(Array.isArray(msg) ? msg[0] : msg);
-    } finally {
-      setCreateLoading(false);
-    }
+  const handleSearchChange = (val: string) => {
+    setSearchQuery(val);
+    fetchPosts(val, sortOption);
   };
 
-  const handleLikePost = async (postId: string) => {
-    if (!user) {
-      setToastMsg('Please sign in to react to posts.');
-      return;
-    }
-    try {
-      await axiosSecure.post(`/community-posts/${postId}/react`, { type: 'like' });
-      setPosts((prev) =>
-        prev.map((p) =>
-          p.id === postId
-            ? { ...p, reactions_count: (p.reactions_count || 0) + 1 }
-            : p
-        )
-      );
-    } catch {
-      // Ignore double react
-    }
+  const handleSortChange = (val: string | null) => {
+    if (!val) return;
+    setSortOption(val);
   };
 
-  const toggleComments = async (postId: string) => {
-    if (activeCommentPostId === postId) {
-      setActiveCommentPostId(null);
-      return;
-    }
-    setActiveCommentPostId(postId);
-
-    if (!commentsMap[postId]) {
-      try {
-        const res = await publicApi.get(`/community-posts/${postId}/comments`);
-        const data = res.data?.data || res.data || [];
-        setCommentsMap((prev) => ({ ...prev, [postId]: Array.isArray(data) ? data : [] }));
-      } catch {
-        setCommentsMap((prev) => ({ ...prev, [postId]: [] }));
-      }
-    }
-  };
-
-  const handleAddComment = async (postId: string) => {
+  const handleOpenDrawer = () => {
     if (!user) {
-      setToastMsg('Please sign in to comment.');
+      router.push('/sign-in?returnUrl=/community');
       return;
     }
-    const text = commentInput[postId]?.trim();
-    if (!text) return;
-
-    setCommentLoading((prev) => ({ ...prev, [postId]: true }));
-    try {
-      await axiosSecure.post(`/community-posts/${postId}/comments`, { content: text });
-      setCommentInput((prev) => ({ ...prev, [postId]: '' }));
-
-      const res = await publicApi.get(`/community-posts/${postId}/comments`);
-      const updatedComments = res.data?.data || res.data || [];
-      setCommentsMap((prev) => ({ ...prev, [postId]: Array.isArray(updatedComments) ? updatedComments : [] }));
-
-      setPosts((prev) =>
-        prev.map((p) =>
-          p.id === postId ? { ...p, comments_count: (p.comments_count || 0) + 1 } : p
-        )
-      );
-    } catch {
-      setToastMsg('Failed to post comment.');
-    } finally {
-      setCommentLoading((prev) => ({ ...prev, [postId]: false }));
-    }
-  };
-
-  const handleReportPost = async (postId: string) => {
-    if (!user) {
-      setToastMsg('Please sign in to report.');
-      return;
-    }
-    try {
-      await axiosSecure.post(`/community-posts/${postId}/report`, { reason: 'Inappropriate content' });
-      setToastMsg('Post reported for moderation review.');
-      setTimeout(() => setToastMsg(null), 3000);
-    } catch {
-      setToastMsg('Failed to report post.');
-    }
+    setIsDrawerOpen(true);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
 
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6">
-        {/* Banner Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-6">
-          <div>
-            <div className="flex items-center gap-2">
-              <MessageSquare className="size-6 text-emerald-600" />
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                Community Discussion Board
-              </h1>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Connect with fellow disaster responders, share field updates, and support relief operations.
-            </p>
-          </div>
-
-          <Button
-            onClick={() => {
-              if (!user) {
-                setToastMsg('Please sign in to create a post.');
-                return;
-              }
-              setCreateModalOpen(true);
-            }}
-            className="gap-1.5 text-xs font-semibold shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white"
-          >
-            <Plus className="size-4" />
-            New Community Post
-          </Button>
-        </div>
-
-        {toastMsg && (
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-semibold">
-            <CheckCircle2 className="size-4 shrink-0" />
-            <span>{toastMsg}</span>
-          </div>
-        )}
-
-        {/* Search & Filter Bar */}
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <Input
-            placeholder="Search community posts by keyword..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-10 text-xs bg-card border-border/60"
-          />
-        </div>
-
-        {/* Posts Feed */}
-        <div className="space-y-4">
-          {loading ? (
-            <div className="text-center py-12 space-y-2">
-              <div className="size-8 rounded-full border-2 border-emerald-600 border-t-transparent animate-spin mx-auto" />
-              <p className="text-xs text-muted-foreground">Loading community discussions...</p>
-            </div>
-          ) : posts.length === 0 ? (
-            <Card className="border-dashed border-border/70 p-8 text-center">
-              <p className="text-sm font-semibold text-muted-foreground">
-                No community posts found. Be the first to share an update!
-              </p>
-              <Button
-                size="sm"
-                onClick={() => setCreateModalOpen(true)}
-                className="mt-3 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="w-full md:w-[65%] max-w-3xl mx-auto space-y-6">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-card p-3.5 rounded-lg border border-border">
+            <div className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+              <Select
+                value={sortOption}
+                onValueChange={handleSortChange}
               >
-                Create Post
-              </Button>
-            </Card>
-          ) : (
-            posts.map((post) => {
-              const postComments = commentsMap[post.id] || [];
-              const isCommentOpen = activeCommentPostId === post.id;
+                <SelectTrigger className="w-full sm:w-[175px] h-9 shrink-0 bg-background text-xs">
+                  <SelectValue placeholder="Sort / Filter" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="desc">Descending</SelectItem>
+                  <SelectItem value="asc">Ascending</SelectItem>
+                  <SelectItem value="posted_by_you">Posted by You</SelectItem>
+                  <SelectItem value="posted_by_volunteers">Posted by Volunteers</SelectItem>
+                  <SelectItem value="posted_by_relief_org">Posted by Relief Org</SelectItem>
+                  <SelectItem value="posted_by_admin">Posted by Admin</SelectItem>
+                </SelectContent>
+              </Select>
 
-              return (
-                <Card key={post.id} className="border-border/60 shadow-xs hover:border-border transition-colors">
-                  <CardHeader className="p-5 pb-2">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-2.5">
-                        <div className="size-9 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs uppercase">
-                          {post.author?.name ? post.author.name.charAt(0) : <User className="size-4" />}
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm text-foreground">
-                            {post.author?.name || 'Community Member'}
-                          </div>
-                          <div className="text-[11px] text-muted-foreground flex items-center gap-1">
-                            <Calendar className="size-3" />
-                            <span>{new Date(post.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                          </div>
-                        </div>
+              <SearchBar
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onSubmit={() => fetchPosts(searchQuery, sortOption)}
+                placeholder="Search community posts..."
+                className="flex-1"
+                inputClassName="w-full sm:w-full focus:w-full sm:focus:w-full"
+              />
+            </div>
+
+            <Button
+              onClick={handleOpenDrawer}
+              size="default"
+              className="shrink-0"
+            >
+              <Plus className="size-4" />
+              <span>Make a post</span>
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            {loading ? (
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="p-4 rounded-lg border border-border bg-card space-y-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="size-9 rounded-full" />
+                      <div className="space-y-1.5 flex-1">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-20" />
                       </div>
-
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleReportPost(post.id)}
-                        title="Report Post"
-                        className="size-7 text-muted-foreground hover:text-destructive"
-                      >
-                        <Flag className="size-3.5" />
-                      </Button>
                     </div>
-
-                    <CardTitle className="text-base font-bold text-foreground pt-3">
-                      {post.title}
-                    </CardTitle>
-                  </CardHeader>
-
-                  <CardContent className="p-5 pt-1 space-y-4">
-                    <p className="text-xs text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                      {post.body}
-                    </p>
-
-                    <div className="flex items-center gap-4 border-t border-border/40 pt-3">
-                      <button
-                        type="button"
-                        onClick={() => handleLikePost(post.id)}
-                        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-emerald-600 font-medium transition-colors"
-                      >
-                        <Heart className="size-4 text-emerald-600" />
-                        <span>{post.reactions_count || 0} Likes</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => toggleComments(post.id)}
-                        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground font-medium transition-colors"
-                      >
-                        <MessageSquare className="size-4" />
-                        <span>{post.comments_count || postComments.length || 0} Comments</span>
-                      </button>
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-16 w-full rounded-lg" />
+                    <div className="flex items-center gap-4 pt-1">
+                      <Skeleton className="h-4 w-16" />
+                      <Skeleton className="h-4 w-20" />
                     </div>
-
-                    {/* Comments Drawer / List */}
-                    {isCommentOpen && (
-                      <div className="space-y-3 pt-3 border-t border-border/50 bg-muted/20 p-3 rounded-xl">
-                        <div className="space-y-2">
-                          {postComments.length === 0 ? (
-                            <p className="text-xs text-muted-foreground italic">No comments yet. Write one below!</p>
-                          ) : (
-                            postComments.map((c) => (
-                              <div key={c.id} className="p-2.5 rounded-lg bg-card border border-border/40 text-xs space-y-1">
-                                <div className="flex items-center justify-between">
-                                  <span className="font-semibold text-foreground">
-                                    {c.user?.name || 'Anonymous User'}
-                                  </span>
-                                  <span className="text-[10px] text-muted-foreground">
-                                    {new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                  </span>
-                                </div>
-                                <p className="text-muted-foreground leading-normal">{c.content}</p>
-                              </div>
-                            ))
-                          )}
-                        </div>
-
-                        {user ? (
-                          <div className="flex items-center gap-2 pt-1">
-                            <Input
-                              placeholder="Write a comment..."
-                              value={commentInput[post.id] || ''}
-                              onChange={(e) =>
-                                setCommentInput((prev) => ({ ...prev, [post.id]: e.target.value }))
-                              }
-                              className="text-xs h-9 bg-card"
-                            />
-                            <Button
-                              size="sm"
-                              onClick={() => handleAddComment(post.id)}
-                              disabled={commentLoading[post.id]}
-                              className="h-9 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white"
-                            >
-                              <Send className="size-3.5" />
-                            </Button>
-                          </div>
-                        ) : (
-                          <p className="text-xs text-muted-foreground">Sign in to write comments.</p>
-                        )}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })
-          )}
+                  </div>
+                ))}
+              </div>
+            ) : posts.length === 0 ? (
+              <div className="py-16 text-center space-y-3 rounded-lg border border-dashed border-border bg-card p-4">
+                <MessageSquarePlus className="size-10 text-muted-foreground/60 mx-auto" />
+                <h3 className="text-sm font-medium text-foreground">
+                  No community posts found
+                </h3>
+                <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                  {searchQuery
+                    ? `No updates matching "${searchQuery}". Try a different keyword.`
+                    : 'Be the first to share an update, field report, or emergency announcement.'}
+                </p>
+                <Button
+                  onClick={handleOpenDrawer}
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                >
+                  <Plus className="size-3.5" />
+                  Make a post
+                </Button>
+              </div>
+            ) : (
+              posts.map((post) => (
+                <CommunityPostCard
+                  key={post.postId}
+                  post={post}
+                  onPostUpdated={() => fetchPosts(searchQuery, sortOption)}
+                />
+              ))
+            )}
+          </div>
         </div>
       </main>
 
-      {/* Create Post Modal */}
-      <MuiModal
-        open={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        title="Create Community Post"
-        maxWidth="sm"
-      >
-        <form onSubmit={handleCreatePost} className="space-y-4 py-1">
-          <div className="space-y-1.5">
-            <Label htmlFor="post-title">Post Title</Label>
-            <Input
-              id="post-title"
-              placeholder="e.g. Flood Relief Update in Feni District"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              required
-              className="text-xs"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="post-body">Content / Message</Label>
-            <Textarea
-              id="post-body"
-              placeholder="Share news, emergency updates, or field reports..."
-              value={newBody}
-              onChange={(e) => setNewBody(e.target.value)}
-              required
-              className="text-xs min-h-[120px]"
-            />
-          </div>
-
-          <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/50">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setCreateModalOpen(false)}
-              className="text-xs"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              size="sm"
-              disabled={createLoading}
-              className="gap-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white"
-            >
-              {createLoading ? 'Publishing...' : 'Publish Post'}
-            </Button>
-          </div>
-        </form>
-      </MuiModal>
+      <AddCommunityPostDrawer
+        open={isDrawerOpen}
+        onOpenChange={setIsDrawerOpen}
+        onSuccess={() => fetchPosts(searchQuery, sortOption)}
+      />
     </div>
   );
-}
+};
+
+export default CommunityPage;

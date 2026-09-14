@@ -6,13 +6,7 @@ import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import MuiSelect from '@/components/mui-select';
 import {
   Popover,
   PopoverContent,
@@ -22,8 +16,9 @@ import { Calendar } from '@/components/ui/calendar';
 import ModernButton from '@/components/modernBtn';
 import MuiDrawer from '@/components/mui-drawer';
 import MuiModal from '@/components/mui-modal';
-import useAxiosSecure from '@/app/hooks/useAxiosSecure';
-import { disasterAlertSchema } from '@/app/lib/validations/disaster-alert-schema';
+import { toast } from '@/components/ui/toast';
+import { axiosSecure } from '@/lib/api';
+import { disasterAlertSchema } from '@/lib/validations/disaster-alert-schema';
 import { Disaster, DisasterTypeCategory } from './types';
 import { cn } from 'cn';
 
@@ -58,7 +53,6 @@ const AddDisasterDrawer = ({
   onSuccess,
   editDisaster,
 }: AddDisasterDrawerProps) => {
-  const axiosSecure = useAxiosSecure();
 
   const [disasterName, setDisasterName] = useState('');
   const [impactedLocation, setImpactedLocation] = useState('');
@@ -157,8 +151,20 @@ const AddDisasterDrawer = ({
 
       if (editDisaster) {
         await axiosSecure.patch(`/disaster/${editDisaster.id}`, payload);
+        toast.add({
+          id: 'disaster-alert-updated',
+          title: 'Disaster alert updated successfully!',
+          type: 'success',
+          timeout: 4000,
+        });
       } else {
         await axiosSecure.post('/disaster', payload);
+        toast.add({
+          id: 'disaster-alert-created',
+          title: 'Disaster alert published successfully!',
+          type: 'success',
+          timeout: 4000,
+        });
       }
 
       onSuccess();
@@ -193,7 +199,7 @@ const AddDisasterDrawer = ({
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="disasterName" className="text-xs font-semibold">
+            <Label htmlFor="disasterName" >
               Disaster Name *
             </Label>
             <Input
@@ -201,36 +207,34 @@ const AddDisasterDrawer = ({
               placeholder="e.g. Cyclone Remal 2026"
               value={disasterName}
               onChange={(e) => setDisasterName(e.target.value)}
-              className="text-xs"
+
             />
             {errors.disasterName && (
-              <p className="text-[11px] text-destructive">{errors.disasterName}</p>
+              <p className="text-xs text-destructive">{errors.disasterName}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="type" className="text-xs font-semibold">
+            <Label htmlFor="type" >
               Disaster Type *
             </Label>
-            <Select value={type} onValueChange={(val: any) => setType(val)}>
-              <SelectTrigger id="type" className="w-full text-xs">
-                <SelectValue placeholder="Select disaster category" />
-              </SelectTrigger>
-              <SelectContent className="max-h-60">
-                {DISASTER_TYPES.map((t) => (
-                  <SelectItem key={t.value} value={t.value} className="text-xs">
-                    {t.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <MuiSelect
+              id="type"
+              value={type}
+              onChange={(val) => setType(val as any)}
+              placeholder="Select disaster category"
+              options={DISASTER_TYPES.map((t) => ({
+                label: t.label,
+                value: t.value,
+              }))}
+            />
             {errors.type && (
-              <p className="text-[11px] text-destructive">{errors.type}</p>
+              <p className="text-xs text-destructive">{errors.type}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="impactedLocation" className="text-xs font-semibold">
+            <Label htmlFor="impactedLocation" >
               Impacted Location / Region *
             </Label>
             <Input
@@ -238,15 +242,15 @@ const AddDisasterDrawer = ({
               placeholder="e.g. Coastal Belt, Cox's Bazar & Chattogram"
               value={impactedLocation}
               onChange={(e) => setImpactedLocation(e.target.value)}
-              className="text-xs"
+
             />
             {errors.impactedLocation && (
-              <p className="text-[11px] text-destructive">{errors.impactedLocation}</p>
+              <p className="text-xs text-destructive">{errors.impactedLocation}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold">
+            <Label >
               Expected Impact Date & Time *
             </Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -257,7 +261,7 @@ const AddDisasterDrawer = ({
                       type="button"
                       variant="outline"
                       className={cn(
-                        'w-full justify-start text-left font-normal text-xs h-9',
+                        'w-full justify-start text-left ',
                         !selectedDate && 'text-muted-foreground'
                       )}
                     />
@@ -284,16 +288,17 @@ const AddDisasterDrawer = ({
                   type="time"
                   value={selectedTime}
                   onChange={(e) => setSelectedTime(e.target.value)}
-                  className="pl-9 text-xs h-9"
+
+                  className="pl-8"
                 />
               </div>
             </div>
             {errors.impactTime && (
-              <p className="text-[11px] text-destructive">{errors.impactTime}</p>
+              <p className="text-xs text-destructive">{errors.impactTime}</p>
             )}
           </div>
 
-          <div className="pt-4 border-t border-border/50 flex items-center justify-start">
+          <div className="pt-4 border-t border-border flex items-center justify-start">
             <ModernButton
               type="submit"
               disabled={loading}
@@ -319,7 +324,7 @@ const AddDisasterDrawer = ({
               variant="outline"
               size="sm"
               onClick={() => setIsConfirmModalOpen(false)}
-              className="text-xs"
+
             >
               Cancel
             </Button>
@@ -328,7 +333,7 @@ const AddDisasterDrawer = ({
               size="sm"
               onClick={handleConfirmedSubmit}
               disabled={loading}
-              className="text-xs font-semibold"
+
             >
               Yes, Continue
             </Button>
@@ -336,7 +341,7 @@ const AddDisasterDrawer = ({
         }
       >
         <div className="flex items-start gap-3 py-1">
-          <AlertTriangle className="size-5 text-amber-500 shrink-0 mt-0.5" />
+          <AlertTriangle className="size-5 text-muted-foreground shrink-0 mt-0.5" />
           <p className="text-xs leading-relaxed text-muted-foreground">
             {editDisaster
               ? 'This will update the disaster alert in the system. Do you want to continue?'

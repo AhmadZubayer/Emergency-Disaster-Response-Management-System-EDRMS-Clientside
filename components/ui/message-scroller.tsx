@@ -12,16 +12,16 @@ import { cn } from "cn"
 import { Button } from "@/components/ui/button"
 import { ArrowDownIcon } from "lucide-react"
 
-function MessageScrollerProvider(
+const MessageScrollerProvider = (
   props: React.ComponentProps<typeof MessageScrollerPrimitive.Provider>
-) {
+) => {
   return <MessageScrollerPrimitive.Provider {...props} />
-}
+};
 
-function MessageScroller({
+const MessageScroller = ({
   className,
   ...props
-}: React.ComponentProps<typeof MessageScrollerPrimitive.Root>) {
+}: React.ComponentProps<typeof MessageScrollerPrimitive.Root>) => {
   return (
     <MessageScrollerPrimitive.Root
       data-slot="message-scroller"
@@ -32,12 +32,12 @@ function MessageScroller({
       {...props}
     />
   )
-}
+};
 
-function MessageScrollerViewport({
+const MessageScrollerViewport = ({
   className,
   ...props
-}: React.ComponentProps<typeof MessageScrollerPrimitive.Viewport>) {
+}: React.ComponentProps<typeof MessageScrollerPrimitive.Viewport>) => {
   return (
     <MessageScrollerPrimitive.Viewport
       data-slot="message-scroller-viewport"
@@ -48,12 +48,12 @@ function MessageScrollerViewport({
       {...props}
     />
   )
-}
+};
 
-function MessageScrollerContent({
+const MessageScrollerContent = ({
   className,
   ...props
-}: React.ComponentProps<typeof MessageScrollerPrimitive.Content>) {
+}: React.ComponentProps<typeof MessageScrollerPrimitive.Content>) => {
   return (
     <MessageScrollerPrimitive.Content
       data-slot="message-scroller-content"
@@ -61,27 +61,24 @@ function MessageScrollerContent({
       {...props}
     />
   )
-}
+};
 
-function MessageScrollerItem({
+const MessageScrollerItem = ({
   className,
   scrollAnchor = false,
   ...props
-}: React.ComponentProps<typeof MessageScrollerPrimitive.Item>) {
+}: React.ComponentProps<typeof MessageScrollerPrimitive.Item>) => {
   return (
     <MessageScrollerPrimitive.Item
       data-slot="message-scroller-item"
       scrollAnchor={scrollAnchor}
-      className={cn(
-        "min-w-0 shrink-0 [contain-intrinsic-size:auto_10rem] [content-visibility:auto]",
-        className
-      )}
+      className={cn("min-w-0 shrink-0 w-full", className)}
       {...props}
     />
   )
-}
+};
 
-function MessageScrollerButton({
+const MessageScrollerButton = ({
   direction = "end",
   className,
   children,
@@ -90,7 +87,7 @@ function MessageScrollerButton({
   size = "icon-sm",
   ...props
 }: React.ComponentProps<typeof MessageScrollerPrimitive.Button> &
-  Pick<React.ComponentProps<typeof Button>, "variant" | "size">) {
+  Pick<React.ComponentProps<typeof Button>, "variant" | "size">) => {
   return (
     <MessageScrollerPrimitive.Button
       data-slot="message-scroller-button"
@@ -116,7 +113,7 @@ function MessageScrollerButton({
       )}
     </MessageScrollerPrimitive.Button>
   )
-}
+};
 
 export {
   MessageScrollerProvider,
