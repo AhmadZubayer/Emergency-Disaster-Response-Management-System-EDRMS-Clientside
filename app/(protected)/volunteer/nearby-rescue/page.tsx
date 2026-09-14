@@ -70,7 +70,7 @@ const VolunteerNearbyRescuePage = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold">Nearby Emergency Alerts</h3>
+              <h3 className="text-sm font-medium">Nearby Emergency Alerts</h3>
               <p className="text-xs text-muted-foreground">
                 View active rescue requests within your immediate GPS proximity.
               </p>
@@ -79,13 +79,13 @@ const VolunteerNearbyRescuePage = () => {
               size="sm"
               variant="outline"
               onClick={() => router.push('/nearby-rescue')}
-              className="rounded-xl text-xs"
+
             >
               Open Proximity Map
             </Button>
           </div>
 
-          <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center bg-card/40 space-y-2">
+          <div className="rounded-lg border border-dashed border-border p-4 text-center bg-card space-y-2">
             <MapPinned className="size-8 text-muted-foreground/60 mx-auto" />
             <p className="text-xs text-muted-foreground">
               Launch the live proximity GPS locator to view emergency rescues.

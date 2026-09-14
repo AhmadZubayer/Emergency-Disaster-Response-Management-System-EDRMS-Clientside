@@ -31,7 +31,7 @@ const RoleRoute = ({ children, allowedRoles }: RoleRouteProps) => {
   if (loading || !user || !hasAccess) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="size-8 rounded-full border-2 border-emerald-600 border-t-transparent animate-spin" />
+        <div className="size-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
         <Spinner className="size-8 text-emerald-600" />
       </div>
     );

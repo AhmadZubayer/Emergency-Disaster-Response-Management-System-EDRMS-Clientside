@@ -111,21 +111,21 @@ const ReliefOrgApplicationsPage = () => {
       >
         <div className="space-y-4">
           <div>
-            <h3 className="text-base font-bold">Your Financial Aid Applications</h3>
+            <h3 className="text-sm font-medium">Your Financial Aid Applications</h3>
             <p className="text-xs text-muted-foreground">
               Status of emergency relief funds requested for rehabilitation.
             </p>
           </div>
 
           {myApplications.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center bg-card/40 space-y-3">
+            <div className="rounded-lg border border-dashed border-border p-4 text-center bg-card space-y-3">
               <FileText className="size-8 text-muted-foreground/60 mx-auto" />
               <p className="text-xs text-muted-foreground">
                 No financial aid applications submitted.
               </p>
             </div>
           ) : (
-            <div className="rounded-2xl border border-border/70 overflow-hidden bg-card shadow-sm">
+            <div className="rounded-lg border border-border overflow-hidden bg-card">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -139,15 +139,15 @@ const ReliefOrgApplicationsPage = () => {
                 <TableBody>
                   {myApplications.map((a) => (
                     <TableRow key={a.id}>
-                      <TableCell className="font-semibold text-xs">{a.campaign_title || 'Relief Campaign'}</TableCell>
-                      <TableCell className="text-xs max-w-xs truncate">{a.reason}</TableCell>
-                      <TableCell className="text-xs font-mono">{a.payout_details}</TableCell>
+                      <TableCell >{a.campaign_title || 'Relief Campaign'}</TableCell>
+                      <TableCell className="max-w-xs truncate">{a.reason}</TableCell>
+                      <TableCell className="font-mono">{a.payout_details}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="text-[10px] uppercase font-bold">
+                        <Badge variant="outline" className="uppercase">
                           {a.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right text-xs">{formatTrashDate(a.created_at)}</TableCell>
+                      <TableCell className="text-right">{formatTrashDate(a.created_at)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

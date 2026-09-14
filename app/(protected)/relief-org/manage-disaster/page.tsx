@@ -88,7 +88,7 @@ const ReliefOrgManageDisasterPage = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold">Disaster Warnings Management</h3>
+              <h3 className="text-sm font-medium">Disaster Warnings Management</h3>
               <p className="text-xs text-muted-foreground">
                 Broadcast emergency alerts, manage affected regions, and issue all-clear notices.
               </p>
@@ -99,7 +99,7 @@ const ReliefOrgManageDisasterPage = () => {
                 setEditingDisaster(null);
                 setIsDisasterDrawerOpen(true);
               }}
-              className="rounded-xl gap-1.5 text-xs font-semibold"
+
             >
               <Plus className="size-4" />
               Add Disaster Alert
@@ -107,12 +107,12 @@ const ReliefOrgManageDisasterPage = () => {
           </div>
 
           {disasters.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center bg-card/40 space-y-3">
+            <div className="rounded-lg border border-dashed border-border p-4 text-center bg-card space-y-3">
               <AlertTriangle className="size-8 text-muted-foreground/60 mx-auto" />
               <p className="text-xs text-muted-foreground">No active disaster alerts registered.</p>
             </div>
           ) : (
-            <div className="rounded-2xl border border-border/70 overflow-hidden bg-card shadow-sm">
+            <div className="rounded-lg border border-border overflow-hidden bg-card">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -126,11 +126,11 @@ const ReliefOrgManageDisasterPage = () => {
                 <TableBody>
                   {disasters.map((d) => (
                     <TableRow key={d.id}>
-                      <TableCell className="font-semibold text-xs">{d.disaster_name}</TableCell>
-                      <TableCell className="text-xs capitalize">{d.type}</TableCell>
-                      <TableCell className="text-xs">{d.impacted_location}</TableCell>
+                      <TableCell >{d.disaster_name}</TableCell>
+                      <TableCell className="capitalize">{d.type}</TableCell>
+                      <TableCell >{d.impacted_location}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="text-[10px] uppercase font-bold">
+                        <Badge variant="outline" className="uppercase">
                           {d.is_verified ? 'Safe / Resolved' : 'Active Warning'}
                         </Badge>
                       </TableCell>
@@ -140,7 +140,7 @@ const ReliefOrgManageDisasterPage = () => {
                             size="sm"
                             variant="ghost"
                             onClick={() => router.push(`/disaster/${d.id}`)}
-                            className="h-8 px-2 text-xs"
+
                           >
                             View
                           </Button>
@@ -151,7 +151,7 @@ const ReliefOrgManageDisasterPage = () => {
                               setEditingDisaster(d);
                               setIsDisasterDrawerOpen(true);
                             }}
-                            className="h-8 px-2 text-xs"
+
                           >
                             Edit
                           </Button>

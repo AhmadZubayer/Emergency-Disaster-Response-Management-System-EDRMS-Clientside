@@ -119,21 +119,21 @@ const VolunteerFieldReportsPage = () => {
       >
         <div className="space-y-6">
           <div>
-            <h3 className="text-base font-bold">Submit Field Intelligence</h3>
+            <h3 className="text-sm font-medium">Submit Field Intelligence</h3>
             <p className="text-xs text-muted-foreground">
               Broadcast real-time road accessibility conditions and critical resource shortages.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm">
+            <div className="rounded-lg border border-border bg-card p-4">
               <RouteReportForm
                 onSubmit={handleRouteReportSubmit}
                 saving={savingFieldReport}
               />
             </div>
 
-            <div className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm">
+            <div className="rounded-lg border border-border bg-card p-4">
               <ShortageReportForm
                 onSubmit={handleShortageReportSubmit}
                 saving={savingFieldReport}

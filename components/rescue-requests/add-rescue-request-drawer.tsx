@@ -211,7 +211,7 @@ const AddRescueRequestDrawer = ({
         )}
 
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
             Coordinates
           </span>
           <Button
@@ -220,7 +220,7 @@ const AddRescueRequestDrawer = ({
             size="sm"
             onClick={handleDetectLocation}
             disabled={detectingLocation}
-            className="gap-1.5 h-8 text-xs font-semibold"
+
           >
             {detectingLocation ? (
               <Spinner className="size-3.5" />
@@ -233,8 +233,8 @@ const AddRescueRequestDrawer = ({
 
         {locationMessage && (
           <p
-            className={`text-[11px] font-medium ${
-              isLocationError ? 'text-red-500' : 'text-emerald-600'
+            className={`text-xs font-medium ${
+              isLocationError ? 'text-red-500' : 'text-primary'
             }`}
           >
             {locationMessage}
@@ -243,7 +243,7 @@ const AddRescueRequestDrawer = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label htmlFor="latitude" className="text-xs font-semibold">
+            <Label htmlFor="latitude" >
               Latitude <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -253,15 +253,15 @@ const AddRescueRequestDrawer = ({
               placeholder="e.g. 23.8103"
               value={latitude}
               onChange={(e) => setLatitude(e.target.value)}
-              className="h-10 text-xs rounded-xl"
+
             />
             {errors.latitude && (
-              <p className="text-[11px] text-red-500 font-medium">{errors.latitude}</p>
+              <p className="text-xs text-red-500 font-medium">{errors.latitude}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="longitude" className="text-xs font-semibold">
+            <Label htmlFor="longitude" >
               Longitude <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -271,15 +271,15 @@ const AddRescueRequestDrawer = ({
               placeholder="e.g. 90.4125"
               value={longitude}
               onChange={(e) => setLongitude(e.target.value)}
-              className="h-10 text-xs rounded-xl"
+
             />
             {errors.longitude && (
-              <p className="text-[11px] text-red-500 font-medium">{errors.longitude}</p>
+              <p className="text-xs text-red-500 font-medium">{errors.longitude}</p>
             )}
           </div>
 
           <div className="space-y-1.5 col-span-1 sm:col-span-2">
-            <Label htmlFor="address" className="text-xs font-semibold">
+            <Label htmlFor="address" >
               Address / Landmark
             </Label>
             <Input
@@ -287,12 +287,12 @@ const AddRescueRequestDrawer = ({
               placeholder="e.g. House 12, Road 4, Sector 7, Uttara, Dhaka"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              className="h-10 text-xs rounded-xl"
+
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="urgency" className="text-xs font-semibold">
+            <Label htmlFor="urgency" >
               Urgency Level <span className="text-red-500">*</span>
             </Label>
             <MuiSelect
@@ -310,7 +310,7 @@ const AddRescueRequestDrawer = ({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="peopleCount" className="text-xs font-semibold">
+            <Label htmlFor="peopleCount" >
               People Count <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -319,15 +319,15 @@ const AddRescueRequestDrawer = ({
               min="1"
               value={peopleCount}
               onChange={(e) => setPeopleCount(e.target.value)}
-              className="h-10 text-xs rounded-xl"
+
             />
             {errors.peopleCount && (
-              <p className="text-[11px] text-red-500 font-medium">{errors.peopleCount}</p>
+              <p className="text-xs text-red-500 font-medium">{errors.peopleCount}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="contactPhone" className="text-xs font-semibold">
+            <Label htmlFor="contactPhone" >
               Contact Phone <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -336,15 +336,15 @@ const AddRescueRequestDrawer = ({
               placeholder="e.g. +8801700000000"
               value={contactPhone}
               onChange={(e) => setContactPhone(e.target.value)}
-              className="h-10 text-xs rounded-xl"
+
             />
             {errors.contactPhone && (
-              <p className="text-[11px] text-red-500 font-medium">{errors.contactPhone}</p>
+              <p className="text-xs text-red-500 font-medium">{errors.contactPhone}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="medicalNotes" className="text-xs font-semibold">
+            <Label htmlFor="medicalNotes" >
               Medical Notes (Optional)
             </Label>
             <Input
@@ -352,13 +352,13 @@ const AddRescueRequestDrawer = ({
               placeholder="e.g. 1 elderly person injured"
               value={medicalNotes}
               onChange={(e) => setMedicalNotes(e.target.value)}
-              className="h-10 text-xs rounded-xl"
+
             />
           </div>
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="description" className="text-xs font-semibold">
+          <Label htmlFor="description" >
             Situation Description <span className="text-red-500">*</span>
           </Label>
           <Textarea
@@ -367,19 +367,19 @@ const AddRescueRequestDrawer = ({
             placeholder="Describe the current emergency, water level, landmark, hazards..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="text-xs rounded-xl resize-none"
+            className="resize-none"
           />
           {errors.description && (
-            <p className="text-[11px] text-red-500 font-medium">{errors.description}</p>
+            <p className="text-xs text-red-500 font-medium">{errors.description}</p>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-xs font-semibold">Photo (Optional)</Label>
+          <Label >Photo (Optional)</Label>
           <div className="flex items-center gap-4">
             <label
               htmlFor="rescue-photo"
-              className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium border border-border/80 rounded-xl cursor-pointer hover:bg-muted/50 transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
             >
               <Upload className="size-4" />
               <span>Choose Photo</span>

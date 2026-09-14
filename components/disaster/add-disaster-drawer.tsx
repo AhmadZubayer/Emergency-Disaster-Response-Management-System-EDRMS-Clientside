@@ -199,7 +199,7 @@ const AddDisasterDrawer = ({
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="disasterName" className="text-xs font-semibold">
+            <Label htmlFor="disasterName" >
               Disaster Name *
             </Label>
             <Input
@@ -207,15 +207,15 @@ const AddDisasterDrawer = ({
               placeholder="e.g. Cyclone Remal 2026"
               value={disasterName}
               onChange={(e) => setDisasterName(e.target.value)}
-              className="text-xs"
+
             />
             {errors.disasterName && (
-              <p className="text-[11px] text-destructive">{errors.disasterName}</p>
+              <p className="text-xs text-destructive">{errors.disasterName}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="type" className="text-xs font-semibold">
+            <Label htmlFor="type" >
               Disaster Type *
             </Label>
             <MuiSelect
@@ -229,12 +229,12 @@ const AddDisasterDrawer = ({
               }))}
             />
             {errors.type && (
-              <p className="text-[11px] text-destructive">{errors.type}</p>
+              <p className="text-xs text-destructive">{errors.type}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="impactedLocation" className="text-xs font-semibold">
+            <Label htmlFor="impactedLocation" >
               Impacted Location / Region *
             </Label>
             <Input
@@ -242,15 +242,15 @@ const AddDisasterDrawer = ({
               placeholder="e.g. Coastal Belt, Cox's Bazar & Chattogram"
               value={impactedLocation}
               onChange={(e) => setImpactedLocation(e.target.value)}
-              className="text-xs"
+
             />
             {errors.impactedLocation && (
-              <p className="text-[11px] text-destructive">{errors.impactedLocation}</p>
+              <p className="text-xs text-destructive">{errors.impactedLocation}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold">
+            <Label >
               Expected Impact Date & Time *
             </Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -261,7 +261,7 @@ const AddDisasterDrawer = ({
                       type="button"
                       variant="outline"
                       className={cn(
-                        'w-full justify-start text-left font-normal text-xs h-9',
+                        'w-full justify-start text-left ',
                         !selectedDate && 'text-muted-foreground'
                       )}
                     />
@@ -288,16 +288,16 @@ const AddDisasterDrawer = ({
                   type="time"
                   value={selectedTime}
                   onChange={(e) => setSelectedTime(e.target.value)}
-                  className="pl-9 text-xs h-9"
+
                 />
               </div>
             </div>
             {errors.impactTime && (
-              <p className="text-[11px] text-destructive">{errors.impactTime}</p>
+              <p className="text-xs text-destructive">{errors.impactTime}</p>
             )}
           </div>
 
-          <div className="pt-4 border-t border-border/50 flex items-center justify-start">
+          <div className="pt-4 border-t border-border flex items-center justify-start">
             <ModernButton
               type="submit"
               disabled={loading}
@@ -323,7 +323,7 @@ const AddDisasterDrawer = ({
               variant="outline"
               size="sm"
               onClick={() => setIsConfirmModalOpen(false)}
-              className="text-xs"
+
             >
               Cancel
             </Button>
@@ -332,7 +332,7 @@ const AddDisasterDrawer = ({
               size="sm"
               onClick={handleConfirmedSubmit}
               disabled={loading}
-              className="text-xs font-semibold"
+
             >
               Yes, Continue
             </Button>

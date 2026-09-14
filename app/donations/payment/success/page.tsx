@@ -73,15 +73,15 @@ const PaymentSuccessContent = () => {
   }, [sessionId, txId]);
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-center max-w-md mx-auto my-16 bg-card border border-border/60 rounded-2xl shadow-sm space-y-4">
-      <div className="size-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600">
+    <div className="flex flex-col items-center justify-center p-4 text-center max-w-md mx-auto my-16 bg-card border border-border rounded-lg space-y-4">
+      <div className="size-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
         <CheckCircle2 className="size-8" />
       </div>
-      <h1 className="text-2xl font-bold tracking-tight text-foreground">
+      <h1 className="text-2xl font-medium tracking-tight text-foreground">
         Thank You for Your Donation!
       </h1>
       <p className="text-xs text-muted-foreground leading-relaxed">
-        Your payment has been successfully processed through Stripe. Reference ID: <span className="font-mono font-semibold">{txId || 'N/A'}</span>.
+        Your payment has been successfully processed through Stripe. Reference ID: <span className="font-mono font-medium">{txId || 'N/A'}</span>.
       </p>
 
       {loading ? (
@@ -94,7 +94,7 @@ const PaymentSuccessContent = () => {
           <Button
             onClick={() => handleDownload()}
             disabled={downloading}
-            className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white w-full sm:w-auto"
+            className="w-full sm:w-auto"
           >
             {downloading ? <Spinner className="size-4" /> : <Download className="size-4" />}
             <span>Download Receipt</span>
@@ -102,7 +102,7 @@ const PaymentSuccessContent = () => {
           <Button
             variant="outline"
             render={<Link href="/donations" />}
-            className="gap-2 w-full sm:w-auto"
+            className="w-full sm:w-auto"
           >
             <span>Return to Donations</span>
             <ArrowRight className="size-4" />
@@ -120,11 +120,11 @@ const PaymentSuccessPage = () => {
       <main className="flex-1">
         <Suspense
           fallback={
-            <div className="flex flex-col items-center justify-center p-8 max-w-md mx-auto my-16 bg-card border border-border/60 rounded-2xl space-y-4">
-              <Skeleton className="size-16 rounded-full" />
-              <Skeleton className="h-6 w-3/4 rounded-lg" />
-              <Skeleton className="h-4 w-full rounded-md" />
-              <Skeleton className="h-10 w-40 rounded-xl" />
+            <div className="flex flex-col items-center justify-center p-4 max-w-md mx-auto my-16 bg-card border border-border rounded-lg space-y-4">
+              <Skeleton className="size-16" />
+              <Skeleton className="h-6 w-3/4" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-10 w-40" />
             </div>
           }
         >

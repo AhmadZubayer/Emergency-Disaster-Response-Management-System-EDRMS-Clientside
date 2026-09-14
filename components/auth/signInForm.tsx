@@ -92,10 +92,10 @@ const SignInForm = () => {
   };
 
   return (
-    <Card className="w-full max-w-sm rounded-2xl border border-border/50 bg-card/75 backdrop-blur-xl shadow-xl">
+    <Card className="w-full max-w-sm border">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-xl font-bold tracking-tight">Login to your account</CardTitle>
-        <CardDescription className="text-sm text-muted-foreground">
+        <CardTitle >Login to your account</CardTitle>
+        <CardDescription className="text-muted-foreground">
           Enter your email below to login to your account
         </CardDescription>
       </CardHeader>
@@ -119,7 +119,7 @@ const SignInForm = () => {
                 placeholder="m@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-10 px-3 bg-background/50"
+
               />
               {errors.email && (
                 <p className="text-xs text-destructive">{errors.email}</p>
@@ -142,7 +142,7 @@ const SignInForm = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-10 pl-3 pr-10 bg-background/50"
+
                 />
                 <button
                   type="button"
@@ -166,7 +166,7 @@ const SignInForm = () => {
             <Button
               type="button"
               variant="outline"
-              className="w-full h-10 rounded-full border-border/80 bg-background/50 hover:bg-muted font-medium"
+              className="w-full"
             >
               <GoogleIcon />
               Login with Google
@@ -175,7 +175,7 @@ const SignInForm = () => {
         )}
       </CardContent>
 
-      <CardFooter className="justify-center pt-0">
+      <CardFooter className="justify-center">
         <p className="text-xs text-muted-foreground">
           Don&apos;t have an account?{' '}
           <Link

@@ -17,21 +17,21 @@ const NearbyRescueCard = ({
   onReject,
 }: NearbyRescueCardProps) => {
   return (
-    <article className="rounded-2xl border border-border/70 bg-card p-5 shadow-sm space-y-4">
+    <article className="rounded-lg border border-border bg-card p-4 space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+          <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
             <MapPin className="size-3.5" />
             {request.address || 'Location provided by coordinates'}
           </p>
-          <p className="mt-2 text-sm font-semibold leading-relaxed">{request.description}</p>
+          <p className="mt-2 text-sm font-medium leading-relaxed">{request.description}</p>
         </div>
         <Badge variant={request.urgency_level === 'CRITICAL' ? 'destructive' : 'secondary'}>
           {request.urgency_level}
         </Badge>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 text-[11px] text-muted-foreground">
+      <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5"><Users className="size-3.5" />{request.people_count} people</span>
         <span className="flex items-center gap-1.5"><MapPin className="size-3.5" />{request.distance_km} km away</span>
         {request.contact_phone && <span className="flex items-center gap-1.5"><Phone className="size-3.5" />{request.contact_phone}</span>}
@@ -39,16 +39,16 @@ const NearbyRescueCard = ({
       </div>
 
       {request.medical_notes && (
-        <div className="rounded-lg bg-amber-500/10 p-2.5 text-[11px] text-amber-800 dark:text-amber-300">
+        <div className="rounded-lg bg-amber-500/10 p-2.5 text-xs text-amber-800 dark:text-amber-300">
           Medical notes: {request.medical_notes}
         </div>
       )}
 
-      <div className="flex gap-2 border-t border-border/50 pt-4">
-        <Button onClick={onAccept} disabled={!!busyAction} className="h-8 flex-1">
+      <div className="flex gap-2 border-t border-border pt-4">
+        <Button onClick={onAccept} disabled={!!busyAction} className="flex-1">
           {busyAction === 'accept' ? 'Accepting...' : 'Accept Task'}
         </Button>
-        <Button onClick={onReject} disabled={!!busyAction} variant="outline" className="h-8 flex-1">
+        <Button onClick={onReject} disabled={!!busyAction} variant="outline" className="flex-1">
           {busyAction === 'reject' ? 'Rejecting...' : 'Not Available'}
         </Button>
       </div>

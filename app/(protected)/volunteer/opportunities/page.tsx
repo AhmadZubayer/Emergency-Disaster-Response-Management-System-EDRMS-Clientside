@@ -118,14 +118,14 @@ const VolunteerOpportunitiesPage = () => {
       >
         <div className="space-y-4">
           <div>
-            <h3 className="text-base font-bold">Relief Organization Opportunities</h3>
+            <h3 className="text-sm font-medium">Relief Organization Opportunities</h3>
             <p className="text-xs text-muted-foreground">
               Explore open volunteer calls published by authorized relief organizations.
             </p>
           </div>
 
           {opportunities.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center bg-card/40 space-y-3">
+            <div className="rounded-lg border border-dashed border-border p-4 text-center bg-card space-y-3">
               <HeartHandshake className="size-8 text-muted-foreground/60 mx-auto" />
               <p className="text-xs text-muted-foreground">
                 No volunteer opportunities currently available.

@@ -54,7 +54,7 @@ const SleekCard = ({ person, onClick }: SleekCardProps) => {
             <div className="card__footer">
               <Badge
                 variant={isMissing ? 'destructive' : 'default'}
-                className="text-[10px] px-2 py-0 font-bold uppercase tracking-wide"
+                className="uppercase"
               >
                 {person.status}
               </Badge>

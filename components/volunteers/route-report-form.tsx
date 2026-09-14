@@ -53,12 +53,12 @@ const RouteReportForm = ({ saving, onSubmit }: RouteReportFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-border/70 bg-card p-5 shadow-sm space-y-4">
+    <form onSubmit={handleSubmit} className="rounded-lg border border-border bg-card p-4 space-y-4">
       <div>
-        <h2 className="text-sm font-bold">Route condition report</h2>
-        <p className="text-[11px] text-muted-foreground">Report a blocked or dangerous route from the field.</p>
+        <h2 className="text-sm font-medium">Route condition report</h2>
+        <p className="text-xs text-muted-foreground">Report a blocked or dangerous route from the field.</p>
       </div>
-      {error && <p className="text-[11px] text-destructive">{error}</p>}
+      {error && <p className="text-xs text-destructive">{error}</p>}
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="routeType">Route condition</Label>
@@ -105,7 +105,7 @@ const RouteReportForm = ({ saving, onSubmit }: RouteReportFormProps) => {
         <Label htmlFor="routeAddress">Address</Label>
         <Input id="routeAddress" value={address} onChange={(event) => setAddress(event.target.value)} placeholder="Nearby road, landmark, or area" />
       </div>
-      <Button type="submit" disabled={saving} className="h-9 px-4">
+      <Button type="submit" disabled={saving} >
         {saving ? 'Submitting...' : 'Submit Route Report'}
       </Button>
     </form>

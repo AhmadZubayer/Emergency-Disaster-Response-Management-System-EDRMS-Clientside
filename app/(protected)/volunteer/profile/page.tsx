@@ -125,10 +125,10 @@ const VolunteerProfilePage = () => {
         onToggleSafety={handleToggleSafety}
       >
         <div className="space-y-6">
-          <div className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm space-y-6">
-            <div className="border-b border-border/50 pb-4 flex items-center justify-between">
+          <div className="rounded-lg border border-border bg-card p-4 space-y-6">
+            <div className="border-b border-border pb-4 flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-foreground">Volunteer Operational Details</h3>
+                <h3 className="text-sm font-medium text-foreground">Volunteer Operational Details</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   Rescue skills, motivation, and field readiness settings.
                 </p>
@@ -137,7 +137,7 @@ const VolunteerProfilePage = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setVolunteerEditing(true)}
-                className="h-8 text-xs gap-1.5"
+
               >
                 <Pencil className="size-3.5" />
                 Edit Profile
@@ -146,12 +146,12 @@ const VolunteerProfilePage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-8 text-xs">
               <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground block">
                   Availability Status
                 </span>
                 <div>
                   {volunteerProfile?.available ? (
-                    <Badge variant="outline" className="text-emerald-600 bg-emerald-500/10 border-emerald-500/20">
+                    <Badge variant="outline" >
                       Available for Deployment
                     </Badge>
                   ) : (
@@ -161,7 +161,7 @@ const VolunteerProfilePage = () => {
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground block">
                   Verification Credential
                 </span>
                 <div>
@@ -173,7 +173,7 @@ const VolunteerProfilePage = () => {
                           ? 'outline'
                           : 'secondary'
                     }
-                    className="text-[10px] uppercase font-bold"
+                    className="uppercase"
                   >
                     {volunteerProfile?.verification_status || 'not_applied'}
                   </Badge>
@@ -181,13 +181,13 @@ const VolunteerProfilePage = () => {
               </div>
 
               <div className="space-y-1 md:col-span-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground block">
                   Active Operational Skills
                 </span>
                 <div className="flex flex-wrap gap-1.5 pt-1">
                   {volunteerProfile?.skills?.length ? (
                     volunteerProfile.skills.map((s) => (
-                      <Badge key={s} variant="outline" className="text-xs capitalize">
+                      <Badge key={s} variant="outline" className="capitalize">
                         {s.replaceAll('_', ' ')}
                       </Badge>
                     ))
@@ -198,19 +198,19 @@ const VolunteerProfilePage = () => {
               </div>
 
               <div className="space-y-1 md:col-span-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground block">
                   Motivation Statement
                 </span>
-                <div className="bg-muted/20 p-3 rounded-xl border border-border/50 text-xs leading-relaxed">
+                <div className="bg-muted/20 p-3 rounded-lg border border-border text-xs leading-relaxed">
                   {volunteerProfile?.why_join || 'No statement provided.'}
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm space-y-4">
+          <div className="rounded-lg border border-border bg-card p-4 space-y-4">
             <div>
-              <h3 className="text-base font-bold text-foreground">Identity Verification (NID)</h3>
+              <h3 className="text-sm font-medium text-foreground">Identity Verification (NID)</h3>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Upload your National ID or government passport to receive official volunteer verification badge.
               </p>
@@ -221,13 +221,13 @@ const VolunteerProfilePage = () => {
                 type="file"
                 accept=".pdf,.png,.jpg,.jpeg"
                 onChange={(e) => setVerificationFile(e.target.files?.[0] || null)}
-                className="text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-muted file:text-foreground hover:file:bg-muted/80 cursor-pointer"
+                className="text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-muted file:text-foreground hover:file:bg-muted/80 cursor-pointer"
               />
               <Button
                 onClick={handleVerification}
                 disabled={applyingVerification || (!verificationFile && !volunteerProfile?.nid_card_url)}
                 size="sm"
-                className="rounded-xl text-xs font-semibold gap-1.5 shrink-0"
+                className="shrink-0"
               >
                 {applyingVerification ? (
                   <Spinner className="size-3.5" />

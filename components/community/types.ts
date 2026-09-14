@@ -19,8 +19,10 @@ export interface CommunityResponse {
 
 export interface CommunityPost {
   postId: string;
+  author_id?: string;
   postedBy: PostAuthor;
   created_at: string;
+  updated_at?: string;
   bumped_at: string;
   title: string;
   body: string;

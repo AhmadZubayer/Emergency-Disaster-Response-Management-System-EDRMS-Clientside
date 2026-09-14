@@ -8,7 +8,7 @@ const Home = () => {
       <Navbar />
       <main className="flex flex-1 flex-col items-center justify-center p-6 text-center">
         <div className="max-w-2xl space-y-6">
-          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
+          <h1 className="text-4xl font-medium tracking-tight sm:text-5xl">
             Emergency Disaster Response Management System
           </h1>
           <p className="text-lg text-muted-foreground">

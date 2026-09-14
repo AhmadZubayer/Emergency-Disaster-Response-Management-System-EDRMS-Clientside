@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, Plus } from 'lucide-react';
 import Navbar from '@/components/navbar';
-import Search from '@/components/Search';
+import SearchBar from '@/components/searchbar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { publicApi } from '@/lib/api';
@@ -69,9 +69,9 @@ const MissingPersonsPage = () => {
       <Navbar />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-border/60 pb-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-border pb-6">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
+            <h1 className="text-3xl font-medium tracking-tight text-foreground">
               Missing Persons
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
@@ -82,13 +82,13 @@ const MissingPersonsPage = () => {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
             <Button
               onClick={handleAddClick}
-              className="h-10 rounded-xl gap-2 font-medium"
+
             >
               <Plus className="size-4" />
               Add Missing Person
             </Button>
 
-            <Search
+            <SearchBar
               value={searchTerm}
               onChange={handleSearchChange}
               onSubmit={() => fetchMissingPersons(searchTerm)}
@@ -100,9 +100,9 @@ const MissingPersonsPage = () => {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map((idx) => (
-              <div key={idx} className="p-4 rounded-2xl border border-border/60 bg-card space-y-3">
+              <div key={idx} className="p-4 rounded-lg border border-border bg-card space-y-3">
                 <div className="flex items-center gap-3">
-                  <Skeleton className="size-12 rounded-xl shrink-0" />
+                  <Skeleton className="size-12 shrink-0" />
                   <div className="space-y-1.5 flex-1">
                     <Skeleton className="h-4 w-32" />
                     <Skeleton className="h-3 w-20" />
@@ -112,15 +112,15 @@ const MissingPersonsPage = () => {
                 <Skeleton className="h-3.5 w-2/3" />
                 <div className="flex items-center justify-between pt-1">
                   <Skeleton className="h-3 w-16" />
-                  <Skeleton className="h-5 w-16 rounded-full" />
+                  <Skeleton className="h-5 w-16" />
                 </div>
               </div>
             ))}
           </div>
         ) : persons.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-dashed border-border/60 bg-muted/10 space-y-3">
+          <div className="flex flex-col items-center justify-center p-12 text-center rounded-lg border border-dashed border-border bg-muted/10 space-y-3">
             <AlertCircle className="size-10 text-muted-foreground/60" />
-            <h3 className="text-base font-semibold">No missing person reports found</h3>
+            <h3 className="text-sm font-medium">No missing person reports found</h3>
             <p className="text-xs text-muted-foreground max-w-sm">
               {searchTerm
                 ? 'Try adjusting your search term to find matching records.'

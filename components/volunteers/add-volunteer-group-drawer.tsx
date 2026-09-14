@@ -189,7 +189,7 @@ const AddVolunteerGroupDrawer = ({
         )}
 
         <div className="space-y-1.5">
-          <Label htmlFor="title" className="text-xs font-semibold">
+          <Label htmlFor="title" >
             Group Title / Number *
           </Label>
           <Input
@@ -197,15 +197,15 @@ const AddVolunteerGroupDrawer = ({
             placeholder="e.g. Rapid Rescue Unit Alpha"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="text-xs"
+
           />
           {errors.title && (
-            <p className="text-[11px] text-destructive">{errors.title}</p>
+            <p className="text-xs text-destructive">{errors.title}</p>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="disaster" className="text-xs font-semibold">
+          <Label htmlFor="disaster" >
             Assigned Disaster Alert
           </Label>
           <MuiSelect
@@ -224,7 +224,7 @@ const AddVolunteerGroupDrawer = ({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="location" className="text-xs font-semibold">
+          <Label htmlFor="location" >
             Deployment Location *
           </Label>
           <Input
@@ -232,15 +232,15 @@ const AddVolunteerGroupDrawer = ({
             placeholder="e.g. Cox's Bazar Sadar Zone"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="text-xs"
+
           />
           {errors.location && (
-            <p className="text-[11px] text-destructive">{errors.location}</p>
+            <p className="text-xs text-destructive">{errors.location}</p>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="neededVolunteers" className="text-xs font-semibold">
+          <Label htmlFor="neededVolunteers" >
             Number of Volunteers Required *
           </Label>
           <Input
@@ -249,15 +249,15 @@ const AddVolunteerGroupDrawer = ({
             min={1}
             value={neededVolunteers}
             onChange={(e) => setNeededVolunteers(Number(e.target.value))}
-            className="text-xs"
+
           />
           {errors.neededVolunteers && (
-            <p className="text-[11px] text-destructive">{errors.neededVolunteers}</p>
+            <p className="text-xs text-destructive">{errors.neededVolunteers}</p>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="requiredSkills" className="text-xs font-semibold">
+          <Label htmlFor="requiredSkills" >
             Required Skills (comma separated)
           </Label>
           <Input
@@ -265,12 +265,12 @@ const AddVolunteerGroupDrawer = ({
             placeholder="e.g. First Aid, Boat Navigation, Medical Support"
             value={requiredSkills}
             onChange={(e) => setRequiredSkills(e.target.value)}
-            className="text-xs"
+
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="description" className="text-xs font-semibold">
+          <Label htmlFor="description" >
             Mission Description *
           </Label>
           <Textarea
@@ -279,19 +279,19 @@ const AddVolunteerGroupDrawer = ({
             placeholder="Provide duty requirements, rendezvous points, and specific instructions..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="text-xs"
+
           />
           {errors.description && (
-            <p className="text-[11px] text-destructive">{errors.description}</p>
+            <p className="text-xs text-destructive">{errors.description}</p>
           )}
         </div>
 
-        <div className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-muted/20">
+        <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/20">
           <div className="space-y-0.5">
-            <Label htmlFor="acceptToggle" className="text-xs font-semibold cursor-pointer">
+            <Label htmlFor="acceptToggle" className="cursor-pointer">
               Accept Volunteer Requests
             </Label>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {acceptingRequests
                 ? 'Volunteers can submit join requests to this unit.'
                 : 'Unit is locked. No new volunteer join requests are accepted.'}
@@ -304,7 +304,7 @@ const AddVolunteerGroupDrawer = ({
           />
         </div>
 
-        <div className="pt-4 border-t border-border/50 flex items-center justify-start">
+        <div className="pt-4 border-t border-border flex items-center justify-start">
           <ModernButton type="submit" disabled={loading}>
             {loading
               ? 'Processing...'

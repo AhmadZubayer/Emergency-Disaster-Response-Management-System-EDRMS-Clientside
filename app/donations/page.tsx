@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { HeartHandshake, Plus } from 'lucide-react';
 import Navbar from '@/components/navbar';
-import Search from '@/components/Search';
+import SearchBar from '@/components/searchbar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
@@ -117,9 +117,9 @@ const DonationsContent = () => {
       <Navbar />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-border/60 pb-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-border pb-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            <h1 className="text-3xl font-medium tracking-tight text-foreground">
               Emergency Relief Funds & Donations
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
@@ -129,13 +129,13 @@ const DonationsContent = () => {
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
             {(user?.role === 'RELIEF_ORG' || user?.role === 'ADMIN') && (
-              <Button onClick={handleAddClick} className="h-10 gap-2 font-medium">
+              <Button onClick={handleAddClick} >
                 <Plus className="size-4" />
                 Add Campaign
               </Button>
             )}
 
-            <Search
+            <SearchBar
               value={searchTerm}
               onChange={handleSearchChange}
               onSubmit={() => fetchCampaigns(searchTerm)}
@@ -147,14 +147,14 @@ const DonationsContent = () => {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map((idx) => (
-              <div key={idx} className="p-5 rounded-2xl border border-border/60 bg-card space-y-3">
+              <div key={idx} className="p-4 rounded-lg border border-border bg-card space-y-3">
                 <div className="flex items-center justify-between">
                   <Skeleton className="h-5 w-36" />
-                  <Skeleton className="h-5 w-16 rounded-full" />
+                  <Skeleton className="h-5 w-16" />
                 </div>
                 <Skeleton className="h-3.5 w-full" />
                 <Skeleton className="h-3.5 w-4/5" />
-                <Skeleton className="h-3 w-full rounded-full" />
+                <Skeleton className="h-3 w-full" />
                 <div className="flex items-center justify-between pt-1">
                   <Skeleton className="h-4 w-20" />
                   <Skeleton className="h-4 w-20" />
@@ -163,9 +163,9 @@ const DonationsContent = () => {
             ))}
           </div>
         ) : campaigns.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-dashed border-border/60 bg-muted/10 space-y-3">
+          <div className="flex flex-col items-center justify-center p-12 text-center rounded-lg border border-dashed border-border bg-muted/10 space-y-3">
             <HeartHandshake className="size-10 text-muted-foreground/60" />
-            <h3 className="text-base font-semibold">No relief campaigns found</h3>
+            <h3 className="text-sm font-medium">No relief campaigns found</h3>
             <p className="text-xs text-muted-foreground max-w-sm">
               {searchTerm
                 ? 'Try adjusting your search term to find matching campaigns.'
@@ -204,7 +204,7 @@ const DonationsPage = () => {
             <Skeleton className="h-12 w-1/3" />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-48 rounded-2xl" />
+                <Skeleton key={i} className="h-48" />
               ))}
             </div>
           </div>

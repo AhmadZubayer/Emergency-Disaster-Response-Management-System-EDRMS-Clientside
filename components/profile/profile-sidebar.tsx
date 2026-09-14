@@ -52,10 +52,10 @@ export const ProfileSidebar = ({
 
   return (
     <aside className="w-full md:w-64 shrink-0">
-      <div className="bg-card border border-border/60 rounded-2xl p-2 shadow-sm space-y-4">
+      <div className="bg-card border border-border rounded-lg p-2 space-y-4">
         {isReliefOrg && (
           <div className="space-y-1">
-            <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            <div className="px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Relief Organization Dashboard
             </div>
             {reliefOrgDashboardItems.map((item) => {
@@ -66,9 +66,9 @@ export const ProfileSidebar = ({
                   key={item.id}
                   type="button"
                   onClick={() => handleNavigate(item)}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all text-left ${
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all text-left ${
                     active
-                      ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold shadow-xs'
+                      ? 'bg-primary/10 text-primary dark:text-primary font-medium shadow-xs'
                       : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'
                   }`}
                 >
@@ -82,7 +82,7 @@ export const ProfileSidebar = ({
 
         {isVolunteer && (
           <div className="space-y-1">
-            <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            <div className="px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Volunteer Operations
             </div>
             {volunteerOperationsItems.map((item) => {
@@ -93,9 +93,9 @@ export const ProfileSidebar = ({
                   key={item.id}
                   type="button"
                   onClick={() => handleNavigate(item)}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all text-left ${
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all text-left ${
                     active
-                      ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold shadow-xs'
+                      ? 'bg-primary/10 text-primary dark:text-primary font-medium shadow-xs'
                       : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'
                   }`}
                 >
@@ -109,7 +109,7 @@ export const ProfileSidebar = ({
 
         <div className="space-y-1">
           {(isVolunteer || isReliefOrg) && (
-            <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground border-t border-border/50 pt-3">
+            <div className="px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground border-t border-border pt-3">
               General Options
             </div>
           )}
@@ -126,9 +126,9 @@ export const ProfileSidebar = ({
                 key={item.id}
                 type="button"
                 onClick={() => handleNavigate(item)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all text-left ${
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all text-left ${
                   active
-                    ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold shadow-xs'
+                    ? 'bg-primary/10 text-primary dark:text-primary font-medium shadow-xs'
                     : item.destructive
                     ? 'text-muted-foreground hover:bg-destructive/10 hover:text-destructive'
                     : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'

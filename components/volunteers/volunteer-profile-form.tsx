@@ -109,15 +109,15 @@ const VolunteerProfileForm = ({
       )}
 
       <div className="space-y-2">
-        <Label className="text-xs font-semibold">Rescue skills *</Label>
+        <Label >Rescue skills *</Label>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {VOLUNTEER_SKILLS.map((skill) => (
             <label
               key={skill.value}
               className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2.5 text-xs transition-colors ${
                 skills.includes(skill.value)
-                  ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
-                  : 'border-border/70 bg-background text-muted-foreground hover:bg-muted/50'
+                  ? 'border-primary/50 bg-primary/10 text-primary dark:text-primary'
+                  : 'border-border bg-background text-muted-foreground hover:bg-muted/50'
               }`}
             >
               <input
@@ -130,12 +130,12 @@ const VolunteerProfileForm = ({
             </label>
           ))}
         </div>
-        {errors.skills && <p className="text-[11px] text-destructive">{errors.skills}</p>}
+        {errors.skills && <p className="text-xs text-destructive">{errors.skills}</p>}
       </div>
 
       {!profile && (
         <div className="space-y-1.5">
-          <Label htmlFor="whyJoin" className="text-xs font-semibold">
+          <Label htmlFor="whyJoin" >
             Why do you want to join? *
           </Label>
           <Textarea
@@ -144,32 +144,32 @@ const VolunteerProfileForm = ({
             value={whyJoin}
             onChange={(event) => setWhyJoin(event.target.value)}
             placeholder="Describe your motivation and relevant experience..."
-            className="text-xs"
+
           />
           {errors.why_join && (
-            <p className="text-[11px] text-destructive">{errors.why_join}</p>
+            <p className="text-xs text-destructive">{errors.why_join}</p>
           )}
         </div>
       )}
 
-      <div className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 p-3">
+      <div className="flex items-center justify-between rounded-lg border border-border bg-muted/20 p-3">
         <div>
-          <Label htmlFor="available" className="cursor-pointer text-xs font-semibold">
+          <Label htmlFor="available" className="cursor-pointer">
             Available for volunteer work
           </Label>
-          <p className="mt-0.5 text-[11px] text-muted-foreground">
+          <p className="mt-0.5 text-xs text-muted-foreground">
             Required before viewing or accepting nearby rescue work.
           </p>
         </div>
         <Switch id="available" checked={available} onCheckedChange={setAvailable} />
       </div>
 
-      <div className="flex items-center gap-2 border-t border-border/50 pt-4">
-        <Button type="submit" disabled={saving} className="h-9 px-4 font-semibold">
+      <div className="flex items-center gap-2 border-t border-border pt-4">
+        <Button type="submit" disabled={saving} >
           {saving ? 'Saving...' : profile ? 'Save Changes' : 'Register as Volunteer'}
         </Button>
         {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel} className="h-9 px-4">
+          <Button type="button" variant="outline" onClick={onCancel} >
             Cancel
           </Button>
         )}

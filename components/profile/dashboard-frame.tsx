@@ -29,9 +29,9 @@ const DashboardFrame = ({ children, profile, role, tab, loading, togglingSafety,
       <Navbar />
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card border border-border/60 rounded-3xl p-6 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card border border-border rounded-lg p-4">
             <div className="flex items-center gap-4">
-              <div className="size-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 font-bold text-xl overflow-hidden shadow-inner">
+              <div className="size-16 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-medium text-xl overflow-hidden shadow-inner">
                 {profile?.photo_url ? (
                   <img
                     src={profile.photo_url}
@@ -44,10 +44,10 @@ const DashboardFrame = ({ children, profile, role, tab, loading, togglingSafety,
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-bold tracking-tight text-foreground">
+                  <h1 className="text-xl font-medium tracking-tight text-foreground">
                     {profile?.name || user?.name || 'Emergency System User'}
                   </h1>
-                  <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-wider">
+                  <Badge variant="outline" className="uppercase">
                     {user?.role || role}
                   </Badge>
                 </div>
@@ -63,7 +63,7 @@ const DashboardFrame = ({ children, profile, role, tab, loading, togglingSafety,
                 variant={profile?.is_safe ? 'default' : 'destructive'}
                 onClick={onToggleSafety}
                 disabled={togglingSafety}
-                className="rounded-xl text-xs font-semibold gap-1.5 shadow-xs"
+
               >
                 {togglingSafety ? (
                   <Spinner className="size-3.5" />
@@ -79,7 +79,7 @@ const DashboardFrame = ({ children, profile, role, tab, loading, togglingSafety,
                 size="sm"
                 variant="outline"
                 onClick={onEdit}
-                className="rounded-xl text-xs font-semibold gap-1.5"
+
               >
                 <FileEdit className="size-3.5" />
                 Edit Profile
@@ -90,10 +90,10 @@ const DashboardFrame = ({ children, profile, role, tab, loading, togglingSafety,
             <ProfileSidebar role={user?.role || role} activeTab={tab} />
             <div className="flex-1 w-full min-w-0 space-y-6">
               {loading ? (
-                <div className="rounded-2xl border border-border/70 bg-card p-6 space-y-4" role="status" aria-label="Loading dashboard">
+                <div className="rounded-lg border border-border bg-card p-4 space-y-4" role="status" aria-label="Loading dashboard">
                   <Skeleton className="h-6 w-48" />
-                  <Skeleton className="h-24 w-full rounded-xl" />
-                  <Skeleton className="h-24 w-full rounded-xl" />
+                  <Skeleton className="h-24 w-full" />
+                  <Skeleton className="h-24 w-full" />
                 </div>
               ) : children}
             </div>

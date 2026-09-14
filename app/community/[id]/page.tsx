@@ -12,13 +12,20 @@ import {
   Clock,
   ArrowLeft,
   AlertCircle,
-  Share2,
+  MoreVertical,
+  Edit3,
 } from 'lucide-react';
 import Navbar from '@/components/navbar';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -27,6 +34,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import MuiModal from '@/components/mui-modal';
+import AddCommunityPostDrawer from '@/components/community/add-community-post-drawer';
 import { toast } from '@/components/ui/toast';
 import useAuth from '@/hooks/use-auth';
 import { axiosSecure, publicApi } from '@/lib/api';
@@ -45,6 +54,10 @@ const CommunityPostDetailPage = () => {
   const [loadingComments, setLoadingComments] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
+
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+  const [isTrashModalOpen, setIsTrashModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [hasLiked, setHasLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -162,6 +175,31 @@ const CommunityPostDetailPage = () => {
     }
   };
 
+  const handleMoveToTrash = async () => {
+    if (!post) return;
+    try {
+      setIsDeleting(true);
+      await axiosSecure.delete(`/community-posts/${post.postId}`);
+      toast.add({
+        id: 'post-trashed-success',
+        title: 'Post moved to trash successfully.',
+        type: 'success',
+        timeout: 4000,
+      });
+      setIsTrashModalOpen(false);
+      router.push('/community');
+    } catch (err: any) {
+      toast.add({
+        id: 'post-trash-error',
+        title: err?.response?.data?.message || 'Failed to move post to trash.',
+        type: 'error',
+        timeout: 4000,
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
@@ -176,91 +214,110 @@ const CommunityPostDetailPage = () => {
 
   const authorInitial = (post?.postedBy?.name || 'U').charAt(0).toUpperCase();
 
+  const isAuthor = Boolean(
+    user &&
+      post &&
+      ((post.author_id && post.author_id === user.id) ||
+        ((post as any).userId && (post as any).userId === user.id) ||
+        (post.postedBy?.name && post.postedBy?.name === user.name))
+  );
+
+  const isEdited = Boolean(
+    post?.updated_at &&
+      post?.created_at &&
+      new Date(post.updated_at).getTime() - new Date(post.created_at).getTime() > 1000
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
-        <Navbar />
+      <Navbar />
 
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink render={<Link href="/" />}>Home</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink render={<Link href="/community" />}>
-                  Community
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>
-                  {post?.title ? (post.title.length > 30 ? `${post.title.slice(0, 30)}...` : post.title) : 'Post Details'}
-                </BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink render={<Link href="/" />}>Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink render={<Link href="/community" />}>
+                Community
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>
+                {post?.title
+                  ? post.title.length > 30
+                    ? `${post.title.slice(0, 30)}...`
+                    : post.title
+                  : 'Post Details'}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
-          {loading ? (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              <div className="lg:col-span-7 space-y-4">
-                <div className="rounded-2xl border border-border/70 bg-card p-5 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Skeleton className="size-10 rounded-full shrink-0" />
-                    <div className="space-y-1.5 flex-1">
-                      <Skeleton className="h-4 w-32" />
-                      <Skeleton className="h-3 w-20" />
-                    </div>
+        {loading ? (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="lg:col-span-7 space-y-4">
+              <div className="rounded-lg border border-border bg-card p-4 space-y-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="size-10 shrink-0" />
+                  <div className="space-y-1.5 flex-1">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-20" />
                   </div>
-                  <Skeleton className="h-7 w-3/4" />
-                  <Skeleton className="h-20 w-full rounded-xl" />
-                  <Skeleton className="h-48 w-full rounded-xl" />
                 </div>
+                <Skeleton className="h-7 w-3/4" />
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-48 w-full" />
               </div>
-              <div className="lg:col-span-5 space-y-4">
-                <div className="rounded-2xl border border-border/70 bg-card p-4 space-y-3">
-                  <Skeleton className="h-5 w-32" />
-                  <Skeleton className="h-9 w-full rounded-xl" />
-                  <div className="space-y-2 pt-2">
-                    <Skeleton className="h-16 w-full rounded-xl" />
-                    <Skeleton className="h-16 w-full rounded-xl" />
-                  </div>
+            </div>
+            <div className="lg:col-span-5 space-y-4">
+              <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-9 w-full" />
+                <div className="space-y-2 pt-2">
+                  <Skeleton className="h-16 w-full" />
+                  <Skeleton className="h-16 w-full" />
                 </div>
               </div>
             </div>
-          ) : !post ? (
-            <div className="py-16 text-center space-y-4">
-              <AlertCircle className="size-12 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-bold text-foreground">
-                Community Post Not Found
-              </h2>
-              <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                This post may have been removed or is no longer available.
-              </p>
-              <Button render={<Link href="/community" />} variant="outline">
-                <ArrowLeft className="size-4 mr-2" />
-                Back to Community Feed
-              </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              <div className="lg:col-span-7 space-y-4">
-                <Card className="rounded-2xl border border-border/70 bg-card shadow-sm overflow-hidden">
-                  <CardHeader className="p-5 pb-4 border-b border-border/40">
-                    <div className="flex items-center gap-3">
-                      <div className="size-10 rounded-full bg-emerald-700/10 text-emerald-800 font-bold text-sm flex items-center justify-center border border-emerald-600/20 shrink-0">
+          </div>
+        ) : !post ? (
+          <div className="py-16 text-center space-y-4">
+            <AlertCircle className="size-12 text-muted-foreground/60 mx-auto" />
+            <h2 className="text-sm font-medium text-foreground">
+              Community Post Not Found
+            </h2>
+            <p className="text-xs text-muted-foreground max-w-md mx-auto">
+              This post may have been removed or is no longer available.
+            </p>
+            <Button render={<Link href="/community" />} variant="outline">
+              <ArrowLeft className="size-4 mr-2" />
+              Back to Community Feed
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="lg:col-span-7 space-y-4">
+              <Card className="border overflow-hidden">
+                <CardHeader className="border-b">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="size-10 rounded-full bg-primary/10 text-primary font-medium text-sm flex items-center justify-center border border-primary/20 shrink-0">
                         {authorInitial}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-sm text-foreground">
+                          <span className="font-medium text-sm text-foreground">
                             {post.postedBy?.name || 'Community Member'}
                           </span>
-                          <span className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200/50">
+                          <span className="text-xs uppercase font-medium text-primary dark:text-primary bg-primary/10 dark:bg-primary/50 px-2 py-0.5 rounded-full border border-primary/50">
                             {post.postedBy?.role || 'User'}
                           </span>
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
                           {post.postedBy?.location && (
                             <span className="flex items-center gap-1">
                               <MapPin className="size-3" />
@@ -270,167 +327,244 @@ const CommunityPostDetailPage = () => {
                           <span className="flex items-center gap-1">
                             <Clock className="size-3" />
                             {formatDate(post.bumped_at || post.created_at)}
+                            {isEdited && (
+                              <span className="text-[11px] text-muted-foreground font-normal ml-0.5">
+                                (edited)
+                              </span>
+                            )}
                           </span>
                         </div>
                       </div>
                     </div>
-                  </CardHeader>
 
-                  <CardContent className="p-5 space-y-4">
-                    <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground leading-snug">
-                      {post.title}
-                    </h1>
-
-                    <p className="text-xs leading-relaxed text-muted-foreground whitespace-pre-line">
-                      {post.body}
-                    </p>
-
-                    {post.media_urls && post.media_urls.length > 0 && (
-                      <div
-                        className={`grid gap-3 pt-2 ${
-                          post.media_urls.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
-                        }`}
-                      >
-                        {post.media_urls.map((url, idx) => {
-                          const fullUrl = url.startsWith('http') ? url : `${backendUrl}${url}`;
-                          return (
-                            <div
-                              key={idx}
-                              className="rounded-xl overflow-hidden border border-border/50 bg-muted/20 flex items-center justify-center"
+                    {isAuthor && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              className="size-8 text-muted-foreground hover:text-foreground shrink-0"
                             >
-                              <img
-                                src={fullUrl}
-                                alt={`Attachment ${idx + 1}`}
-                                className="w-full h-auto object-cover max-h-96"
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </CardContent>
-
-                  <CardFooter className="p-4 px-5 border-t border-border/50 flex items-center justify-between bg-muted/10">
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={handleReact}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                          hasLiked
-                            ? 'text-rose-600 bg-rose-50 dark:bg-rose-950/40'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                        }`}
-                      >
-                        <Heart
-                          className={`size-4 ${hasLiked ? 'fill-rose-600 text-rose-600' : ''}`}
+                              <MoreVertical className="size-4" />
+                            </Button>
+                          }
                         />
-                        <span>{likeCount} Likes</span>
-                      </button>
+                        <DropdownMenuContent align="end" className="w-40 z-[10000]">
+                          <DropdownMenuItem onClick={() => setIsEditDrawerOpen(true)}>
+                            <Edit3 className="size-3.5 mr-2" />
+                            <span>Edit post</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => setIsTrashModalOpen(true)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="size-3.5 mr-2" />
+                            <span>Move to trash</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </div>
+                </CardHeader>
 
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <MessageSquare className="size-4" />
-                        <span>{comments.length} Comments</span>
-                      </div>
+                <CardContent className="space-y-4">
+                  <h1 className="text-xl sm:text-2xl font-medium tracking-tight text-foreground leading-snug">
+                    {post.title}
+                  </h1>
+
+                  <p className="text-xs leading-relaxed text-muted-foreground whitespace-pre-line">
+                    {post.body}
+                  </p>
+
+                  {post.media_urls && post.media_urls.length > 0 && (
+                    <div
+                      className={`grid gap-3 pt-2 ${
+                        post.media_urls.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
+                      }`}
+                    >
+                      {post.media_urls.map((url, idx) => {
+                        const fullUrl = url.startsWith('http')
+                          ? url
+                          : `${backendUrl}${url}`;
+                        return (
+                          <div
+                            key={idx}
+                            className="rounded-lg overflow-hidden border border-border bg-muted/20 flex items-center justify-center"
+                          >
+                            <img
+                              src={fullUrl}
+                              alt={`Attachment ${idx + 1}`}
+                              className="w-full h-auto object-cover max-h-96"
+                            />
+                          </div>
+                        );
+                      })}
                     </div>
-                  </CardFooter>
-                </Card>
-              </div>
+                  )}
+                </CardContent>
 
-              <div className="lg:col-span-5 space-y-4">
-                <Card className="rounded-2xl border border-border/70 bg-card shadow-sm overflow-hidden sticky top-20">
-                  <CardHeader className="p-4 pb-3 border-b border-border/40">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-                        <MessageSquare className="size-4 text-muted-foreground" />
-                        Comments ({comments.length})
-                      </h2>
-                    </div>
-                  </CardHeader>
-
-                  <CardContent className="p-4 space-y-4">
-                    <form onSubmit={handleAddComment} className="space-y-2">
-                      <Input
-                        type="text"
-                        placeholder="Add a comment to this discussion..."
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        className="text-xs h-9 bg-muted/20 rounded-xl"
+                <CardFooter className="border-t flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={handleReact}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                        hasLiked
+                          ? 'text-rose-600 bg-rose-50 dark:bg-rose-950/40'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                      }`}
+                    >
+                      <Heart
+                        className={`size-4 ${hasLiked ? 'fill-rose-600 text-rose-600' : ''}`}
                       />
-                      <div className="flex justify-end">
-                        <Button
-                          type="submit"
-                          size="sm"
-                          disabled={submittingComment || !newComment.trim()}
-                          className="text-xs font-semibold h-8 px-3 rounded-lg gap-1.5"
-                        >
-                          <Send className="size-3" />
-                          <span>{submittingComment ? 'Sending...' : 'Post Comment'}</span>
-                        </Button>
-                      </div>
-                    </form>
+                      <span>{likeCount} Likes</span>
+                    </button>
 
-                    <div className="space-y-2.5 max-h-[550px] overflow-y-auto pr-1">
-                      {loadingComments ? (
-                        <p className="text-center text-xs text-muted-foreground py-4">
-                          Loading comments...
-                        </p>
-                      ) : comments.length === 0 ? (
-                        <div className="py-8 text-center space-y-1">
-                          <p className="text-xs font-semibold text-foreground">
-                            No comments yet
-                          </p>
-                          <p className="text-[11px] text-muted-foreground">
-                            Start the conversation by posting a comment above.
-                          </p>
-                        </div>
-                      ) : (
-                        comments.map((comment) => {
-                          const isCommentAuthor =
-                            user?.name === comment.postedBy?.name;
-
-                          return (
-                            <div
-                              key={comment.id}
-                              className="p-3 rounded-xl bg-muted/20 border border-border/50 text-xs space-y-1.5"
-                            >
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-1.5 flex-wrap">
-                                  <span className="font-bold text-foreground">
-                                    {comment.postedBy?.name || 'User'}
-                                  </span>
-                                  <span className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-1.5 py-0.2 rounded-full">
-                                    {comment.postedBy?.role || 'User'}
-                                  </span>
-                                  <span className="text-[10px] text-muted-foreground">
-                                    • {formatDate(comment.created_at)}
-                                  </span>
-                                </div>
-                                {isCommentAuthor && (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleDeleteComment(comment.id)}
-                                    className="text-muted-foreground hover:text-destructive transition-colors p-1"
-                                    title="Delete comment"
-                                  >
-                                    <Trash2 className="size-3.5" />
-                                  </button>
-                                )}
-                              </div>
-                              <p className="text-muted-foreground whitespace-pre-line text-xs leading-relaxed">
-                                {comment.content}
-                              </p>
-                            </div>
-                          );
-                        })
-                      )}
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <MessageSquare className="size-4" />
+                      <span>{comments.length} Comments</span>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
+                  </div>
+                </CardFooter>
+              </Card>
             </div>
-          )}
-        </main>
-      </div>
+
+            <div className="lg:col-span-5 space-y-4">
+              <Card className="border overflow-hidden sticky top-20">
+                <CardHeader className="border-b">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-sm font-medium text-foreground flex items-center gap-2">
+                      <MessageSquare className="size-4 text-muted-foreground" />
+                      Comments ({comments.length})
+                    </h2>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+                  <form onSubmit={handleAddComment} className="space-y-2">
+                    <Input
+                      type="text"
+                      placeholder="Add a comment to this discussion..."
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                    />
+                    <div className="flex justify-end">
+                      <Button
+                        type="submit"
+                        size="sm"
+                        disabled={submittingComment || !newComment.trim()}
+                      >
+                        <Send className="size-3" />
+                        <span>{submittingComment ? 'Sending...' : 'Post Comment'}</span>
+                      </Button>
+                    </div>
+                  </form>
+
+                  <div className="flex flex-col gap-3 max-h-[550px] overflow-y-auto pr-1">
+                    {loadingComments ? (
+                      <p className="text-center text-xs text-muted-foreground py-4">
+                        Loading comments...
+                      </p>
+                    ) : comments.length === 0 ? (
+                      <div className="py-8 text-center space-y-1">
+                        <p className="text-xs font-medium text-foreground">
+                          No comments yet
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Start the conversation by posting a comment above.
+                        </p>
+                      </div>
+                    ) : (
+                      comments.map((comment) => {
+                        const isCommentAuthor =
+                          user?.name === comment.postedBy?.name;
+
+                        return (
+                          <div
+                            key={comment.id}
+                            className="text-xs space-y-1"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="font-semibold text-foreground">
+                                  {comment.postedBy?.name || 'User'}
+                                </span>
+                                <span className="text-[10px] uppercase font-semibold text-primary dark:text-primary bg-primary/10 dark:bg-primary/50 px-1.5 py-0.5 rounded-full border border-primary/20">
+                                  {comment.postedBy?.role || 'User'}
+                                </span>
+                                <span className="text-[11px] text-muted-foreground">
+                                  • {formatDate(comment.created_at)}
+                                </span>
+                              </div>
+                              {isCommentAuthor && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteComment(comment.id)}
+                                  className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                                  title="Delete comment"
+                                >
+                                  <Trash2 className="size-3.5" />
+                                </button>
+                              )}
+                            </div>
+                            <p className="text-muted-foreground whitespace-pre-line text-xs leading-relaxed pl-0.5">
+                              {comment.content}
+                            </p>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+      </main>
+
+      <AddCommunityPostDrawer
+        open={isEditDrawerOpen}
+        onOpenChange={setIsEditDrawerOpen}
+        postToEdit={post}
+        onSuccess={() => fetchPost()}
+      />
+
+      <MuiModal
+        open={isTrashModalOpen}
+        onClose={() => setIsTrashModalOpen(false)}
+        title="Move Post to Trash?"
+        actions={
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsTrashModalOpen(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleMoveToTrash}
+              disabled={isDeleting}
+            >
+              <Trash2 className="size-3.5" />
+              <span>{isDeleting ? 'Moving...' : 'Move to Trash'}</span>
+            </Button>
+          </>
+        }
+      >
+        <p className="text-xs text-muted-foreground">
+          Are you sure you want to move{' '}
+          <span className="font-medium text-foreground">
+            &ldquo;{post?.title}&rdquo;
+          </span>{' '}
+          to trash? This post can be restored within 30 days.
+        </p>
+      </MuiModal>
+    </div>
   );
 };
 

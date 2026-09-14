@@ -4,9 +4,16 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, MessageSquarePlus } from 'lucide-react';
 import Navbar from '@/components/navbar';
-import Search from '@/components/Search';
+import SearchBar from '@/components/searchbar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import useAuth from '@/hooks/use-auth';
 import { publicApi } from '@/lib/api';
 import { CommunityPost } from '@/components/community/types';
@@ -20,31 +27,71 @@ const CommunityPage = () => {
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortOption, setSortOption] = useState('desc');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const fetchPosts = useCallback(async (search?: string) => {
+  const fetchPosts = useCallback(async (search?: string, sortVal: string = 'desc') => {
     try {
       setLoading(true);
-      const url = search?.trim()
-        ? `/community-posts?search=${encodeURIComponent(search.trim())}`
-        : '/community-posts';
+
+      const params = new URLSearchParams();
+      if (search?.trim()) {
+        params.append('search', search.trim());
+      }
+
+      if (sortVal === 'asc' || sortVal === 'desc') {
+        params.append('sort', sortVal);
+      }
+
+      const queryString = params.toString();
+      const url = queryString ? `/community-posts?${queryString}` : '/community-posts';
+
       const res = await publicApi.get(url);
-      const data = res.data?.data || res.data || [];
-      setPosts(Array.isArray(data) ? data : []);
+      const rawData = res.data?.data || res.data || [];
+      let list: CommunityPost[] = Array.isArray(rawData) ? rawData : [];
+
+      if (sortVal === 'posted_by_you') {
+        list = list.filter(
+          (p) =>
+            (user?.id && p.author_id === user.id) ||
+            (user?.name && p.postedBy?.name === user.name)
+        );
+      } else if (sortVal === 'posted_by_volunteers') {
+        list = list.filter(
+          (p) => p.postedBy?.role?.toLowerCase() === 'volunteer'
+        );
+      } else if (sortVal === 'posted_by_relief_org') {
+        list = list.filter(
+          (p) =>
+            p.postedBy?.role?.toLowerCase() === 'relief_org' ||
+            p.postedBy?.role?.toLowerCase() === 'organization'
+        );
+      } else if (sortVal === 'posted_by_admin') {
+        list = list.filter(
+          (p) => p.postedBy?.role?.toLowerCase() === 'admin'
+        );
+      }
+
+      setPosts(list);
     } catch {
       setPosts([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    fetchPosts(searchQuery, sortOption);
+  }, [fetchPosts, sortOption]);
 
   const handleSearchChange = (val: string) => {
     setSearchQuery(val);
-    fetchPosts(val);
+    fetchPosts(val, sortOption);
+  };
+
+  const handleSortChange = (val: string | null) => {
+    if (!val) return;
+    setSortOption(val);
   };
 
   const handleOpenDrawer = () => {
@@ -61,20 +108,39 @@ const CommunityPage = () => {
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="w-full md:w-[65%] max-w-3xl mx-auto space-y-6">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-card p-3.5 rounded-2xl border border-border/70 shadow-sm">
-            <Search
-              value={searchQuery}
-              onChange={handleSearchChange}
-              onSubmit={() => fetchPosts(searchQuery)}
-              placeholder="Search community posts..."
-              className="flex-1"
-              inputClassName="w-full sm:w-full focus:w-full sm:focus:w-full"
-            />
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-card p-3.5 rounded-lg border border-border">
+            <div className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+              <Select
+                value={sortOption}
+                onValueChange={handleSortChange}
+              >
+                <SelectTrigger className="w-full sm:w-[175px] h-9 shrink-0 bg-background text-xs">
+                  <SelectValue placeholder="Sort / Filter" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="desc">Descending</SelectItem>
+                  <SelectItem value="asc">Ascending</SelectItem>
+                  <SelectItem value="posted_by_you">Posted by You</SelectItem>
+                  <SelectItem value="posted_by_volunteers">Posted by Volunteers</SelectItem>
+                  <SelectItem value="posted_by_relief_org">Posted by Relief Org</SelectItem>
+                  <SelectItem value="posted_by_admin">Posted by Admin</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <SearchBar
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onSubmit={() => fetchPosts(searchQuery, sortOption)}
+                placeholder="Search community posts..."
+                className="flex-1"
+                inputClassName="w-full sm:w-full focus:w-full sm:focus:w-full"
+              />
+            </div>
 
             <Button
               onClick={handleOpenDrawer}
               size="default"
-              className="gap-2 text-xs font-semibold shrink-0 rounded-xl"
+              className="shrink-0"
             >
               <Plus className="size-4" />
               <span>Make a post</span>
@@ -87,22 +153,17 @@ const CommunityPage = () => {
                 {[1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="p-6 rounded-2xl border border-border/60 bg-card shadow-sm space-y-3"
+                    className="p-4 rounded-lg border border-border bg-card space-y-3"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="size-9 rounded-full bg-muted/70" />
-                      <Skeleton className="size-10 rounded-full" />
+                      <Skeleton className="size-9 rounded-full" />
                       <div className="space-y-1.5 flex-1">
-                        <div className="h-3 w-32 bg-muted/70 rounded" />
-                        <div className="h-2.5 w-20 bg-muted/50 rounded" />
                         <Skeleton className="h-4 w-32" />
                         <Skeleton className="h-3 w-20" />
                       </div>
                     </div>
-                    <div className="h-4 w-3/4 bg-muted/70 rounded" />
-                    <div className="h-16 bg-muted/40 rounded-xl" />
-                    <Skeleton className="h-5 w-3/4" />
-                    <Skeleton className="h-16 w-full rounded-xl" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-16 w-full rounded-lg" />
                     <div className="flex items-center gap-4 pt-1">
                       <Skeleton className="h-4 w-16" />
                       <Skeleton className="h-4 w-20" />
@@ -111,9 +172,9 @@ const CommunityPage = () => {
                 ))}
               </div>
             ) : posts.length === 0 ? (
-              <div className="py-16 text-center space-y-3 rounded-2xl border border-dashed border-border/80 bg-card/40 p-8">
+              <div className="py-16 text-center space-y-3 rounded-lg border border-dashed border-border bg-card p-4">
                 <MessageSquarePlus className="size-10 text-muted-foreground/60 mx-auto" />
-                <h3 className="text-base font-bold text-foreground">
+                <h3 className="text-sm font-medium text-foreground">
                   No community posts found
                 </h3>
                 <p className="text-xs text-muted-foreground max-w-sm mx-auto">
@@ -125,7 +186,7 @@ const CommunityPage = () => {
                   onClick={handleOpenDrawer}
                   variant="outline"
                   size="sm"
-                  className="mt-2 text-xs font-semibold gap-1.5"
+                  className="mt-2"
                 >
                   <Plus className="size-3.5" />
                   Make a post
@@ -136,7 +197,7 @@ const CommunityPage = () => {
                 <CommunityPostCard
                   key={post.postId}
                   post={post}
-                  onPostUpdated={() => fetchPosts(searchQuery)}
+                  onPostUpdated={() => fetchPosts(searchQuery, sortOption)}
                 />
               ))
             )}
@@ -147,7 +208,7 @@ const CommunityPage = () => {
       <AddCommunityPostDrawer
         open={isDrawerOpen}
         onOpenChange={setIsDrawerOpen}
-        onSuccess={() => fetchPosts(searchQuery)}
+        onSuccess={() => fetchPosts(searchQuery, sortOption)}
       />
     </div>
   );

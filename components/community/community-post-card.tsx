@@ -1,15 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import styled from 'styled-components';
 import {
   Heart,
   MessageSquare,
   MapPin,
   Clock,
-  ArrowUpRight,
 } from 'lucide-react';
-import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { toast } from '@/components/ui/toast';
 import useAuth from '@/hooks/use-auth';
 import { axiosSecure } from '@/lib/api';
@@ -21,6 +20,7 @@ interface CommunityPostCardProps {
 }
 
 const CommunityPostCard = ({ post, onPostUpdated }: CommunityPostCardProps) => {
+  const router = useRouter();
   const { user } = useAuth();
 
   const [hasLiked, setHasLiked] = useState(false);
@@ -31,6 +31,10 @@ const CommunityPostCard = ({ post, onPostUpdated }: CommunityPostCardProps) => {
 
   const backendUrl =
     process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+
+  const handleCardClick = () => {
+    router.push(`/community/${post.postId}`);
+  };
 
   const handleReact = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -66,6 +70,12 @@ const CommunityPostCard = ({ post, onPostUpdated }: CommunityPostCardProps) => {
     }
   };
 
+  const handleCommentsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    router.push(`/community/${post.postId}`);
+  };
+
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
@@ -87,103 +97,199 @@ const CommunityPostCard = ({ post, onPostUpdated }: CommunityPostCardProps) => {
     : null;
 
   return (
-    <Card className="rounded-xl border border-border/70 bg-card shadow-xs overflow-hidden transition-all hover:shadow-sm hover:border-emerald-600/30">
-      <CardHeader className="p-2.5 px-3.5 pb-1">
-        <div className="flex items-center gap-2">
-          <div className="size-6 rounded-full bg-emerald-700/10 text-emerald-800 font-bold text-[10px] flex items-center justify-center border border-emerald-600/20 shrink-0">
-            {authorInitial}
-          </div>
-          <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
-            <span className="font-bold text-xs text-foreground truncate">
-              {post.postedBy?.name || 'Community Member'}
-            </span>
-            <span className="text-[9px] uppercase font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-1.5 py-0 rounded-full border border-emerald-200/50">
-              {post.postedBy?.role || 'User'}
-            </span>
-            {post.postedBy?.location && (
-              <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
-                <MapPin className="size-2.5" />
-                {post.postedBy.location}
-              </span>
-            )}
-            <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
-              <Clock className="size-2.5" />
-              {formatDate(post.bumped_at || post.created_at)}
-            </span>
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="px-3.5 py-0.5">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex-1 min-w-0 space-y-0.5">
-            <Link
-              href={`/community/${post.postId}`}
-              className="font-bold text-xs sm:text-[13px] text-foreground leading-tight hover:text-emerald-700 dark:hover:text-emerald-400 hover:underline transition-colors line-clamp-1 block"
-            >
-              {post.title}
-            </Link>
-            <p className="text-[11px] text-muted-foreground leading-snug line-clamp-2">
-              {post.body}
-            </p>
-          </div>
-
-          {hasMedia && firstMediaUrl && (
-            <Link
-              href={`/community/${post.postId}`}
-              className="size-14 sm:size-16 rounded-lg overflow-hidden border border-border/50 bg-muted/20 shrink-0 relative group block"
-            >
-              <img
-                src={firstMediaUrl}
-                alt="Post preview"
-                className="size-full object-cover group-hover:scale-105 transition-transform duration-200"
-              />
-              {post.media_urls.length > 1 && (
-                <span className="absolute bottom-0.5 right-0.5 bg-black/75 text-white text-[8px] font-bold px-1 rounded">
-                  +{post.media_urls.length - 1}
+    <StyledWrapper onClick={handleCardClick}>
+      <div className="card">
+        <div className="card__shine" />
+        <div className="card__glow" />
+        <div className="card__content">
+          <div className="flex items-center justify-between gap-3 w-full">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="size-5 rounded-full bg-primary/10 text-primary font-medium text-[10px] flex items-center justify-center border border-primary/20 shrink-0">
+                {authorInitial}
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                <span className="font-semibold text-xs text-foreground truncate">
+                  {post.postedBy?.name || 'Community Member'}
                 </span>
-              )}
-            </Link>
-          )}
+                <span className="text-[9px] uppercase font-semibold text-primary dark:text-primary bg-primary/10 dark:bg-primary/50 px-1.5 py-0 rounded-full border border-primary/50 shrink-0">
+                  {post.postedBy?.role || 'User'}
+                </span>
+                {post.postedBy?.location && (
+                  <span className="flex items-center gap-0.5 text-[11px] text-muted-foreground truncate">
+                    <MapPin className="size-2.5 shrink-0" />
+                    {post.postedBy.location}
+                  </span>
+                )}
+                <span className="flex items-center gap-0.5 text-[11px] text-muted-foreground shrink-0">
+                  <Clock className="size-2.5 shrink-0" />
+                  {formatDate(post.bumped_at || post.created_at)}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={handleReact}
+                className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium transition-colors ${
+                  hasLiked
+                    ? 'text-rose-600 bg-rose-50 dark:bg-rose-950/40'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`}
+              >
+                <Heart
+                  className={`size-3 ${hasLiked ? 'fill-rose-600 text-rose-600' : ''}`}
+                />
+                <span>{likeCount}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleCommentsClick}
+                className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              >
+                <MessageSquare className="size-3" />
+                <span>{post.CommunityResponse?.totalComments || 0}</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 w-full mt-1.5">
+            <div className="flex-1 min-w-0 space-y-0.5">
+              <h3 className="card__title text-xs font-bold text-foreground leading-tight line-clamp-1">
+                {post.title}
+              </h3>
+              <p className="card__description text-xs text-muted-foreground leading-snug line-clamp-2">
+                {post.body}
+              </p>
+            </div>
+
+            {hasMedia && firstMediaUrl && (
+              <div className="size-12 sm:size-14 rounded-lg overflow-hidden border border-border bg-muted/20 shrink-0 relative group">
+                <img
+                  src={firstMediaUrl}
+                  alt="Post preview"
+                  className="size-full object-cover group-hover:scale-105 transition-transform duration-200"
+                />
+                {post.media_urls.length > 1 && (
+                  <span className="absolute bottom-0.5 right-0.5 bg-black/75 text-white text-[8px] font-medium px-1 rounded">
+                    +{post.media_urls.length - 1}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </CardContent>
-
-      <CardFooter className="p-1.5 px-3.5 border-t border-border/40 flex items-center justify-between mt-1.5 bg-muted/10">
-        <div className="flex items-center gap-2.5">
-          <button
-            type="button"
-            onClick={handleReact}
-            className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-semibold transition-colors ${
-              hasLiked
-                ? 'text-rose-600 bg-rose-50 dark:bg-rose-950/40'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-            }`}
-          >
-            <Heart
-              className={`size-3 ${hasLiked ? 'fill-rose-600 text-rose-600' : ''}`}
-            />
-            <span>{likeCount}</span>
-          </button>
-
-          <Link
-            href={`/community/${post.postId}`}
-            className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-          >
-            <MessageSquare className="size-3" />
-            <span>{post.CommunityResponse?.totalComments || 0}</span>
-          </Link>
-        </div>
-
-        <Link
-          href={`/community/${post.postId}`}
-          className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-0.5"
-        >
-          <span>View</span>
-          <ArrowUpRight className="size-2.5" />
-        </Link>
-      </CardFooter>
-    </Card>
+      </div>
+    </StyledWrapper>
   );
 };
+
+const StyledWrapper = styled.div`
+  width: 100%;
+  cursor: pointer;
+
+  .card {
+    --card-bg: var(--card, #ffffff);
+    --card-accent: #059669;
+    --card-accent-light: #10b981;
+    --card-text: #1e293b;
+    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+
+    width: 100%;
+    background: var(--card-bg);
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    font-family: inherit;
+  }
+
+  .card__shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0) 40%,
+      rgba(255, 255, 255, 0.6) 50%,
+      rgba(255, 255, 255, 0) 60%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .card__glow {
+    position: absolute;
+    inset: -10px;
+    background: radial-gradient(
+      circle at 50% 0%,
+      rgba(16, 185, 129, 0.22) 0%,
+      rgba(16, 185, 129, 0) 70%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  .card__content {
+    padding: 12px 14px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .card__title {
+    transition: all 0.3s ease;
+  }
+
+  .card__description {
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 14px 20px -4px rgba(0, 0, 0, 0.07),
+      0 6px 8px -3px rgba(0, 0, 0, 0.03);
+    border-color: rgba(16, 185, 129, 0.4);
+  }
+
+  .card:hover .card__shine {
+    opacity: 1;
+    animation: shine 2.5s infinite;
+  }
+
+  .card:hover .card__glow {
+    opacity: 1;
+  }
+
+  .card:hover .card__title {
+    color: var(--card-accent);
+    transform: translateX(1px);
+  }
+
+  .card:hover .card__description {
+    transform: translateX(1px);
+  }
+
+  .card:active {
+    transform: translateY(-2px) scale(0.995);
+  }
+
+  @keyframes shine {
+    0% {
+      background-position: -100% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+`;
 
 export default CommunityPostCard;

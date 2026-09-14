@@ -18,7 +18,7 @@ const Error = ({
   description = 'An unexpected error occurred. Please try again later or return to home.',
   code = '500',
   onAction,
-  actionText = 'Go Home',
+  actionText = 'Back to Home',
 }: ErrorProps) => {
   const router = useRouter();
 
@@ -41,8 +41,8 @@ const Error = ({
       <div className="relative z-10 flex flex-col min-h-screen">
         <Navbar />
         <main className="flex-1 flex items-center justify-center p-4 py-8">
-          <div className="w-full max-w-md bg-white/70 dark:bg-card/70 backdrop-blur-md rounded-3xl border border-white/40 dark:border-border/40 shadow-2xl p-8 sm:p-10 text-center space-y-4">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <div className="w-full max-w-md bg-background dark:bg-card rounded-lg border border-white/40 dark:border-border p-4 sm:p-10 text-center space-y-4">
+            <h1 className="text-2xl font-medium tracking-tight text-foreground">
               {title}
             </h1>
             {description && (
@@ -51,7 +51,7 @@ const Error = ({
               </p>
             )}
             {code && (
-              <p className="text-xs font-mono font-semibold text-red-500">
+              <p className="text-xs font-mono font-medium text-red-500">
                 Error Code: {code}
               </p>
             )}

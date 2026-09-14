@@ -141,30 +141,30 @@ const MissingPersonDetailPage = () => {
 
           {loading ? (
             <div className="space-y-8">
-              <div className="flex items-center gap-5 pb-6 border-b border-border/40">
-                <Skeleton className="size-24 sm:size-28 rounded-lg shrink-0" />
+              <div className="flex items-center gap-5 pb-6 border-b border-border">
+                <Skeleton className="size-24 sm:size-28 shrink-0" />
                 <div className="space-y-2 flex-1">
                   <Skeleton className="h-8 w-1/3" />
-                  <Skeleton className="h-5 w-20 rounded-full" />
+                  <Skeleton className="h-5 w-20" />
                 </div>
               </div>
               <div className="space-y-4">
                 <Skeleton className="h-6 w-32" />
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                  <Skeleton className="h-12 w-full rounded-xl" />
-                  <Skeleton className="h-12 w-full rounded-xl" />
-                  <Skeleton className="h-12 w-full col-span-2 rounded-xl" />
-                  <Skeleton className="h-12 w-full rounded-xl" />
-                  <Skeleton className="h-12 w-full rounded-xl" />
-                  <Skeleton className="h-12 w-full col-span-2 rounded-xl" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full col-span-2" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full col-span-2" />
                 </div>
               </div>
-              <Skeleton className="h-24 w-full rounded-xl" />
+              <Skeleton className="h-24 w-full" />
             </div>
           ) : !person ? (
             <div className="py-16 text-center space-y-4">
               <AlertCircle className="size-12 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-bold text-foreground">
+              <h2 className="text-sm font-medium text-foreground">
                 Missing Person Report Not Found
               </h2>
               <p className="text-xs text-muted-foreground max-w-md mx-auto">
@@ -180,12 +180,12 @@ const MissingPersonDetailPage = () => {
             </div>
           ) : (
             <div className="space-y-8">
-              <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 pb-6 border-b border-border/40">
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 pb-6 border-b border-border">
                 <div className="flex items-center gap-5">
                   <div
                     onClick={() => person.photo_url && setIsPhotoModalOpen(true)}
-                    className={`relative group size-24 sm:size-28 rounded-lg bg-muted/40 border border-border/60 flex items-center justify-center overflow-hidden shrink-0 ${
-                      person.photo_url ? 'cursor-pointer hover:border-emerald-500/60 transition-all shadow-sm' : ''
+                    className={`relative group size-24 sm:size-28 rounded-lg bg-muted/40 border border-border flex items-center justify-center overflow-hidden shrink-0 ${
+                      person.photo_url ? 'cursor-pointer hover:border-primary/60 transition-all shadow-sm' : ''
                     }`}
                   >
                     {person.photo_url ? (
@@ -205,13 +205,13 @@ const MissingPersonDetailPage = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                    <h1 className="text-2xl sm:text-3xl font-medium tracking-tight text-foreground">
                       {person.full_name}
                     </h1>
                     <div>
                       <Badge
                         variant={isFound ? 'default' : 'destructive'}
-                        className="text-[11px] px-2.5 py-0.5 uppercase font-bold"
+                        className="uppercase"
                       >
                         {person.status}
                       </Badge>
@@ -226,7 +226,7 @@ const MissingPersonDetailPage = () => {
                       size="sm"
                       onClick={handleToggleFound}
                       disabled={actionLoading}
-                      className="text-xs gap-1.5 font-semibold justify-start md:justify-center w-full md:w-40"
+                      className="justify-start md:justify-center w-full md:w-40"
                     >
                       <CheckCircle2 className="size-3.5" />
                       {isFound ? 'Mark as Missing' : 'Mark as Found'}
@@ -237,7 +237,7 @@ const MissingPersonDetailPage = () => {
                       size="sm"
                       onClick={() => setIsEditOpen(true)}
                       disabled={actionLoading}
-                      className="text-xs gap-1.5 font-semibold justify-start md:justify-center w-full md:w-40"
+                      className="justify-start md:justify-center w-full md:w-40"
                     >
                       <FileEdit className="size-3.5" />
                       Edit
@@ -248,7 +248,7 @@ const MissingPersonDetailPage = () => {
                       size="sm"
                       onClick={handleDelete}
                       disabled={actionLoading}
-                      className="text-xs gap-1.5 font-semibold justify-start md:justify-center w-full md:w-40"
+                      className="justify-start md:justify-center w-full md:w-40"
                     >
                       <Trash2 className="size-3.5" />
                       Delete
@@ -258,25 +258,25 @@ const MissingPersonDetailPage = () => {
               </div>
 
               <div>
-                <h2 className="text-xl font-bold tracking-tight text-foreground mb-6">
+                <h2 className="text-sm font-medium tracking-tight text-foreground mb-6">
                   Details
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-8 text-sm">
                   <div className="space-y-1">
-                    <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                       Age & Gender
                     </span>
-                    <span className="text-foreground font-semibold block">
+                    <span className="text-foreground font-medium block">
                       {person.age} yrs • {person.gender || 'N/A'}
                     </span>
                   </div>
 
                   <div className="space-y-1">
-                    <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                       Last Seen Date
                     </span>
-                    <span className="text-foreground font-semibold block">
+                    <span className="text-foreground font-medium block">
                       {person.last_seen_date
                         ? new Date(person.last_seen_date).toLocaleDateString()
                         : 'Unknown'}
@@ -284,16 +284,16 @@ const MissingPersonDetailPage = () => {
                   </div>
 
                   <div className="space-y-1 sm:col-span-2">
-                    <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                       Last Seen Location
                     </span>
-                    <span className="text-foreground font-semibold block">
+                    <span className="text-foreground font-medium block">
                       {person.last_seen_location}
                     </span>
                   </div>
 
                   <div className="space-y-1">
-                    <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                       Report ID
                     </span>
                     <span className="text-foreground font-mono font-medium block text-xs">
@@ -302,7 +302,7 @@ const MissingPersonDetailPage = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                       Filed On
                     </span>
                     <span className="text-foreground font-medium block text-xs">
@@ -313,12 +313,12 @@ const MissingPersonDetailPage = () => {
                   </div>
 
                   <div className="space-y-1 sm:col-span-2">
-                    <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                       Emergency Contact
                     </span>
                     {user ? (
                       <div className="flex flex-wrap items-center gap-3">
-                        <span className="text-foreground font-semibold text-sm">
+                        <span className="text-foreground font-medium text-sm">
                           {person.contact_phone || 'No phone provided'}
                         </span>
                         {person.contact_phone && (
@@ -326,7 +326,7 @@ const MissingPersonDetailPage = () => {
                             render={<a href={`tel:${person.contact_phone}`} />}
                             size="sm"
                             variant="outline"
-                            className="h-7 text-xs gap-1.5"
+
                           >
                             <Phone className="size-3" />
                             Call
@@ -339,7 +339,7 @@ const MissingPersonDetailPage = () => {
                         <span>
                           <Link
                             href={`/sign-in?returnUrl=/missing-persons/${id}`}
-                            className="font-semibold text-foreground underline hover:text-primary"
+                            className="font-medium text-foreground underline hover:text-primary"
                           >
                             Sign in
                           </Link>{' '}
@@ -353,7 +353,7 @@ const MissingPersonDetailPage = () => {
 
               {person.description && (
                 <div className="space-y-2 pt-2">
-                  <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                  <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                     Description & Case Notes
                   </span>
                   <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">
@@ -362,12 +362,12 @@ const MissingPersonDetailPage = () => {
                 </div>
               )}
 
-              <div className="pt-6 border-t border-border/50">
+              <div className="pt-6 border-t border-border">
                 <Button
                   render={<Link href="/missing-persons" />}
                   variant="outline"
                   size="sm"
-                  className="text-xs"
+
                 >
                   <ArrowLeft className="size-3.5 mr-1" />
                   All Reports
@@ -388,18 +388,18 @@ const MissingPersonDetailPage = () => {
             variant="outline"
             size="sm"
             onClick={() => setIsPhotoModalOpen(false)}
-            className="rounded-xl text-xs"
+
           >
             Close
           </Button>
         }
       >
         {person?.photo_url && (
-          <div className="w-full flex items-center justify-center overflow-hidden rounded-xl bg-black/5">
+          <div className="w-full flex items-center justify-center overflow-hidden rounded-lg bg-black/5">
             <img
               src={person.photo_url}
               alt={person.full_name}
-              className="max-h-[75vh] w-auto object-contain rounded-xl"
+              className="max-h-[75vh] w-auto object-contain rounded-lg"
             />
           </div>
         )}

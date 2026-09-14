@@ -164,19 +164,19 @@ const VolunteerTrashPage = () => {
       >
         <div className="space-y-4">
           <div>
-            <h3 className="text-base font-bold text-destructive">Trash & Recycling Bin</h3>
+            <h3 className="text-sm font-medium text-destructive">Trash & Recycling Bin</h3>
             <p className="text-xs text-muted-foreground">
               Deleted reports, requests, and posts. Items are permanently deleted automatically after 30 days.
             </p>
           </div>
 
           {myTrashItems.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center bg-card/40 space-y-3">
+            <div className="rounded-lg border border-dashed border-border p-4 text-center bg-card space-y-3">
               <Trash2 className="size-8 text-muted-foreground/60 mx-auto" />
               <p className="text-xs text-muted-foreground">Your trash bin is currently empty.</p>
             </div>
           ) : (
-            <div className="rounded-2xl border border-border/70 overflow-hidden bg-card shadow-sm">
+            <div className="rounded-lg border border-border overflow-hidden bg-card">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -189,13 +189,13 @@ const VolunteerTrashPage = () => {
                 <TableBody>
                   {myTrashItems.map((item) => (
                     <TableRow key={item.id}>
-                      <TableCell className="font-semibold text-xs">{item.item_title}</TableCell>
+                      <TableCell >{item.item_title}</TableCell>
                       <TableCell>
-                        <Badge variant="secondary" className="text-[10px] uppercase font-bold">
+                        <Badge variant="secondary" className="uppercase">
                           {formatTrashType(item.item_type)}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-xs">{formatTrashDate(item.deleted_at)}</TableCell>
+                      <TableCell >{formatTrashDate(item.deleted_at)}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Button
@@ -203,7 +203,7 @@ const VolunteerTrashPage = () => {
                             variant="outline"
                             onClick={() => handleRestore(item.id, item.item_title)}
                             disabled={actionInProgress === `restore-${item.id}`}
-                            className="h-8 px-3 rounded-xl gap-1 text-xs"
+
                           >
                             {actionInProgress === `restore-${item.id}` ? (
                               <Spinner className="size-3" />
@@ -218,7 +218,7 @@ const VolunteerTrashPage = () => {
                             variant="ghost"
                             onClick={() => handleDeletePermanently(item.id, item.item_title)}
                             disabled={actionInProgress === `delete-${item.id}`}
-                            className="h-8 px-3 rounded-xl gap-1 text-xs text-destructive hover:bg-destructive/10"
+                            className="text-destructive"
                           >
                             {actionInProgress === `delete-${item.id}` ? (
                               <Spinner className="size-3" />

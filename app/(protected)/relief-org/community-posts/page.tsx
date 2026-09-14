@@ -129,7 +129,7 @@ const ReliefOrgCommunityPostsPage = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold">Your Community Posts</h3>
+              <h3 className="text-sm font-medium">Your Community Posts</h3>
               <p className="text-xs text-muted-foreground">
                 Discussions, field warnings, and informational updates you have posted.
               </p>
@@ -137,7 +137,7 @@ const ReliefOrgCommunityPostsPage = () => {
             <Button
               size="sm"
               onClick={() => setIsCreatePostOpen(true)}
-              className="rounded-xl gap-1.5 text-xs font-semibold"
+
             >
               <Plus className="size-4" />
               Create Post
@@ -145,14 +145,14 @@ const ReliefOrgCommunityPostsPage = () => {
           </div>
 
           {myPosts.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center bg-card/40 space-y-3">
+            <div className="rounded-lg border border-dashed border-border p-4 text-center bg-card space-y-3">
               <MessageSquare className="size-8 text-muted-foreground/60 mx-auto" />
               <p className="text-xs text-muted-foreground">
                 You have not created any community posts yet.
               </p>
             </div>
           ) : (
-            <div className="rounded-2xl border border-border/70 overflow-hidden bg-card shadow-sm">
+            <div className="rounded-lg border border-border overflow-hidden bg-card">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -166,23 +166,23 @@ const ReliefOrgCommunityPostsPage = () => {
                 <TableBody>
                   {myPosts.map((post) => (
                     <TableRow key={post.postId}>
-                      <TableCell className="font-semibold text-xs max-w-xs truncate">{post.title}</TableCell>
-                      <TableCell className="text-xs text-muted-foreground">
+                      <TableCell className="max-w-xs truncate">{post.title}</TableCell>
+                      <TableCell className="text-muted-foreground">
                         {post.CommunityResponse?.Reactions?.total || 0} reactions &bull; {post.CommunityResponse?.totalComments || 0} comments
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="text-[10px] uppercase font-bold">
+                        <Badge variant="outline" className="uppercase">
                           {post.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-xs">{formatTrashDate(post.created_at)}</TableCell>
+                      <TableCell >{formatTrashDate(post.created_at)}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <Button
                             size="sm"
                             variant="ghost"
                             onClick={() => router.push(`/community/${post.postId}`)}
-                            className="h-8 px-2 text-xs"
+
                           >
                             View
                           </Button>
@@ -193,7 +193,7 @@ const ReliefOrgCommunityPostsPage = () => {
                               setConfirmTrashItem(post);
 
                             }}
-                            className="h-8 px-2 text-xs text-destructive hover:bg-destructive/10"
+                            className="text-destructive"
                           >
                             <Trash2 className="size-3.5" />
                           </Button>
@@ -230,7 +230,7 @@ const ReliefOrgCommunityPostsPage = () => {
               variant="outline"
               size="sm"
               onClick={() => setConfirmTrashItem(null)}
-              className="rounded-xl"
+
             >
               Cancel
             </Button>
@@ -239,7 +239,7 @@ const ReliefOrgCommunityPostsPage = () => {
               size="sm"
               onClick={handleMoveToTrash}
               disabled={actionInProgress === 'moving-to-trash'}
-              className="rounded-xl gap-1.5"
+
             >
               <Trash2 className="size-3.5" />
               Move to Trash
@@ -249,7 +249,7 @@ const ReliefOrgCommunityPostsPage = () => {
       >
         <p className="text-xs text-muted-foreground">
           Are you sure you want to delete{' '}
-          <span className="font-semibold text-foreground">
+          <span className="font-medium text-foreground">
             {confirmTrashItem?.title}
           </span>
           ? This record will be moved to your Trash and can be restored within 30 days.

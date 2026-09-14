@@ -107,21 +107,21 @@ const UserDonationsPage = () => {
       >
         <div className="space-y-4">
           <div>
-            <h3 className="text-base font-bold">Your Donation Contributions</h3>
+            <h3 className="text-sm font-medium">Your Donation Contributions</h3>
             <p className="text-xs text-muted-foreground">
               History of humanitarian aid funds contributed through your account.
             </p>
           </div>
 
           {myDonations.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center bg-card/40 space-y-3">
+            <div className="rounded-lg border border-dashed border-border p-4 text-center bg-card space-y-3">
               <HeartHandshake className="size-8 text-muted-foreground/60 mx-auto" />
               <p className="text-xs text-muted-foreground">
                 You have not made any donations yet.
               </p>
             </div>
           ) : (
-            <div className="rounded-2xl border border-border/70 overflow-hidden bg-card shadow-sm">
+            <div className="rounded-lg border border-border overflow-hidden bg-card">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -136,12 +136,12 @@ const UserDonationsPage = () => {
                 <TableBody>
                   {myDonations.map((d) => (
                     <TableRow key={d.id}>
-                      <TableCell className="font-semibold text-xs">{d.campaign_title || 'Emergency Aid'}</TableCell>
-                      <TableCell className="text-xs font-bold">${d.amount}</TableCell>
-                      <TableCell className="text-xs uppercase">{d.payment_gateway}</TableCell>
-                      <TableCell className="text-xs">{formatTrashDate(d.paid_at || d.created_at)}</TableCell>
+                      <TableCell >{d.campaign_title || 'Emergency Aid'}</TableCell>
+                      <TableCell >${d.amount}</TableCell>
+                      <TableCell className="uppercase">{d.payment_gateway}</TableCell>
+                      <TableCell >{formatTrashDate(d.paid_at || d.created_at)}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="text-[10px] uppercase font-bold text-emerald-600">
+                        <Badge variant="outline" className="uppercase">
                           {d.status}
                         </Badge>
                       </TableCell>
@@ -162,7 +162,7 @@ const UserDonationsPage = () => {
                               reliefOrg: 'Emergency Disaster Response Management System',
                             });
                           }}
-                          className="h-8 px-2 text-xs rounded-xl gap-1"
+
                         >
                           <Download className="size-3.5" />
                           Receipt

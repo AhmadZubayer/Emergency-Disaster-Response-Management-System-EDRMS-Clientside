@@ -167,21 +167,21 @@ const DisasterDetailPage = () => {
           {loading ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               <div className="space-y-6">
-                <div className="pb-5 border-b border-border/40 space-y-2">
+                <div className="pb-5 border-b border-border space-y-2">
                   <Skeleton className="h-8 w-2/3" />
                   <div className="flex gap-2">
-                    <Skeleton className="h-5 w-20 rounded-full" />
-                    <Skeleton className="h-5 w-24 rounded-full" />
+                    <Skeleton className="h-5 w-20" />
+                    <Skeleton className="h-5 w-24" />
                   </div>
                 </div>
                 <div className="space-y-4">
                   <Skeleton className="h-6 w-32" />
                   <div className="grid grid-cols-2 gap-4">
-                    <Skeleton className="h-12 w-full rounded-xl" />
-                    <Skeleton className="h-12 w-full rounded-xl" />
-                    <Skeleton className="h-12 w-full col-span-2 rounded-xl" />
-                    <Skeleton className="h-12 w-full rounded-xl" />
-                    <Skeleton className="h-12 w-full rounded-xl" />
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full col-span-2" />
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full" />
                   </div>
                 </div>
               </div>
@@ -189,14 +189,14 @@ const DisasterDetailPage = () => {
                 <div className="h-8 w-1/3 bg-muted/40 rounded" />
                 <div className="h-4 w-1/2 bg-muted/30 rounded" />
                 <div className="h-24 w-full bg-muted/20 rounded" />
-                <Skeleton className="h-14 w-full rounded-xl" />
-                <Skeleton className="h-[460px] w-full rounded-2xl" />
+                <Skeleton className="h-14 w-full" />
+                <Skeleton className="h-[460px] w-full" />
               </div>
             </div>
           ) : !disaster ? (
             <div className="py-16 text-center space-y-4">
               <AlertCircle className="size-12 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-bold text-foreground">
+              <h2 className="text-sm font-medium text-foreground">
                 Disaster Alert Not Found
               </h2>
               <p className="text-xs text-muted-foreground max-w-md mx-auto">
@@ -213,21 +213,21 @@ const DisasterDetailPage = () => {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-5 border-b border-border/40">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-5 border-b border-border">
                   <div className="space-y-1.5">
-                    <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                    <h1 className="text-xl sm:text-2xl font-medium tracking-tight text-foreground">
                       {disaster.disaster_name}
                     </h1>
                     <div className="flex items-center gap-2">
                       <Badge
                         variant={disaster.is_verified ? 'default' : 'destructive'}
-                        className="text-[10px] px-2 py-0.5 uppercase font-bold"
+                        className="uppercase"
                       >
                         {disaster.is_verified ? 'Safe' : 'Active Warning'}
                       </Badge>
                       <Badge
                         variant="secondary"
-                        className="text-[10px] px-2 py-0.5 uppercase font-bold"
+                        className="uppercase"
                       >
                         {disaster.type}
                       </Badge>
@@ -242,7 +242,7 @@ const DisasterDetailPage = () => {
                           size="sm"
                           onClick={() => setConfirmSafeModal(true)}
                           disabled={actionLoading}
-                          className="h-8 text-xs gap-1 font-semibold w-full sm:w-32"
+                          className="w-full sm:w-32"
                         >
                           <ShieldCheck className="size-3" />
                           Mark Safe
@@ -254,7 +254,7 @@ const DisasterDetailPage = () => {
                         size="sm"
                         onClick={() => setIsEditOpen(true)}
                         disabled={actionLoading}
-                        className="h-8 text-xs gap-1 font-semibold w-full sm:w-32"
+                        className="w-full sm:w-32"
                       >
                         <FileEdit className="size-3" />
                         Edit
@@ -265,7 +265,7 @@ const DisasterDetailPage = () => {
                         size="sm"
                         onClick={() => setConfirmDeleteModal(true)}
                         disabled={actionLoading}
-                        className="h-8 text-xs gap-1 font-semibold w-full sm:w-32"
+                        className="w-full sm:w-32"
                       >
                         <Trash2 className="size-3" />
                         Delete
@@ -275,40 +275,40 @@ const DisasterDetailPage = () => {
                 </div>
 
                 <div>
-                  <h2 className="text-lg font-bold tracking-tight text-foreground mb-4">
+                  <h2 className="text-sm font-medium tracking-tight text-foreground mb-4">
                     Details
                   </h2>
 
                   <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
                     <div className="space-y-0.5">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                      <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                         Disaster Type
                       </span>
-                      <span className="text-foreground font-semibold block uppercase">
+                      <span className="text-foreground font-medium block uppercase">
                         {disaster.type}
                       </span>
                     </div>
 
                     <div className="space-y-0.5">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                      <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                         Current Status
                       </span>
-                      <span className="text-foreground font-semibold block">
+                      <span className="text-foreground font-medium block">
                         {disaster.is_verified ? 'Safe / Resolved' : 'Active Emergency'}
                       </span>
                     </div>
 
                     <div className="space-y-0.5 col-span-2">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                      <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                         Impacted Region / Location
                       </span>
-                      <span className="text-foreground font-semibold block">
+                      <span className="text-foreground font-medium block">
                         {disaster.impacted_location}
                       </span>
                     </div>
 
                     <div className="space-y-0.5">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                      <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                         Impact Time
                       </span>
                       <span className="text-foreground font-medium block text-xs">
@@ -319,7 +319,7 @@ const DisasterDetailPage = () => {
                     </div>
 
                     <div className="space-y-0.5">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold block">
+                      <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium block">
                         Reported On
                       </span>
                       <span className="text-foreground font-medium block text-xs">
@@ -331,12 +331,12 @@ const DisasterDetailPage = () => {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-border/50">
+                <div className="pt-4 border-t border-border">
                   <Button
                     render={<Link href="/disaster" />}
                     variant="outline"
                     size="sm"
-                    className="text-xs"
+
                   >
                     <ArrowLeft className="size-3.5 mr-1" />
                     All Disasters
@@ -346,12 +346,12 @@ const DisasterDetailPage = () => {
 
               <div className="w-full space-y-3">
                 {user && (
-                  <div className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-card">
+                  <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-card">
                     <div>
-                      <p className="text-xs font-semibold text-foreground">
+                      <p className="text-xs font-medium text-foreground">
                         Your Safety Status
                       </p>
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-xs text-muted-foreground">
                         {userProfile?.is_safe
                           ? 'You are currently marked as safe.'
                           : 'Mark yourself safe to notify emergency responders.'}
@@ -363,7 +363,7 @@ const DisasterDetailPage = () => {
                       size="sm"
                       onClick={handleToggleUserSafety}
                       disabled={togglingUserSafety}
-                      className="text-xs gap-1.5 font-semibold shrink-0"
+                      className="shrink-0"
                     >
                       {userProfile?.is_safe ? (
                         <>
@@ -380,8 +380,8 @@ const DisasterDetailPage = () => {
                   </div>
                 )}
 
-                <Card className="overflow-hidden p-0 border border-border/60">
-                  <CardContent className="p-0">
+                <Card className="overflow-hidden border">
+                  <CardContent >
                     <div className="h-[460px] w-full">
                       <LeafletMap
                         latitude={fallbackLat}
@@ -415,7 +415,7 @@ const DisasterDetailPage = () => {
               variant="outline"
               size="sm"
               onClick={() => setConfirmSafeModal(false)}
-              className="text-xs"
+
             >
               Cancel
             </Button>
@@ -424,7 +424,7 @@ const DisasterDetailPage = () => {
               size="sm"
               onClick={handleMarkDisasterSafe}
               disabled={actionLoading}
-              className="text-xs font-semibold"
+
             >
               {actionLoading ? 'Updating...' : 'Yes, Mark Safe'}
             </Button>
@@ -450,7 +450,7 @@ const DisasterDetailPage = () => {
               variant="outline"
               size="sm"
               onClick={() => setConfirmDeleteModal(false)}
-              className="text-xs"
+
             >
               Cancel
             </Button>
@@ -459,7 +459,7 @@ const DisasterDetailPage = () => {
               size="sm"
               onClick={handleDeleteDisaster}
               disabled={actionLoading}
-              className="text-xs font-semibold"
+
             >
               {actionLoading ? 'Deleting...' : 'Yes, Delete'}
             </Button>

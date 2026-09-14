@@ -58,12 +58,12 @@ const ShortageReportForm = ({ saving, onSubmit }: ShortageReportFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-border/70 bg-card p-5 shadow-sm space-y-4">
+    <form onSubmit={handleSubmit} className="rounded-lg border border-border bg-card p-4 space-y-4">
       <div>
-        <h2 className="text-sm font-bold">Resource shortage report</h2>
-        <p className="text-[11px] text-muted-foreground">Request resources required at an affected location.</p>
+        <h2 className="text-sm font-medium">Resource shortage report</h2>
+        <p className="text-xs text-muted-foreground">Request resources required at an affected location.</p>
       </div>
-      {error && <p className="text-[11px] text-destructive">{error}</p>}
+      {error && <p className="text-xs text-destructive">{error}</p>}
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="resourceName">Resource *</Label>
@@ -108,7 +108,7 @@ const ShortageReportForm = ({ saving, onSubmit }: ShortageReportFormProps) => {
           />
         </div>
       </div>
-      <Button type="submit" disabled={saving} className="h-9 px-4">
+      <Button type="submit" disabled={saving} >
         {saving ? 'Submitting...' : 'Submit Shortage Report'}
       </Button>
     </form>

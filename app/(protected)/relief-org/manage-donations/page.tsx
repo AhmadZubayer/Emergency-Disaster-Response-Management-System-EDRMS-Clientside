@@ -90,7 +90,7 @@ const ReliefOrgManageDonationsPage = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold">Donation Campaigns Management</h3>
+              <h3 className="text-sm font-medium">Donation Campaigns Management</h3>
               <p className="text-xs text-muted-foreground">
                 Track funds raised, disburse financial aid, and publish campaigns.
               </p>
@@ -101,7 +101,7 @@ const ReliefOrgManageDonationsPage = () => {
                 setEditingCampaign(null);
                 setIsDonationDrawerOpen(true);
               }}
-              className="rounded-xl gap-1.5 text-xs font-semibold"
+
             >
               <Plus className="size-4" />
               Create Campaign
@@ -109,12 +109,12 @@ const ReliefOrgManageDonationsPage = () => {
           </div>
 
           {campaigns.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center bg-card/40 space-y-3">
+            <div className="rounded-lg border border-dashed border-border p-4 text-center bg-card space-y-3">
               <HeartHandshake className="size-8 text-muted-foreground/60 mx-auto" />
               <p className="text-xs text-muted-foreground">No donation campaigns created.</p>
             </div>
           ) : (
-            <div className="rounded-2xl border border-border/70 overflow-hidden bg-card shadow-sm">
+            <div className="rounded-lg border border-border overflow-hidden bg-card">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -127,10 +127,10 @@ const ReliefOrgManageDonationsPage = () => {
                 <TableBody>
                   {campaigns.map((c) => (
                     <TableRow key={c.id}>
-                      <TableCell className="font-semibold text-xs">{c.title}</TableCell>
-                      <TableCell className="text-xs font-bold">${c.raised_amount} / ${c.target_amount}</TableCell>
+                      <TableCell >{c.title}</TableCell>
+                      <TableCell >${c.raised_amount} / ${c.target_amount}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="text-[10px] uppercase font-bold">
+                        <Badge variant="outline" className="uppercase">
                           {c.status}
                         </Badge>
                       </TableCell>
@@ -143,7 +143,7 @@ const ReliefOrgManageDonationsPage = () => {
                               setSelectedProgressCampaign(c);
                               setIsProgressDrawerOpen(true);
                             }}
-                            className="h-8 px-2 text-xs"
+
                           >
                             Progress
                           </Button>
@@ -154,7 +154,7 @@ const ReliefOrgManageDonationsPage = () => {
                               setEditingCampaign(c);
                               setIsDonationDrawerOpen(true);
                             }}
-                            className="h-8 px-2 text-xs"
+
                           >
                             Edit
                           </Button>

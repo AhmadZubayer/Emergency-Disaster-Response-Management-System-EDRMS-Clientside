@@ -119,7 +119,7 @@ const VolunteerMissingPersonsPage = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold">Your Missing Person Reports</h3>
+              <h3 className="text-sm font-medium">Your Missing Person Reports</h3>
               <p className="text-xs text-muted-foreground">
                 Manage individuals you have reported missing during active crises.
               </p>
@@ -130,7 +130,7 @@ const VolunteerMissingPersonsPage = () => {
                 setEditingPerson(null);
                 setIsMissingPersonDrawerOpen(true);
               }}
-              className="rounded-xl gap-1.5 text-xs font-semibold"
+
             >
               <Plus className="size-4" />
               Report Missing Person
@@ -138,14 +138,14 @@ const VolunteerMissingPersonsPage = () => {
           </div>
 
           {myMissingPersons.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center bg-card/40 space-y-3">
+            <div className="rounded-lg border border-dashed border-border p-4 text-center bg-card space-y-3">
               <User className="size-8 text-muted-foreground/60 mx-auto" />
               <p className="text-xs text-muted-foreground">
                 You have not filed any missing person reports.
               </p>
             </div>
           ) : (
-            <div className="rounded-2xl border border-border/70 overflow-hidden bg-card shadow-sm">
+            <div className="rounded-lg border border-border overflow-hidden bg-card">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -159,20 +159,20 @@ const VolunteerMissingPersonsPage = () => {
                 <TableBody>
                   {myMissingPersons.map((p) => (
                     <TableRow key={p.id}>
-                      <TableCell className="font-semibold text-xs">{p.full_name}</TableCell>
-                      <TableCell className="text-xs">{p.age || 'N/A'}</TableCell>
-                      <TableCell className="text-xs">{p.last_seen_location}</TableCell>
+                      <TableCell >{p.full_name}</TableCell>
+                      <TableCell >{p.age || 'N/A'}</TableCell>
+                      <TableCell >{p.last_seen_location}</TableCell>
                       <TableCell>
                         <Badge
                           variant={p.status === 'found' ? 'default' : 'secondary'}
-                          className="text-[10px] uppercase font-bold"
+                          className="uppercase"
                         >
                           {p.status}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
-                          <DropdownMenuTrigger className="h-8 w-8 p-0 inline-flex items-center justify-center rounded-md hover:bg-muted text-muted-foreground hover:text-foreground">
+                          <DropdownMenuTrigger className="h-8 w-8 p-0 inline-flex items-center justify-center text-muted-foreground hover:text-foreground">
                             <MoreHorizontal className="size-4" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
@@ -253,7 +253,7 @@ const VolunteerMissingPersonsPage = () => {
               variant="outline"
               size="sm"
               onClick={() => setConfirmTrashItem(null)}
-              className="rounded-xl"
+
             >
               Cancel
             </Button>
@@ -262,7 +262,7 @@ const VolunteerMissingPersonsPage = () => {
               size="sm"
               onClick={handleMoveToTrash}
               disabled={actionInProgress === 'moving-to-trash'}
-              className="rounded-xl gap-1.5"
+
             >
               <Trash2 className="size-3.5" />
               Move to Trash
@@ -272,7 +272,7 @@ const VolunteerMissingPersonsPage = () => {
       >
         <p className="text-xs text-muted-foreground">
           Are you sure you want to delete{' '}
-          <span className="font-semibold text-foreground">
+          <span className="font-medium text-foreground">
             {confirmTrashItem?.full_name}
           </span>
           ? This record will be moved to your Trash and can be restored within 30 days.

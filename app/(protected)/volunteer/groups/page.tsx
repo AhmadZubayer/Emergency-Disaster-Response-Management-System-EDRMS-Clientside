@@ -70,7 +70,7 @@ const VolunteerGroupsPage = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold">Volunteer Group Deployments</h3>
+              <h3 className="text-sm font-medium">Volunteer Group Deployments</h3>
               <p className="text-xs text-muted-foreground">
                 Teams and task forces you have been assigned to.
               </p>
@@ -79,13 +79,13 @@ const VolunteerGroupsPage = () => {
               size="sm"
               variant="outline"
               onClick={() => router.push('/groups')}
-              className="rounded-xl text-xs"
+
             >
               View Group Deployments
             </Button>
           </div>
 
-          <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center bg-card/40 space-y-2">
+          <div className="rounded-lg border border-dashed border-border p-4 text-center bg-card space-y-2">
             <UsersRound className="size-8 text-muted-foreground/60 mx-auto" />
             <p className="text-xs text-muted-foreground">
               View your assigned rescue group details and operational partners.

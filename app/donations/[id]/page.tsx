@@ -369,7 +369,7 @@ const DonationDetailContent = () => {
           {loading ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               <div className="space-y-6">
-                <div className="space-y-2 border-b border-border/40 pb-5">
+                <div className="space-y-2 border-b border-border pb-5">
                   <Skeleton className="h-9 w-3/4" />
                   <Skeleton className="h-4 w-24" />
                 </div>
@@ -378,26 +378,26 @@ const DonationDetailContent = () => {
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-5/6" />
                 </div>
-                <Skeleton className="h-56 w-full rounded-2xl" />
+                <Skeleton className="h-56 w-full" />
                 <div className="grid grid-cols-2 gap-4 pt-2">
-                  <Skeleton className="h-12 w-full rounded-xl" />
-                  <Skeleton className="h-12 w-full rounded-xl" />
-                  <Skeleton className="h-12 w-full rounded-xl" />
-                  <Skeleton className="h-12 w-full rounded-xl" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
                 </div>
               </div>
               <div className="w-full space-y-5">
-                <Skeleton className="h-80 w-full rounded-2xl" />
+                <Skeleton className="h-80 w-full" />
                 <div className="flex gap-3">
-                  <Skeleton className="h-11 w-36 rounded-full" />
-                  <Skeleton className="h-11 w-44 rounded-full" />
+                  <Skeleton className="h-11 w-36" />
+                  <Skeleton className="h-11 w-44" />
                 </div>
               </div>
             </div>
           ) : !campaign ? (
             <div className="py-16 text-center space-y-4">
               <AlertCircle className="size-12 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-bold text-foreground">
+              <h2 className="text-sm font-medium text-foreground">
                 Donation Campaign Not Found
               </h2>
               <p className="text-xs text-muted-foreground max-w-md mx-auto">
@@ -411,17 +411,17 @@ const DonationDetailContent = () => {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               <div className="space-y-6">
-                <div className="space-y-1.5 border-b border-border/40 pb-5">
-                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                <div className="space-y-1.5 border-b border-border pb-5">
+                  <h1 className="text-2xl sm:text-3xl font-medium tracking-tight text-foreground">
                     {campaign.title}
                   </h1>
-                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block">
+                  <span className="text-xs font-medium text-primary dark:text-primary uppercase tracking-widest block">
                     {campaign.status}
                   </span>
                 </div>
 
                 <div className="space-y-2">
-                  <h2 className="text-base font-bold tracking-tight text-foreground">
+                  <h2 className="text-sm font-medium tracking-tight text-foreground">
                     Description & Purpose
                   </h2>
                   <p className="text-xs leading-relaxed text-muted-foreground whitespace-pre-line">
@@ -429,16 +429,16 @@ const DonationDetailContent = () => {
                   </p>
                 </div>
 
-                <Card className="border border-border/60 shadow-sm overflow-hidden">
-                  <CardHeader className="py-3 px-4 pb-1">
-                    <CardTitle className="text-sm font-bold">
+                <Card className="border overflow-hidden">
+                  <CardHeader >
+                    <CardTitle >
                       Fundraising Overview & Goals
                     </CardTitle>
-                    <CardDescription className="text-[11px]">
+                    <CardDescription >
                       Visual distribution of funds raised against total campaign target.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="py-2 px-4">
+                  <CardContent >
                     <ChartContainer config={chartConfig} className="h-48 w-full">
                       <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.3} />
@@ -462,37 +462,37 @@ const DonationDetailContent = () => {
                   </CardContent>
                 </Card>
 
-                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-border/40">
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-border">
                   <div className="space-y-0.5">
-                    <span className="text-[10px] uppercase font-semibold text-muted-foreground block">
+                    <span className="text-xs uppercase font-medium text-muted-foreground block">
                       Target Goal
                     </span>
-                    <span className="text-base font-bold text-foreground block">
+                    <span className="text-base font-medium text-foreground block">
                       ${target.toLocaleString()}
                     </span>
                   </div>
 
                   <div className="space-y-0.5">
-                    <span className="text-[10px] uppercase font-semibold text-muted-foreground block">
+                    <span className="text-xs uppercase font-medium text-muted-foreground block">
                       Received Amount
                     </span>
-                    <span className="text-base font-bold text-emerald-600 dark:text-emerald-400 block">
+                    <span className="text-base font-medium text-primary dark:text-primary block">
                       ${collected.toLocaleString()}
                     </span>
                   </div>
 
                   <div className="space-y-0.5">
-                    <span className="text-[10px] uppercase font-semibold text-muted-foreground block">
+                    <span className="text-xs uppercase font-medium text-muted-foreground block">
                       Total Donors
                     </span>
-                    <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <span className="text-xs font-medium text-foreground flex items-center gap-1.5">
                       <Users className="size-3 text-muted-foreground" />
                       {donorsCount} Supporters
                     </span>
                   </div>
 
                   <div className="space-y-0.5">
-                    <span className="text-[10px] uppercase font-semibold text-muted-foreground block">
+                    <span className="text-xs uppercase font-medium text-muted-foreground block">
                       Campaign Timeline
                     </span>
                     <span className="text-xs font-medium text-foreground flex items-center gap-1.5">
@@ -503,12 +503,12 @@ const DonationDetailContent = () => {
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-border/40">
+                <div className="pt-2 border-t border-border">
                   <Button
                     render={<Link href="/donations" />}
                     variant="outline"
                     size="sm"
-                    className="text-xs"
+
                   >
                     <ArrowLeft className="size-3.5 mr-1" />
                     All Campaigns
@@ -518,7 +518,7 @@ const DonationDetailContent = () => {
 
               <div className="w-full space-y-5">
                 {photoFullUrl ? (
-                  <div className="w-full h-72 sm:h-80 rounded-2xl overflow-hidden border border-border/60 shadow-sm bg-muted/20">
+                  <div className="w-full h-72 sm:h-80 rounded-lg overflow-hidden border border-border shadow-sm bg-muted/20">
                     <img
                       src={photoFullUrl}
                       alt={campaign.title}
@@ -526,9 +526,9 @@ const DonationDetailContent = () => {
                     />
                   </div>
                 ) : (
-                  <div className="w-full h-60 rounded-2xl border border-dashed border-border/70 flex items-center justify-center bg-muted/10">
+                  <div className="w-full h-60 rounded-lg border border-dashed border-border flex items-center justify-center bg-muted/10">
                     <div className="text-center space-y-1.5">
-                      <HeartHandshake className="size-10 text-emerald-600/70 mx-auto" />
+                      <HeartHandshake className="size-10 text-primary/70 mx-auto" />
                       <p className="text-xs text-muted-foreground font-medium">
                         Emergency Relief Donation Fund
                       </p>
@@ -536,13 +536,12 @@ const DonationDetailContent = () => {
                   </div>
                 )}
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="w-fit" onClick={() => setIsDonateModalOpen(true)}>
-                    <ModernButton>Make Donation</ModernButton>
-                  </div>
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <ModernButton onClick={() => setIsDonateModalOpen(true)}>
+                    Make Donation
+                  </ModernButton>
 
-                  <div
-                    className="w-fit"
+                  <ModernButton
                     onClick={() => {
                       if (!user) {
                         router.push(`/sign-in?returnUrl=/donations/${id}`);
@@ -551,8 +550,8 @@ const DonationDetailContent = () => {
                       }
                     }}
                   >
-                    <ModernButton>Request for donation</ModernButton>
-                  </div>
+                    Request for donation
+                  </ModernButton>
                 </div>
               </div>
             </div>
@@ -570,7 +569,7 @@ const DonationDetailContent = () => {
               variant="ghost"
               size="icon-xs"
               onClick={() => setIsDonateModalOpen(false)}
-              className="size-7 rounded-full text-muted-foreground hover:text-foreground shrink-0"
+              className="text-muted-foreground shrink-0"
             >
               <X className="size-4" />
             </Button>
@@ -588,8 +587,8 @@ const DonationDetailContent = () => {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-xs font-semibold">Select Donation Amount</Label>
-              <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+              <Label >Select Donation Amount</Label>
+              <span className="text-sm font-medium text-primary dark:text-primary">
                 ${Number(donationAmount).toLocaleString()} USD
               </span>
             </div>
@@ -615,16 +614,16 @@ const DonationDetailContent = () => {
                 max={maxAllowedAmount}
                 value={donationAmount}
                 onChange={(e) => setDonationAmount(Number(e.target.value))}
-                className="pl-9 text-xs"
+
               />
             </div>
             {donationErrors.amount && (
-              <p className="text-[11px] text-destructive">{donationErrors.amount}</p>
+              <p className="text-xs text-destructive">{donationErrors.amount}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="donorName" className="text-xs font-semibold">
+            <Label htmlFor="donorName" >
               Your Name {isAnonymous ? '(Optional)' : '*'}
             </Label>
             <Input
@@ -633,15 +632,15 @@ const DonationDetailContent = () => {
               value={donorName}
               disabled={isAnonymous}
               onChange={(e) => setDonorName(e.target.value)}
-              className="text-xs"
+
             />
             {donationErrors.donorName && (
-              <p className="text-[11px] text-destructive">{donationErrors.donorName}</p>
+              <p className="text-xs text-destructive">{donationErrors.donorName}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="donorEmail" className="text-xs font-semibold">
+            <Label htmlFor="donorEmail" >
               Your Email {isAnonymous ? '(Optional)' : '*'}
             </Label>
             <Input
@@ -651,19 +650,19 @@ const DonationDetailContent = () => {
               value={donorEmail}
               disabled={isAnonymous}
               onChange={(e) => setDonorEmail(e.target.value)}
-              className="text-xs"
+
             />
             {donationErrors.donorEmail && (
-              <p className="text-[11px] text-destructive">{donationErrors.donorEmail}</p>
+              <p className="text-xs text-destructive">{donationErrors.donorEmail}</p>
             )}
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-muted/20">
+          <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/20">
             <div className="space-y-0.5">
-              <Label htmlFor="anonymousToggle" className="text-xs font-semibold cursor-pointer">
+              <Label htmlFor="anonymousToggle" className="cursor-pointer">
                 Make anonymous donation
               </Label>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Your identity will not be displayed publicly in donor lists.
               </p>
             </div>
@@ -674,7 +673,7 @@ const DonationDetailContent = () => {
             />
           </div>
 
-          <div className="pt-3 border-t border-border/50 flex items-center justify-start">
+          <div className="pt-3 border-t border-border flex items-center justify-start">
             <ModernButton type="submit" disabled={submittingModal}>
               {submittingModal ? 'Redirecting to Stripe...' : 'Proceed'}
             </ModernButton>
@@ -692,7 +691,7 @@ const DonationDetailContent = () => {
               variant="ghost"
               size="icon-xs"
               onClick={() => setIsRequestAidModalOpen(false)}
-              className="size-7 rounded-full text-muted-foreground hover:text-foreground shrink-0"
+              className="text-muted-foreground shrink-0"
             >
               <X className="size-4" />
             </Button>
@@ -707,7 +706,7 @@ const DonationDetailContent = () => {
               className={cn(
                 'p-3 text-xs rounded-md border',
                 aidServerMsg.type === 'success'
-                  ? 'text-emerald-600 bg-emerald-500/10 border-emerald-500/20'
+                  ? 'text-primary bg-primary/10 border-primary/20'
                   : 'text-destructive bg-destructive/10 border-destructive/20'
               )}
             >
@@ -716,7 +715,7 @@ const DonationDetailContent = () => {
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="applicantEmail" className="text-xs font-semibold">
+            <Label htmlFor="applicantEmail" >
               User Email
             </Label>
             <Input
@@ -724,7 +723,7 @@ const DonationDetailContent = () => {
               value={user?.email || ''}
               disabled
               readOnly
-              className="text-xs bg-muted text-muted-foreground cursor-not-allowed"
+              className="text-muted-foreground cursor-not-allowed"
             />
             <p className="text-xs text-muted-foreground">
               You will be contacted via your profile email address.
@@ -732,7 +731,7 @@ const DonationDetailContent = () => {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="aidReason" className="text-xs font-semibold">
+            <Label htmlFor="aidReason" >
               Briefly Enter your situation and loss details
             </Label>
             <Textarea
@@ -741,15 +740,15 @@ const DonationDetailContent = () => {
               placeholder="Provide details of damages, emergency requirements, and family situation..."
               value={aidReason}
               onChange={(e) => setAidReason(e.target.value)}
-              className="text-xs"
+
             />
             {aidErrors.reason && (
-              <p className="text-[11px] text-destructive">{aidErrors.reason}</p>
+              <p className="text-xs text-destructive">{aidErrors.reason}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs font-semibold block">Payment Mode</Label>
+            <Label className="block">Payment Mode</Label>
             <RadioGroup
               value={paymentMode}
               onValueChange={(val) => {
@@ -760,13 +759,13 @@ const DonationDetailContent = () => {
             >
               <div className="flex items-center gap-2">
                 <RadioGroupItem value="bank" id="radio-bank" />
-                <Label htmlFor="radio-bank" className="text-xs font-medium cursor-pointer">
+                <Label htmlFor="radio-bank" className="cursor-pointer">
                   Bank
                 </Label>
               </div>
               <div className="flex items-center gap-2">
                 <RadioGroupItem value="mfs" id="radio-mfs" />
-                <Label htmlFor="radio-mfs" className="text-xs font-medium cursor-pointer">
+                <Label htmlFor="radio-mfs" className="cursor-pointer">
                   MFS
                 </Label>
               </div>
@@ -774,9 +773,9 @@ const DonationDetailContent = () => {
           </div>
 
           {paymentMode === 'bank' ? (
-            <div className="space-y-3 pt-1 border-t border-border/40">
+            <div className="space-y-3 pt-1 border-t border-border">
               <div className="space-y-1.5">
-                <Label htmlFor="bankName" className="text-xs font-semibold">
+                <Label htmlFor="bankName" >
                   Bank Name
                 </Label>
                 <Input
@@ -784,15 +783,15 @@ const DonationDetailContent = () => {
                   placeholder="e.g. Dutch-Bangla Bank, BRAC Bank"
                   value={bankName}
                   onChange={(e) => setBankName(e.target.value)}
-                  className="text-xs"
+
                 />
                 {aidErrors.bankName && (
-                  <p className="text-[11px] text-destructive">{aidErrors.bankName}</p>
+                  <p className="text-xs text-destructive">{aidErrors.bankName}</p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="branchName" className="text-xs font-semibold">
+                <Label htmlFor="branchName" >
                   Branch
                 </Label>
                 <Input
@@ -800,15 +799,15 @@ const DonationDetailContent = () => {
                   placeholder="e.g. Bashundhara Branch"
                   value={branchName}
                   onChange={(e) => setBranchName(e.target.value)}
-                  className="text-xs"
+
                 />
                 {aidErrors.branchName && (
-                  <p className="text-[11px] text-destructive">{aidErrors.branchName}</p>
+                  <p className="text-xs text-destructive">{aidErrors.branchName}</p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="bankAccountNo" className="text-xs font-semibold">
+                <Label htmlFor="bankAccountNo" >
                   Bank Account No
                 </Label>
                 <Input
@@ -816,17 +815,17 @@ const DonationDetailContent = () => {
                   placeholder="e.g. 115.120.45892"
                   value={bankAccountNo}
                   onChange={(e) => setBankAccountNo(e.target.value)}
-                  className="text-xs"
+
                 />
                 {aidErrors.bankAccountNo && (
-                  <p className="text-[11px] text-destructive">{aidErrors.bankAccountNo}</p>
+                  <p className="text-xs text-destructive">{aidErrors.bankAccountNo}</p>
                 )}
               </div>
             </div>
           ) : (
-            <div className="space-y-3 pt-1 border-t border-border/40">
+            <div className="space-y-3 pt-1 border-t border-border">
               <div className="space-y-1.5">
-                <Label htmlFor="accountPhoneNumber" className="text-xs font-semibold">
+                <Label htmlFor="accountPhoneNumber" >
                   Account Phone Number
                 </Label>
                 <Input
@@ -834,24 +833,24 @@ const DonationDetailContent = () => {
                   placeholder="e.g. 01700000000"
                   value={accountPhoneNumber}
                   onChange={(e) => setAccountPhoneNumber(e.target.value)}
-                  className="text-xs"
+
                 />
                 {aidErrors.accountPhoneNumber && (
-                  <p className="text-[11px] text-destructive">{aidErrors.accountPhoneNumber}</p>
+                  <p className="text-xs text-destructive">{aidErrors.accountPhoneNumber}</p>
                 )}
               </div>
             </div>
           )}
 
-          <div className="space-y-1.5 pt-1 border-t border-border/40">
-            <Label className="text-xs font-semibold block">Attach Proof Document / Photos (Optional)</Label>
-            <div className="border border-dashed border-border/70 rounded-lg p-3 text-center bg-muted/10 flex flex-col items-center justify-center gap-2">
+          <div className="space-y-1.5 pt-1 border-t border-border">
+            <Label className="block">Attach Proof Document / Photos (Optional)</Label>
+            <div className="border border-dashed border-border rounded-lg p-3 text-center bg-muted/10 flex flex-col items-center justify-center gap-2">
               {selectedProofFile ? (
                 <div className="flex items-center justify-between w-full p-2 bg-card rounded-md border text-xs">
                   <div className="flex items-center gap-2 truncate">
                     <FileText className="size-4 text-muted-foreground shrink-0" />
                     <span className="truncate max-w-[200px] font-medium">{selectedProofFile.name}</span>
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-xs text-muted-foreground">
                       ({(selectedProofFile.size / 1024).toFixed(0)} KB)
                     </span>
                   </div>
@@ -860,7 +859,7 @@ const DonationDetailContent = () => {
                     variant="ghost"
                     size="icon-xs"
                     onClick={() => setSelectedProofFile(null)}
-                    className="size-6 text-muted-foreground hover:text-destructive"
+                    className="text-muted-foreground hover:text-destructive"
                   >
                     <X className="size-3.5" />
                   </Button>
@@ -869,7 +868,7 @@ const DonationDetailContent = () => {
                 <label className="cursor-pointer flex flex-col items-center gap-1.5 w-full py-1">
                   <Upload className="size-4 text-muted-foreground" />
                   <span className="text-xs font-medium text-foreground">Click to upload document or photo</span>
-                  <span className="text-[10px] text-muted-foreground">PDF, JPG, PNG, DOC (Max 10MB)</span>
+                  <span className="text-xs text-muted-foreground">PDF, JPG, PNG, DOC (Max 10MB)</span>
                   <input
                     type="file"
                     accept="image/*,.pdf,.doc,.docx"
@@ -881,7 +880,7 @@ const DonationDetailContent = () => {
             </div>
           </div>
 
-          <div className="pt-3 border-t border-border/50 flex items-center justify-start">
+          <div className="pt-3 border-t border-border flex items-center justify-start">
             <ModernButton type="submit" disabled={submittingAid}>
               {submittingAid ? 'Submitting...' : 'Apply'}
             </ModernButton>
@@ -901,8 +900,8 @@ const DonationDetailPage = () => {
           <div className="max-w-7xl w-full mx-auto px-4 py-8 space-y-6">
             <Skeleton className="h-8 w-1/3" />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Skeleton className="h-96 rounded-2xl" />
-              <Skeleton className="h-96 rounded-2xl" />
+              <Skeleton className="h-96" />
+              <Skeleton className="h-96" />
             </div>
           </div>
         </div>

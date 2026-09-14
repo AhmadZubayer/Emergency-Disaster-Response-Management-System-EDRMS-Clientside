@@ -12,7 +12,7 @@ import DashboardFrame from '@/components/profile/dashboard-frame';
 import { getApiErrorMessage } from '@/utils/api-error';
 const renderValue = (val?: string | number | null) => {
   if (val !== undefined && val !== null && String(val).trim().length > 0) {
-    return <span className="font-semibold text-foreground">{String(val)}</span>;
+    return <span className="font-medium text-foreground">{String(val)}</span>;
   }
   return <span className="text-muted-foreground/50 italic font-normal">Not added</span>;
 };
@@ -84,10 +84,10 @@ const UserProfilePage = () => {
         onToggleSafety={handleToggleSafety}
       >
         <div className="space-y-6">
-          <div className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm space-y-6">
-            <div className="border-b border-border/50 pb-4 flex items-center justify-between">
+          <div className="rounded-lg border border-border bg-card p-4 space-y-6">
+            <div className="border-b border-border pb-4 flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-foreground">Personal Information</h3>
+                <h3 className="text-sm font-medium text-foreground">Personal Information</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   Verified civilian credentials and emergency identity.
                 </p>
@@ -96,7 +96,7 @@ const UserProfilePage = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsEditOpen(true)}
-                className="h-8 text-xs gap-1.5"
+
               >
                 <Pencil className="size-3.5" />
                 Edit
@@ -105,28 +105,28 @@ const UserProfilePage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-8 text-xs">
               <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground block">
                   Full Name
                 </span>
                 <div>{renderValue(profile?.name)}</div>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground block">
                   Account Email
                 </span>
                 <div>{renderValue(profile?.auth?.email || user?.email)}</div>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground block">
                   Primary Phone
                 </span>
                 <div>{renderValue(profile?.phone)}</div>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground block">
                   System Role
                 </span>
                 <div className="capitalize">{renderValue(profile?.auth?.role || user?.role)}</div>
@@ -134,9 +134,9 @@ const UserProfilePage = () => {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm space-y-6">
-            <div className="border-b border-border/50 pb-4">
-              <h3 className="text-base font-bold text-foreground">Safety Status & Medical Overview</h3>
+          <div className="rounded-lg border border-border bg-card p-4 space-y-6">
+            <div className="border-b border-border pb-4">
+              <h3 className="text-sm font-medium text-foreground">Safety Status & Medical Overview</h3>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Critical information used for emergency rescue priority.
               </p>
@@ -144,12 +144,12 @@ const UserProfilePage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-8 text-xs">
               <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground block">
                   Safety Status
                 </span>
                 <div>
                   {profile?.is_safe ? (
-                    <Badge variant="outline" className="text-emerald-600 border-emerald-500/30 bg-emerald-500/10">
+                    <Badge variant="outline" >
                       Safe
                     </Badge>
                   ) : (
@@ -161,28 +161,28 @@ const UserProfilePage = () => {
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground block">
                   Emergency Broadcast Message
                 </span>
-                <div className="leading-relaxed bg-muted/20 p-3 rounded-xl border border-border/50">
+                <div className="leading-relaxed bg-muted/20 p-3 rounded-lg border border-border">
                   {renderValue(profile?.emergency_message)}
                 </div>
               </div>
 
               <div className="space-y-1 md:col-span-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground block">
                   Medical Information & History
                 </span>
-                <div className="leading-relaxed bg-muted/20 p-3 rounded-xl border border-border/50">
+                <div className="leading-relaxed bg-muted/20 p-3 rounded-lg border border-border">
                   {renderValue(profile?.medical_information)}
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm space-y-6">
-            <div className="border-b border-border/50 pb-4">
-              <h3 className="text-base font-bold text-foreground">Primary Address & Coordinates</h3>
+          <div className="rounded-lg border border-border bg-card p-4 space-y-6">
+            <div className="border-b border-border pb-4">
+              <h3 className="text-sm font-medium text-foreground">Primary Address & Coordinates</h3>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Registered residence and real-time pinned rescue location.
               </p>
@@ -190,14 +190,14 @@ const UserProfilePage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-8 text-xs">
               <div className="space-y-1 md:col-span-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground block">
                   Physical Address
                 </span>
                 <div>{renderValue(formattedAddress)}</div>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground block">
                   Pinned GPS Coordinates
                 </span>
                 <div>{renderValue(coordinates)}</div>
@@ -208,7 +208,7 @@ const UserProfilePage = () => {
           <div className="flex justify-end">
             <Button
               onClick={() => setIsEditOpen(true)}
-              className="rounded-xl px-6 gap-2 text-xs font-semibold"
+
             >
               <FileEdit className="size-4" />
               Edit Profile Details

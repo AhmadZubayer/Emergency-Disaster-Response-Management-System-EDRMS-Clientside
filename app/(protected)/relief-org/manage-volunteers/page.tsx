@@ -86,7 +86,7 @@ const ReliefOrgManageVolunteersPage = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold">Volunteer Management & Task Forces</h3>
+              <h3 className="text-sm font-medium">Volunteer Management & Task Forces</h3>
               <p className="text-xs text-muted-foreground">
                 Organize registered field volunteers into specialized rescue squads.
               </p>
@@ -97,7 +97,7 @@ const ReliefOrgManageVolunteersPage = () => {
                 setEditingGroup(null);
                 setIsGroupDrawerOpen(true);
               }}
-              className="rounded-xl gap-1.5 text-xs font-semibold"
+
             >
               <Plus className="size-4" />
               Create Volunteer Group
@@ -105,12 +105,12 @@ const ReliefOrgManageVolunteersPage = () => {
           </div>
 
           {volunteerGroups.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center bg-card/40 space-y-3">
+            <div className="rounded-lg border border-dashed border-border p-4 text-center bg-card space-y-3">
               <Users className="size-8 text-muted-foreground/60 mx-auto" />
               <p className="text-xs text-muted-foreground">No volunteer groups created.</p>
             </div>
           ) : (
-            <div className="rounded-2xl border border-border/70 overflow-hidden bg-card shadow-sm">
+            <div className="rounded-lg border border-border overflow-hidden bg-card">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -123,9 +123,9 @@ const ReliefOrgManageVolunteersPage = () => {
                 <TableBody>
                   {volunteerGroups.map((g) => (
                     <TableRow key={g.id}>
-                      <TableCell className="font-semibold text-xs">{g.title}</TableCell>
-                      <TableCell className="text-xs">{g.disaster_name || 'General'}</TableCell>
-                      <TableCell className="text-xs">{g.joined_volunteers || 0} / {g.needed_volunteers}</TableCell>
+                      <TableCell >{g.title}</TableCell>
+                      <TableCell >{g.disaster_name || 'General'}</TableCell>
+                      <TableCell >{g.joined_volunteers || 0} / {g.needed_volunteers}</TableCell>
                       <TableCell className="text-right">
                         <Button
                           size="sm"
@@ -134,7 +134,7 @@ const ReliefOrgManageVolunteersPage = () => {
                             setEditingGroup(g);
                             setIsGroupDrawerOpen(true);
                           }}
-                          className="h-8 px-2 text-xs"
+
                         >
                           Edit
                         </Button>

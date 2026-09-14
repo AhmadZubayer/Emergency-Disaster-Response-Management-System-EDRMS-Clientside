@@ -27,8 +27,8 @@ const VolunteerSidebar = () => {
 
   return (
     <aside className="w-full md:w-60 shrink-0">
-      <div className="rounded-xl border border-border/60 bg-card p-1.5 shadow-sm space-y-1">
-        <div className="px-3.5 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+      <div className="rounded-lg border border-border bg-card p-1.5 space-y-1">
+        <div className="px-3.5 py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Volunteer Operations
         </div>
         {navItems.map((item) => {
@@ -39,9 +39,9 @@ const VolunteerSidebar = () => {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs font-semibold transition-all ${
+              className={`flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs font-medium transition-all ${
                 isActive
-                  ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400'
+                  ? 'bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary'
                   : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'
               }`}
             >

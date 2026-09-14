@@ -193,7 +193,7 @@ const AddMissingPersonDrawer = ({
                 placeholder="e.g. John Doe"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="h-10 bg-background/50"
+
               />
               {errors.fullName && (
                 <p className="text-xs text-destructive">{errors.fullName}</p>
@@ -209,7 +209,7 @@ const AddMissingPersonDrawer = ({
                 placeholder="e.g. 25"
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
-                className="h-10 bg-background/50"
+
               />
               {errors.age && (
                 <p className="text-xs text-destructive">{errors.age}</p>
@@ -241,7 +241,7 @@ const AddMissingPersonDrawer = ({
                 placeholder="e.g. City, District, Street"
                 value={lastSeenLocation}
                 onChange={(e) => setLastSeenLocation(e.target.value)}
-                className="h-10 bg-background/50"
+
               />
               {errors.lastSeenLocation && (
                 <p className="text-xs text-destructive">{errors.lastSeenLocation}</p>
@@ -258,7 +258,7 @@ const AddMissingPersonDrawer = ({
                       type="button"
                       variant="outline"
                       className={cn(
-                        'w-full h-10 justify-start text-left font-normal bg-background/50 border-input text-xs',
+                        'w-full justify-start text-left ',
                         !lastSeenDate && 'text-muted-foreground'
                       )}
                     >
@@ -292,7 +292,7 @@ const AddMissingPersonDrawer = ({
                 placeholder="e.g. +8801800000000"
                 value={contactPhone}
                 onChange={(e) => setContactPhone(e.target.value)}
-                className="h-10 bg-background/50"
+
               />
             </div>
           </div>
@@ -305,7 +305,7 @@ const AddMissingPersonDrawer = ({
               placeholder="Mention clothes, physical identifiers, medical conditions, or any helpful info..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full rounded-md border border-input bg-background/50 px-3 py-2 text-xs placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
             />
             {errors.description && (
               <p className="text-xs text-destructive">{errors.description}</p>
@@ -315,7 +315,7 @@ const AddMissingPersonDrawer = ({
           <div className="space-y-1.5">
             <Label htmlFor="photo">Photo Upload</Label>
             <div className="flex items-center gap-4">
-              <label className="flex flex-1 items-center justify-center gap-2 h-20 rounded-xl border border-dashed border-border/80 bg-background/50 hover:bg-muted/50 cursor-pointer p-4 transition-colors">
+              <label className="flex flex-1 items-center justify-center gap-2 h-20 rounded-lg border border-dashed border-border bg-background hover:bg-muted/50 cursor-pointer p-4 transition-colors">
                 <Upload className="size-5 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">
                   {photoFile ? photoFile.name : 'Click to select photo (JPG, PNG, WebP)'}
@@ -329,7 +329,7 @@ const AddMissingPersonDrawer = ({
                 />
               </label>
               {photoPreview && (
-                <div className="size-20 rounded-xl overflow-hidden border border-border/60 shrink-0 bg-muted">
+                <div className="size-20 rounded-lg overflow-hidden border border-border shrink-0 bg-muted">
                   <img
                     src={photoPreview}
                     alt="Preview"

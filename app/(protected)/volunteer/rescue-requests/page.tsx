@@ -119,7 +119,7 @@ const VolunteerRescueRequestsPage = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold">Your Rescue Requests</h3>
+              <h3 className="text-sm font-medium">Your Rescue Requests</h3>
               <p className="text-xs text-muted-foreground">
                 Track the deployment status of emergency extraction alerts you have posted.
               </p>
@@ -130,7 +130,7 @@ const VolunteerRescueRequestsPage = () => {
                 setEditingRescueRequest(null);
                 setIsRescueRequestDrawerOpen(true);
               }}
-              className="rounded-xl gap-1.5 text-xs font-semibold"
+
             >
               <Plus className="size-4" />
               Request Rescue
@@ -138,14 +138,14 @@ const VolunteerRescueRequestsPage = () => {
           </div>
 
           {myRescueRequests.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center bg-card/40 space-y-3">
+            <div className="rounded-lg border border-dashed border-border p-4 text-center bg-card space-y-3">
               <LifeBuoy className="size-8 text-muted-foreground/60 mx-auto" />
               <p className="text-xs text-muted-foreground">
                 You have not submitted any emergency rescue requests.
               </p>
             </div>
           ) : (
-            <div className="rounded-2xl border border-border/70 overflow-hidden bg-card shadow-sm">
+            <div className="rounded-lg border border-border overflow-hidden bg-card">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -159,24 +159,24 @@ const VolunteerRescueRequestsPage = () => {
                 <TableBody>
                   {myRescueRequests.map((r) => (
                     <TableRow key={r.id}>
-                      <TableCell className="font-semibold text-xs">{r.address}</TableCell>
-                      <TableCell className="text-xs">{r.people_count}</TableCell>
+                      <TableCell >{r.address}</TableCell>
+                      <TableCell >{r.people_count}</TableCell>
                       <TableCell>
                         <Badge
                           variant={r.urgency_level === 'CRITICAL' ? 'destructive' : 'secondary'}
-                          className="text-[10px] uppercase font-bold"
+                          className="uppercase"
                         >
                           {r.urgency_level}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="text-[10px] uppercase font-bold">
+                        <Badge variant="outline" className="uppercase">
                           {r.status}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
-                          <DropdownMenuTrigger className="h-8 w-8 p-0 inline-flex items-center justify-center rounded-md hover:bg-muted text-muted-foreground hover:text-foreground">
+                          <DropdownMenuTrigger className="h-8 w-8 p-0 inline-flex items-center justify-center text-muted-foreground hover:text-foreground">
                             <MoreHorizontal className="size-4" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
@@ -257,7 +257,7 @@ const VolunteerRescueRequestsPage = () => {
               variant="outline"
               size="sm"
               onClick={() => setConfirmTrashItem(null)}
-              className="rounded-xl"
+
             >
               Cancel
             </Button>
@@ -266,7 +266,7 @@ const VolunteerRescueRequestsPage = () => {
               size="sm"
               onClick={handleMoveToTrash}
               disabled={actionInProgress === 'moving-to-trash'}
-              className="rounded-xl gap-1.5"
+
             >
               <Trash2 className="size-3.5" />
               Move to Trash
@@ -276,7 +276,7 @@ const VolunteerRescueRequestsPage = () => {
       >
         <p className="text-xs text-muted-foreground">
           Are you sure you want to delete{' '}
-          <span className="font-semibold text-foreground">
+          <span className="font-medium text-foreground">
             {confirmTrashItem?.address}
           </span>
           ? This record will be moved to your Trash and can be restored within 30 days.
