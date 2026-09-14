@@ -51,7 +51,44 @@ Admins manage all accounts and verify or approve public warnings, posts, volunte
 
 ---
 
-# 2. Project Configuration
+# 2. Additional Features
+
+## Frontend
+
+* Zod for form validation
+* OAuth for authentication
+* AI Chatbot (Toolcalling) using Gemini API (Access to all public GET API only)
+* Proxy for hiding backend endpoints
+* Skeletons & loaders for all components
+* Environment-based configuration using `.env`
+* File upload (e.g., profile image or documents)
+* Soft Deletetion & Trash
+* PDF Generation using React PDF
+* Stripe Integration
+* Toast for confirmation for every action.
+* Global custom error handling page, redirect to `/home` if not authorized
+* Custom UI Library (Shadcn, Material UI, Universe io)
+* Central Endpoint API Addressbook
+* Dynamic Navbar with role-based navlinks.  
+
+## Backend
+
+* Email notification using Mailer
+* Refresh Token authentication
+* Custom decorators
+* Global and custom exception handling
+* Searching, sorting
+* File upload (e.g., profile image or documents)
+* API documentation using Swagger
+* Logging using the NestJS Logger
+* Audit logs (Created By, Updated By, Deleted By)
+* Environment-based configuration using `.env` (NestJS Config)
+* File upload (e.g., profile image or documents)
+* Stripe Integration
+
+---
+
+# 3. Project Configuration
 
 ## Frontend
 
@@ -90,13 +127,13 @@ Admins manage all accounts and verify or approve public warnings, posts, volunte
 
 ---
 
-# 3. Entity Relationship Diagram
+# 4. Entity Relationship Diagram
 
 ![Entity Relationship Diagram](files/er-diagram.jpg)
 
 ---
 
-# 4. Functional Requirements
+# 5. Functional Requirements
 
 | No       | Name                                                    | Frontend URL                     | Backend Endpoint                                                                                                                           | Authorization                                      |
 | -------- | ------------------------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
@@ -143,32 +180,4 @@ Admins manage all accounts and verify or approve public warnings, posts, volunte
 
 ---
 
-# 5. Additional Features
 
-## Frontend
-
-* Zod for form validation
-* OAuth for Google sign-in
-* Proxy for hiding backend endpoints
-* Skeletons & loaders for all components
-* Environment-based configuration using `.env`
-* File upload (e.g., profile image or documents)
-* Stripe Integration
-* Toast for confirmation for every action.
-* Global custom error handling page, redirect to `/home` if not authorized
-* Custom UI Library (Shadcn, Material UI)
-
-## Backend
-
-* Email notification using Mailer
-* Refresh Token authentication
-* Custom decorators
-* Global and custom exception handling
-* Searching, sorting
-* File upload (e.g., profile image or documents)
-* API documentation using Swagger
-* Logging using the NestJS Logger
-* Audit logs (Created By, Updated By, Deleted By)
-* Environment-based configuration using `.env`
-* File upload (e.g., profile image or documents)
-* Stripe Integration
