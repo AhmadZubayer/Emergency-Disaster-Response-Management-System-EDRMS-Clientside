@@ -7,6 +7,7 @@
 **Supervised By:** Md. Khairul Alam Mazumder
 
 **Department of Computer Science**
+
 **American International University - Bangladesh**
 
 ## Group 03
@@ -70,6 +71,7 @@ Admins manage all accounts and verify or approve public warnings, posts, volunte
 * Custom UI Library (Shadcn, Material UI, Universe io)
 * Central Endpoint API Addressbook
 * Dynamic Navbar with role-based navlinks.  
+* Open Street Maps integration. 
 
 ## Backend
 
