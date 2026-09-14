@@ -4,10 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
-  ClipboardList,
   FileWarning,
   HeartHandshake,
-  MapPinned,
   UserRound,
   UsersRound,
 } from 'lucide-react';
@@ -15,8 +13,6 @@ import {
 const navItems = [
   { label: 'Dashboard', href: '/volunteer-dashboard', icon: LayoutDashboard },
   { label: 'Volunteer Profile', href: '/volunteer-profile', icon: UserRound },
-  { label: 'Nearby Rescue', href: '/nearby-rescue', icon: MapPinned },
-  { label: 'My Tasks', href: '/my-tasks', icon: ClipboardList },
   { label: 'Field Reports', href: '/field-reports', icon: FileWarning },
   { label: 'Opportunities', href: '/opportunities', icon: HeartHandshake },
   { label: 'Group Joins', href: '/groups', icon: UsersRound },

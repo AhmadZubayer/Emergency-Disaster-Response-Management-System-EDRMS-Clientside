@@ -289,6 +289,7 @@ const AddDisasterDrawer = ({
                   value={selectedTime}
                   onChange={(e) => setSelectedTime(e.target.value)}
 
+                  className="pl-8"
                 />
               </div>
             </div>

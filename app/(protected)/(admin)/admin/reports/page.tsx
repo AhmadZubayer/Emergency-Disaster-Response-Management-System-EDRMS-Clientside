@@ -181,7 +181,7 @@ export default function AdminReportsPage() {
                     </span>
                   </div>
                   <div className={`p-3 rounded-xl bg-background border border-border/40 ${item.color}`}>
-                    {/* <Icon className="size-5" /> */}
+                    <Icon className="size-5" />
                   </div>
                 </div>
               );

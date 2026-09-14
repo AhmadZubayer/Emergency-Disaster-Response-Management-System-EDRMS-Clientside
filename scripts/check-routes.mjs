@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 const projectRoot = fileURLToPath(new URL('../', import.meta.url));
 const appDirectory = path.join(projectRoot, 'app');
 const baseUrl = process.env.ROUTE_TEST_URL || 'http://localhost:3000';
+const baseUrl = process.env.ROUTE_TEST_URL || 'http://localhost:3001';
 const sampleId = process.env.ROUTE_TEST_ID || '00000000-0000-4000-8000-000000000000';
 
 const findRoutes = async (directory) => {

@@ -12,6 +12,7 @@ import {
   Users,
   Building2,
 } from 'lucide-react';
+import ChatbotIcon from '@/chatbot/chatbot-icon';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -65,154 +66,171 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-4 z-50 w-full px-4 sm:px-6 pointer-events-none">
-      <div className="max-w-fit mx-auto pointer-events-auto">
-        <nav className="flex items-center gap-1.5 bg-white/95 text-neutral-900 rounded-full py-2 px-3.5 shadow-xl shadow-emerald-950/5 backdrop-blur-xl border border-emerald-600/15 transition-all">
-          <Link
-            href="/"
-            className="px-2.5 py-1 text-emerald-700 font-black text-sm tracking-wider uppercase hover:opacity-80 transition-opacity shrink-0"
-            title="EDRMS Home"
-          >
-            EDRMS
-          </Link>
-
-          <div className="hidden md:flex items-center gap-1 px-1">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`px-3 py-1.5 text-sm font-semibold transition-colors ${
-                    isActive
-                      ? 'text-emerald-700 underline underline-offset-4 decoration-2 decoration-emerald-600'
-                      : 'text-neutral-600 hover:text-neutral-900'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-
-            <div
-              className="relative"
-              onMouseEnter={handleContributeMouseEnter}
-              onMouseLeave={handleContributeMouseLeave}
+      <div className="max-w-fit mx-auto pointer-events-auto flex flex-col items-center">
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <nav className="flex items-center gap-1.5 bg-white/95 text-neutral-900 rounded-full py-2 px-3.5 shadow-xl shadow-emerald-950/5 backdrop-blur-xl border border-emerald-600/15 transition-all">
+            <Link
+              href="/"
+              className="px-2.5 py-1 text-emerald-700 font-black text-sm tracking-wider uppercase hover:opacity-80 transition-opacity shrink-0"
+              title="EDRMS Home"
             >
-              <DropdownMenu open={contributeOpen} onOpenChange={setContributeOpen}>
-                <DropdownMenuTrigger
-                  render={
-                    <button
-                      type="button"
-                      className="px-3 py-1.5 text-sm font-semibold text-neutral-600 hover:text-neutral-900 flex items-center gap-1 transition-colors"
-                    />
-                  }
-                >
-                  <span>Contribute</span>
-                  <ChevronDown className={`size-3.5 text-neutral-400 transition-transform duration-200 ${contributeOpen ? 'rotate-180' : ''}`} />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="center"
-                  sideOffset={8}
-                  onMouseEnter={handleContributeMouseEnter}
-                  onMouseLeave={handleContributeMouseLeave}
-                  className="w-52 bg-white/95 text-neutral-900 border border-emerald-600/15 shadow-2xl backdrop-blur-xl rounded-2xl p-1.5"
-                >
-                  <DropdownMenuItem
-                    className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                    render={<Link href="/volunteer-registration-form" />}
-                  >
-                    <Users className="size-4" />
-                    <span>Contribute as Volunteer</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                    render={<Link href="/signup-as-relief-org" />}
-                  >
-                    <Building2 className="size-4" />
-                    <span>Contribute as Relief Org</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
+              EDRMS
+            </Link>
 
-          <div className="flex items-center gap-1.5 pl-1">
-            {user ? (
+            <div className="hidden md:flex items-center gap-1 px-1">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`px-3 py-1.5 text-sm font-semibold transition-colors ${
+                      isActive
+                        ? 'text-emerald-700 underline underline-offset-4 decoration-2 decoration-emerald-600'
+                        : 'text-neutral-600 hover:text-neutral-900'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+
               <div
                 className="relative"
-                onMouseEnter={handleAccountMouseEnter}
-                onMouseLeave={handleAccountMouseLeave}
+                onMouseEnter={handleContributeMouseEnter}
+                onMouseLeave={handleContributeMouseLeave}
               >
-                <DropdownMenu open={accountOpen} onOpenChange={setAccountOpen}>
+                <DropdownMenu open={contributeOpen} onOpenChange={setContributeOpen}>
                   <DropdownMenuTrigger
                     render={
                       <button
                         type="button"
-                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-full px-4 py-1.5 text-sm transition-all shadow-md flex items-center gap-1.5 shrink-0 max-w-[200px] truncate"
+                        className="px-3 py-1.5 text-sm font-semibold text-neutral-600 hover:text-neutral-900 flex items-center gap-1 transition-colors"
                       />
                     }
                   >
-                    <span className="truncate">{user.name || user.email}</span>
-                    <ChevronDown className={`size-3.5 text-emerald-100 shrink-0 transition-transform duration-200 ${accountOpen ? 'rotate-180' : ''}`} />
+                    <span>Contribute</span>
+                    <ChevronDown className={`size-3.5 text-neutral-400 transition-transform duration-200 ${contributeOpen ? 'rotate-180' : ''}`} />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
-                    align="end"
+                    align="center"
                     sideOffset={8}
-                    onMouseEnter={handleAccountMouseEnter}
-                    onMouseLeave={handleAccountMouseLeave}
-                    className="w-48 bg-white/95 text-neutral-900 border border-emerald-600/15 shadow-2xl backdrop-blur-xl rounded-2xl p-1.5"
+                    onMouseEnter={handleContributeMouseEnter}
+                    onMouseLeave={handleContributeMouseLeave}
+                    className="w-52 bg-white/95 text-neutral-900 border border-emerald-600/15 shadow-2xl backdrop-blur-xl rounded-2xl p-1.5"
                   >
                     <DropdownMenuItem
                       className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
-                      render={
-                        <Link href={getPrimaryProfileRoute(user.role)} />
-                      }
+                      render={<Link href="/volunteer-registration-form" />}
                     >
-                      <UserRound className="size-4" />
-                      <span>Your Profile</span>
+                      <Users className="size-4" />
+                      <span>Contribute as Volunteer</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      variant="destructive"
-                      onClick={async () => {
-                        await logOut();
-                        toast.add({
-                          id: 'logout-toast',
-                          title: 'Signed out successfully',
-                          type: 'success',
-                          timeout: 3000,
-                        });
-                        router.push('/');
-                      }}
-                      className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 focus:bg-red-50 rounded-xl mt-1 border-t border-neutral-100 transition-colors"
+                      className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
+                      render={<Link href="/signup-as-relief-org" />}
                     >
-                      <LogOut className="size-4 text-red-600" />
-                      <span>Log out</span>
+                      <Building2 className="size-4" />
+                      <span>Contribute as Relief Org</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-            ) : (
-              <Link
-                href="/sign-in"
-                className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-full px-4.5 py-1.5 text-sm transition-all shadow-md shrink-0"
-              >
-                Sign In
-              </Link>
-            )}
+            </div>
 
-            <button
-              type="button"
-              className="md:hidden size-8 rounded-full flex items-center justify-center text-neutral-600 hover:text-neutral-900 transition-colors shrink-0"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="Toggle navigation"
-            >
-              {mobileOpen ? <X className="size-4.5" /> : <Menu className="size-4.5" />}
-            </button>
-          </div>
-        </nav>
+            <div className="flex items-center gap-1.5 pl-1">
+              {user ? (
+                <div
+                  className="relative"
+                  onMouseEnter={handleAccountMouseEnter}
+                  onMouseLeave={handleAccountMouseLeave}
+                >
+                  <DropdownMenu open={accountOpen} onOpenChange={setAccountOpen}>
+                    <DropdownMenuTrigger
+                      render={
+                        <button
+                          type="button"
+                          className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-full px-4 py-1.5 text-sm transition-all shadow-md flex items-center gap-1.5 shrink-0 max-w-[200px] truncate"
+                        />
+                      }
+                    >
+                      <span className="truncate">{user.name || user.email}</span>
+                      <ChevronDown className={`size-3.5 text-emerald-100 shrink-0 transition-transform duration-200 ${accountOpen ? 'rotate-180' : ''}`} />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      sideOffset={8}
+                      onMouseEnter={handleAccountMouseEnter}
+                      onMouseLeave={handleAccountMouseLeave}
+                      className="w-48 bg-white/95 text-neutral-900 border border-emerald-600/15 shadow-2xl backdrop-blur-xl rounded-2xl p-1.5"
+                    >
+                      <DropdownMenuItem
+                        className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-neutral-700 hover:text-emerald-800 hover:bg-emerald-50 focus:bg-emerald-50 rounded-xl transition-colors"
+                        render={
+                          <Link href={getPrimaryProfileRoute(user.role)} />
+                        }
+                      >
+                        <UserRound className="size-4" />
+                        <span>Your Profile</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onClick={async () => {
+                          await logOut();
+                          toast.add({
+                            id: 'logout-toast',
+                            title: 'Signed out successfully',
+                            type: 'success',
+                            timeout: 3000,
+                          });
+                          router.push('/');
+                        }}
+                        className="cursor-pointer gap-2.5 px-3 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 focus:bg-red-50 rounded-xl mt-1 border-t border-neutral-100 transition-colors"
+                      >
+                        <LogOut className="size-4 text-red-600" />
+                        <span>Log out</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              ) : (
+                <Link
+                  href="/sign-in"
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-full px-4.5 py-1.5 text-sm transition-all shadow-md shrink-0"
+                >
+                  Sign In
+                </Link>
+              )}
+
+              <button
+                type="button"
+                className="md:hidden size-8 rounded-full flex items-center justify-center text-neutral-600 hover:text-neutral-900 transition-colors shrink-0"
+                onClick={() => setMobileOpen(!mobileOpen)}
+                aria-label="Toggle navigation"
+              >
+                {mobileOpen ? <X className="size-4.5" /> : <Menu className="size-4.5" />}
+              </button>
+            </div>
+          </nav>
+
+          {/* Detached Circular Chatbot Button with Uiverse Spinner */}
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('open-edrms-chatbot'));
+              }
+            }}
+            aria-label="Open AI Assistant"
+            title="Open EDRMS AI Assistant"
+            className="size-[42px] sm:size-[44px] rounded-full bg-[#1c1c22] hover:bg-[#15151a] active:bg-[#0f0f13] text-white shadow-xl shadow-purple-950/20 backdrop-blur-xl border border-purple-500/30 flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer relative shrink-0 group overflow-hidden"
+          >
+            <ChatbotIcon size={26} />
+          </button>
+        </div>
 
         {mobileOpen && (
-          <div className="md:hidden mt-2 p-3 bg-white/95 text-neutral-900 rounded-2xl border border-emerald-600/15 shadow-2xl backdrop-blur-xl flex flex-col gap-1">
+          <div className="w-full md:hidden mt-2 p-3 bg-white/95 text-neutral-900 rounded-2xl border border-emerald-600/15 shadow-2xl backdrop-blur-xl flex flex-col gap-1">
             {navItems.map((item) => (
               <Link
                 key={item.href}

@@ -1,16 +1,24 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { isAxiosError } from 'axios';
 import { toast } from '@/components/ui/toast';
 import useAuth from '@/hooks/use-auth';
 import { axiosSecure } from '@/lib/api';
 import { ENDPOINTS } from '@/lib/endpoints';
-import EditProfileDrawer, { UserProfileData } from '@/components/profile/edit-profile-drawer';
+import EditProfileDrawer, {
+  UserProfileData,
+} from '@/components/profile/edit-profile-drawer';
 import RouteReportForm from '@/components/volunteers/route-report-form';
 import ShortageReportForm from '@/components/volunteers/shortage-report-form';
 import DashboardFrame from '@/components/profile/dashboard-frame';
 import { getApiErrorMessage } from '@/utils/api-error';
-import { ReportSeverity } from '@/components/volunteers/types';
+import {
+  ReportSeverity,
+  VolunteerProfile,
+} from '@/components/volunteers/types';
+import RegistrationNotice from '@/components/volunteers/registration-notice';
+import { LoadError } from '@/components/volunteers/operations-dashboard';
 
 const VolunteerFieldReportsPage = () => {
   const { user } = useAuth();
@@ -20,12 +28,17 @@ const VolunteerFieldReportsPage = () => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [togglingSafety, setTogglingSafety] = useState(false);
   const [savingFieldReport, setSavingFieldReport] = useState(false);
+  const [volunteerProfile, setVolunteerProfile] =
+    useState<VolunteerProfile | null>(null);
+  const [pageError, setPageError] = useState('');
 
   const fetchPageData = useCallback(async () => {
     try {
-      const [profileResult] = await Promise.allSettled([
-        axiosSecure.get('/users/profile')
+      const [profileResult, volunteerResult] = await Promise.allSettled([
+        axiosSecure.get('/users/profile'),
+        axiosSecure.get(ENDPOINTS.VOLUNTEERS.ME),
       ]);
+      setPageError('');
       if (profileResult.status === 'fulfilled') {
         const data = profileResult.value.data?.data || profileResult.value.data;
         setProfile(data);
@@ -33,8 +46,25 @@ const VolunteerFieldReportsPage = () => {
         toast.add({
           id: 'field-reports-profile-error',
           title: 'Failed to load profile. Please try again.',
-          type: 'error'
+          type: 'error',
         });
+      }
+      if (volunteerResult.status === 'fulfilled') {
+        setVolunteerProfile(
+          volunteerResult.value.data?.data ?? volunteerResult.value.data,
+        );
+      } else if (
+        isAxiosError(volunteerResult.reason) &&
+        volunteerResult.reason.response?.status === 404
+      ) {
+        setVolunteerProfile(null);
+      } else {
+        setPageError(
+          getApiErrorMessage(
+            volunteerResult.reason,
+            'Unable to check your volunteer profile.',
+          ),
+        );
       }
     } finally {
       setLoading(false);
@@ -52,13 +82,24 @@ const VolunteerFieldReportsPage = () => {
       await axiosSecure.patch('/users/is-safe');
       await fetchPageData();
     } catch (err) {
-      toast.add({ id: 'safety-update-error', title: getApiErrorMessage(err, 'Failed to update safety status.'), type: 'error' });
+      toast.add({
+        id: 'safety-update-error',
+        title: getApiErrorMessage(err, 'Failed to update safety status.'),
+        type: 'error',
+      });
     } finally {
       setTogglingSafety(false);
     }
   };
 
-  const handleRouteReportSubmit = async (payload: { report_type: 'blocked_route' | 'dangerous_route'; description: string; latitude: number; longitude: number; address?: string; severity: ReportSeverity }) => {
+  const handleRouteReportSubmit = async (payload: {
+    report_type: 'blocked_route' | 'dangerous_route';
+    description: string;
+    latitude: number;
+    longitude: number;
+    address?: string;
+    severity: ReportSeverity;
+  }) => {
     setSavingFieldReport(true);
     try {
       await axiosSecure.post(ENDPOINTS.VOLUNTEERS.REPORT_ROUTE, payload);
@@ -82,7 +123,15 @@ const VolunteerFieldReportsPage = () => {
     }
   };
 
-  const handleShortageReportSubmit = async (payload: { resource_name: string; quantity_needed: number; description: string; latitude: number; longitude: number; address?: string; severity: ReportSeverity }) => {
+  const handleShortageReportSubmit = async (payload: {
+    resource_name: string;
+    quantity_needed: number;
+    description: string;
+    latitude: number;
+    longitude: number;
+    address?: string;
+    severity: ReportSeverity;
+  }) => {
     setSavingFieldReport(true);
     try {
       await axiosSecure.post(ENDPOINTS.VOLUNTEERS.REPORT_SHORTAGE, payload);
@@ -121,25 +170,32 @@ const VolunteerFieldReportsPage = () => {
           <div>
             <h3 className="text-sm font-medium">Submit Field Intelligence</h3>
             <p className="text-xs text-muted-foreground">
-              Broadcast real-time road accessibility conditions and critical resource shortages.
+              Broadcast real-time road accessibility conditions and critical
+              resource shortages.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="rounded-lg border border-border bg-card p-4">
-              <RouteReportForm
-                onSubmit={handleRouteReportSubmit}
-                saving={savingFieldReport}
-              />
-            </div>
+          {pageError ? (
+            <LoadError message={pageError} retry={fetchPageData} />
+          ) : volunteerProfile?.verification_status !== 'verified' ? (
+            <RegistrationNotice profile={volunteerProfile} />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="rounded-lg border border-border bg-card p-4">
+                <RouteReportForm
+                  onSubmit={handleRouteReportSubmit}
+                  saving={savingFieldReport}
+                />
+              </div>
 
-            <div className="rounded-lg border border-border bg-card p-4">
-              <ShortageReportForm
-                onSubmit={handleShortageReportSubmit}
-                saving={savingFieldReport}
-              />
+              <div className="rounded-lg border border-border bg-card p-4">
+                <ShortageReportForm
+                  onSubmit={handleShortageReportSubmit}
+                  saving={savingFieldReport}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </DashboardFrame>
       {profile && (

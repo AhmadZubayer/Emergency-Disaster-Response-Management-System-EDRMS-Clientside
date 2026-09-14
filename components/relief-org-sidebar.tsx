@@ -3,7 +3,13 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { User, AlertTriangle, Users, HeartHandshake } from 'lucide-react';
+import {
+  User,
+  AlertTriangle,
+  Users,
+  HeartHandshake,
+  FileWarning,
+} from 'lucide-react';
 
 const navItems = [
   {
@@ -20,6 +26,11 @@ const navItems = [
     label: 'Volunteers',
     href: '/manage-volunteers',
     icon: Users,
+  },
+  {
+    label: 'Volunteer Reports',
+    href: '/relief-org/volunteer-reports',
+    icon: FileWarning,
   },
   {
     label: 'Donations',

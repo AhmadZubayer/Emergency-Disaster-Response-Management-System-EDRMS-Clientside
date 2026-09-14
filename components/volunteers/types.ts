@@ -26,10 +26,7 @@ export type VolunteerSkill =
   | 'other';
 
 export type VolunteerVerificationStatus =
-  | 'not_applied'
-  | 'pending'
-  | 'verified'
-  | 'rejected';
+  'not_applied' | 'pending' | 'verified' | 'rejected';
 
 export interface VolunteerProfile {
   id: string;
@@ -39,6 +36,7 @@ export interface VolunteerProfile {
     name?: string;
     email?: string;
     phone_number?: string;
+    phone?: string;
   };
   skills: VolunteerSkill[];
   why_join: string;
@@ -69,10 +67,7 @@ export interface NearbyRescueRequest {
 }
 
 export type VolunteerTaskStatus =
-  | 'accepted'
-  | 'rejected'
-  | 'in_progress'
-  | 'completed';
+  'accepted' | 'rejected' | 'in_progress' | 'completed';
 
 export interface VolunteerTask {
   id: string;
@@ -87,14 +82,16 @@ export interface VolunteerTask {
 }
 
 export type FieldReportType =
-  | 'blocked_route'
-  | 'dangerous_route'
-  | 'resource_shortage';
+  'blocked_route' | 'dangerous_route' | 'resource_shortage';
 
 export type ReportSeverity = 'low' | 'medium' | 'high' | 'critical';
 
 export interface FieldReport {
   id: string;
+  volunteer?: {
+    id: string;
+    user?: { id: string; name?: string } | null;
+  } | null;
   report_type: FieldReportType;
   description: string;
   latitude: number;
@@ -121,6 +118,8 @@ export interface OrganizationJoin {
   organization_request_id: string;
   joined_at?: string;
   organization_request?: OrganizationOpportunity;
+  status: 'pending' | 'approved' | 'rejected';
+  volunteer?: VolunteerProfile | null;
 }
 
 export interface GroupJoin {
@@ -156,4 +155,3 @@ export const formatVolunteerValue = (value: string) =>
     .split('_')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
-

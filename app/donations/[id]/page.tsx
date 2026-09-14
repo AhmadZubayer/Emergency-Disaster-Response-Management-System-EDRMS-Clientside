@@ -615,6 +615,7 @@ const DonationDetailContent = () => {
                 value={donationAmount}
                 onChange={(e) => setDonationAmount(Number(e.target.value))}
 
+                className="pl-8"
               />
             </div>
             {donationErrors.amount && (

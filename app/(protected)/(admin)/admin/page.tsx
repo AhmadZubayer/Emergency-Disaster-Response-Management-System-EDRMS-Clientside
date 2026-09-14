@@ -126,9 +126,9 @@ export default function AdminOverviewPage() {
                 <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   {card.title}
                 </CardTitle>
-                {/* <div className={`p-2 rounded-xl border ${card.color}`}>
+                <div className={`p-2 rounded-xl border ${card.color}`}>
                   <Icon className="size-4" />
-                </div> */}
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-extrabold tracking-tight text-foreground">
@@ -154,7 +154,7 @@ export default function AdminOverviewPage() {
         <Card className="border-border/60">
           <CardHeader>
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              {/* <UserCheck className="size-5 text-emerald-600" /> */}
+              <UserCheck className="size-5 text-emerald-600" />
               <span>Pending Verifications</span>
             </CardTitle>
           </CardHeader>
@@ -183,7 +183,7 @@ export default function AdminOverviewPage() {
         <Card className="border-border/60">
           <CardHeader>
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              {/* <AlertTriangle className="size-5 text-amber-600" /> */}
+              <AlertTriangle className="size-5 text-amber-600" />
               <span>Emergency Response Operations</span>
             </CardTitle>
           </CardHeader>

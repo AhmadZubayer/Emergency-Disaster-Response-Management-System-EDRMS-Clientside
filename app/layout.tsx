@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import { Geist_Mono, Inter } from 'next/font/google';
 
 import { AuthProvider } from '@/contexts/auth-provider';
+import Footer from '@/components/footer';
+import ChatbotUI from '@/chatbot/chat-ui';
 import { Toaster } from '@/components/ui/toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
@@ -35,7 +37,13 @@ const RootLayout = ({
       <body className="min-h-full">
         <AuthProvider>
           <TooltipProvider>
-            <Toaster>{children}</Toaster>
+            <Toaster>
+              <div className="flex min-h-screen flex-col">
+                <div className="flex-1">{children}</div>
+                <Footer />
+                <ChatbotUI />
+              </div>
+            </Toaster>
           </TooltipProvider>
         </AuthProvider>
       </body>
@@ -44,5 +52,3 @@ const RootLayout = ({
 };
 
 export default RootLayout;
-
-

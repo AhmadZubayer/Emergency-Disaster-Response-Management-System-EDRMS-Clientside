@@ -1,168 +1,392 @@
-'use client';
+﻿'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { Plus, Users } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { Plus, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import MuiDrawer from '@/components/mui-drawer';
 import { toast } from '@/components/ui/toast';
 import useAuth from '@/hooks/use-auth';
-import { axiosSecure, publicApi } from '@/lib/api';
-import EditProfileDrawer, { UserProfileData } from '@/components/profile/edit-profile-drawer';
-import { VolunteerGroup } from '@/components/volunteers/types';
+import { axiosSecure } from '@/lib/api';
+import {
+  VolunteerGroup,
+  OrganizationJoin,
+  formatVolunteerValue,
+} from '@/components/volunteers/types';
 import AddVolunteerGroupDrawer from '@/components/volunteers/add-volunteer-group-drawer';
-import DashboardFrame from '@/components/profile/dashboard-frame';
+import OperationsDashboard, {
+  LoadError,
+} from '@/components/volunteers/operations-dashboard';
 import { getApiErrorMessage } from '@/utils/api-error';
 
-const ReliefOrgManageVolunteersPage = () => {
+export default function ReliefOrgManageVolunteersPage() {
   const { user } = useAuth();
-
-  const [profile, setProfile] = useState<UserProfileData | null>(null);
+  const [groups, setGroups] = useState<VolunteerGroup[]>([]);
+  const [applications, setApplications] = useState<OrganizationJoin[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [togglingSafety, setTogglingSafety] = useState(false);
-  const [volunteerGroups, setVolunteerGroups] = useState<VolunteerGroup[]>([]);
-  const [isGroupDrawerOpen, setIsGroupDrawerOpen] = useState(false);
+  const [error, setError] = useState('');
+  const [groupDrawer, setGroupDrawer] = useState(false);
   const [editingGroup, setEditingGroup] = useState<VolunteerGroup | null>(null);
+  const [selected, setSelected] = useState<OrganizationJoin | null>(null);
+  const [reviewing, setReviewing] = useState(false);
+  const [groupFilter, setGroupFilter] = useState('all');
 
-  const fetchPageData = useCallback(async () => {
-    try {
-      const [profileResult, groupsResult] = await Promise.allSettled([
-        axiosSecure.get('/users/profile'),
-        publicApi.get('/volunteers/groups')
-      ]);
-      if (profileResult.status === 'fulfilled') {
-        const data = profileResult.value.data?.data || profileResult.value.data;
-        setProfile(data);
-      } else {
-        toast.add({
-          id: 'manage-volunteers-profile-error',
-          title: 'Failed to load profile. Please try again.',
-          type: 'error'
-        });
-      }
-      if (groupsResult.status === 'fulfilled') {
-        const data = groupsResult.value.data?.data || groupsResult.value.data;
-        setVolunteerGroups(Array.isArray(data) ? data : []);
-      } else {
-        toast.add({
-          id: 'manage-volunteers-groups-error',
-          title: 'Failed to load groups. Please try again.',
-          type: 'error'
-        });
-      }
-    } finally {
-      setLoading(false);
-    }
+  const load = useCallback(() => {
+    return Promise.all([
+      axiosSecure.get('/volunteers/organization-requests/my-created'),
+      axiosSecure.get('/volunteers/organization-applications'),
+    ])
+      .then(([groups, applications]) => {
+        setError('');
+        setGroups(groups.data?.data ?? groups.data);
+        setApplications(applications.data?.data ?? applications.data);
+      })
+      .catch((error: unknown) => {
+        setError(
+          getApiErrorMessage(
+            error,
+            'Unable to load volunteer groups and applications.',
+          ),
+        );
+      })
+      .finally(() => setLoading(false));
   }, []);
   useEffect(() => {
-    if (user) {
-      fetchPageData();
-    }
-  }, [user, fetchPageData]);
+    if (user) void load();
+  }, [user, load]);
 
-  const handleToggleSafety = async () => {
+  const review = async (status: 'approved' | 'rejected') => {
+    if (!selected) return;
+    setReviewing(true);
     try {
-      setTogglingSafety(true);
-      await axiosSecure.patch('/users/is-safe');
-      await fetchPageData();
-    } catch (err) {
-      toast.add({ id: 'safety-update-error', title: getApiErrorMessage(err, 'Failed to update safety status.'), type: 'error' });
+      await axiosSecure.patch(
+        `/volunteers/organization-applications/${selected.id}`,
+        { status },
+      );
+      toast.add({
+        id: 'application-reviewed',
+        title:
+          status === 'approved'
+            ? 'Volunteer added to the group.'
+            : 'Application declined.',
+        type: 'success',
+      });
+      setSelected(null);
+      await load();
+    } catch (error) {
+      toast.add({
+        id: 'application-review-error',
+        title: getApiErrorMessage(error, 'Unable to review this application.'),
+        type: 'error',
+      });
     } finally {
-      setTogglingSafety(false);
+      setReviewing(false);
     }
   };
+  const filtered = applications.filter(
+    (a) => groupFilter === 'all' || a.organization_request_id === groupFilter,
+  );
+  const volunteer = selected?.volunteer;
 
   return (
-    <>
-      <DashboardFrame
-        profile={profile}
-        role="RELIEF_ORG"
-        tab="manage-volunteers"
-        loading={loading}
-        togglingSafety={togglingSafety}
-        onEdit={() => setIsEditOpen(true)}
-        onToggleSafety={handleToggleSafety}
-      >
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-medium">Volunteer Management & Task Forces</h3>
-              <p className="text-xs text-muted-foreground">
-                Organize registered field volunteers into specialized rescue squads.
-              </p>
-            </div>
+    <OperationsDashboard role="RELIEF_ORG" tab="manage-volunteers">
+      <div className="space-y-8">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="text-base font-semibold">Volunteer Groups</h1>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Create groups and review the volunteers who apply to join.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={load}
+              disabled={loading}
+              aria-label="Refresh groups"
+            >
+              <RefreshCw className="size-4" />
+            </Button>
             <Button
               size="sm"
               onClick={() => {
                 setEditingGroup(null);
-                setIsGroupDrawerOpen(true);
+                setGroupDrawer(true);
               }}
-
             >
               <Plus className="size-4" />
-              Create Volunteer Group
+              Create Group
             </Button>
           </div>
-
-          {volunteerGroups.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-border p-4 text-center bg-card space-y-3">
-              <Users className="size-8 text-muted-foreground/60 mx-auto" />
-              <p className="text-xs text-muted-foreground">No volunteer groups created.</p>
-            </div>
-          ) : (
-            <div className="rounded-lg border border-border overflow-hidden bg-card">
+        </div>
+        {loading ? (
+          <p role="status" className="text-sm text-muted-foreground">
+            Loading groups and applications...
+          </p>
+        ) : error ? (
+          <LoadError message={error} retry={load} />
+        ) : (
+          <>
+            <div className="rounded-lg border border-border bg-card overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Group Title</TableHead>
-                    <TableHead>Disaster / Deployment</TableHead>
-                    <TableHead>Capacity</TableHead>
+                    <TableHead>Group</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Members</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {volunteerGroups.map((g) => (
-                    <TableRow key={g.id}>
-                      <TableCell >{g.title}</TableCell>
-                      <TableCell >{g.disaster_name || 'General'}</TableCell>
-                      <TableCell >{g.joined_volunteers || 0} / {g.needed_volunteers}</TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            setEditingGroup(g);
-                            setIsGroupDrawerOpen(true);
-                          }}
-
-                        >
-                          Edit
-                        </Button>
+                  {groups.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={5}
+                        className="h-24 text-center text-muted-foreground"
+                      >
+                        No groups yet. Create a group to start receiving
+                        applications.
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    groups.map((group) => (
+                      <TableRow key={group.id}>
+                        <TableCell>
+                          <span className="font-medium">{group.title}</span>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {group.disaster_name || 'General deployment'}
+                          </p>
+                        </TableCell>
+                        <TableCell>{group.location}</TableCell>
+                        <TableCell>
+                          {group.joined_volunteers ?? 0} /{' '}
+                          {group.needed_volunteers}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="capitalize">
+                            {group.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              setEditingGroup(group);
+                              setGroupDrawer(true);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </div>
-          )}
-        </div>
-      </DashboardFrame>
-      {profile && (
-        <EditProfileDrawer
-          open={isEditOpen}
-          onOpenChange={setIsEditOpen}
-          profile={profile}
-          onSuccess={fetchPageData}
-        />
-      )}
+            <section className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-sm font-semibold">
+                    Volunteer Applications
+                  </h2>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Select a volunteer to review their profile and add them to
+                    the group.
+                  </p>
+                </div>
+                <select
+                  aria-label="Filter applications by group"
+                  value={groupFilter}
+                  onChange={(event) => setGroupFilter(event.target.value)}
+                  className="max-w-full rounded-md border border-border bg-card px-3 py-2 text-xs"
+                >
+                  <option value="all">All groups</option>
+                  {groups.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="rounded-lg border border-border bg-card overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Volunteer</TableHead>
+                      <TableHead>Group</TableHead>
+                      <TableHead>Applied</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.length === 0 ? (
+                      <TableRow>
+                        <TableCell
+                          colSpan={4}
+                          className="h-24 text-center text-muted-foreground"
+                        >
+                          No applications yet.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filtered.map((application) => (
+                        <TableRow
+                          key={application.id}
+                          className="cursor-pointer"
+                          onClick={() => setSelected(application)}
+                        >
+                          <TableCell>
+                            <button
+                              type="button"
+                              className="font-medium text-primary underline-offset-4 hover:underline"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                setSelected(application);
+                              }}
+                            >
+                              {application.volunteer?.user?.name ||
+                                'Volunteer profile unavailable'}
+                            </button>
+                          </TableCell>
+                          <TableCell>
+                            {application.organization_request?.title ||
+                              'Group unavailable'}
+                          </TableCell>
+                          <TableCell className="text-xs">
+                            {application.joined_at
+                              ? new Date(
+                                  application.joined_at,
+                                ).toLocaleDateString()
+                              : '—'}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={
+                                application.status === 'approved'
+                                  ? 'default'
+                                  : 'outline'
+                              }
+                            >
+                              {application.status === 'approved'
+                                ? 'Added'
+                                : formatVolunteerValue(application.status)}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </section>
+          </>
+        )}
+      </div>
       <AddVolunteerGroupDrawer
-        open={isGroupDrawerOpen}
-        onOpenChange={setIsGroupDrawerOpen}
-        onSuccess={fetchPageData}
+        open={groupDrawer}
+        onOpenChange={setGroupDrawer}
+        onSuccess={load}
         editGroup={editingGroup}
       />
-    </>
+      <MuiDrawer
+        open={!!selected}
+        onClose={() => {
+          if (!reviewing) setSelected(null);
+        }}
+        title="Volunteer Profile"
+        subtitle={selected?.organization_request?.title}
+      >
+        {selected && (
+          <div className="p-6 space-y-6 text-sm">
+            {volunteer ? (
+              <>
+                <div>
+                  <h3 className="text-lg font-semibold">
+                    {volunteer.user?.name || 'Volunteer'}
+                  </h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {volunteer.user?.phone || 'No contact number provided'}
+                  </p>
+                </div>
+                <dl className="grid grid-cols-2 gap-5">
+                  <div>
+                    <dt className="text-xs text-muted-foreground">
+                      Verification
+                    </dt>
+                    <dd className="mt-1 capitalize">
+                      {formatVolunteerValue(volunteer.verification_status)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-muted-foreground">
+                      Availability
+                    </dt>
+                    <dd className="mt-1">
+                      {volunteer.available ? 'Available' : 'Unavailable'}
+                    </dd>
+                  </div>
+                </dl>
+                <div>
+                  <h4 className="text-xs text-muted-foreground">Skills</h4>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {volunteer.skills.map((skill) => (
+                      <Badge key={skill} variant="outline">
+                        {formatVolunteerValue(skill)}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h4 className="text-xs text-muted-foreground">
+                    Why I volunteer
+                  </h4>
+                  <p className="mt-2 whitespace-pre-wrap break-words leading-relaxed">
+                    {volunteer.why_join}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <p>This volunteer profile is no longer available.</p>
+            )}
+            <div className="border-t border-border pt-5">
+              <p className="mb-4 text-xs text-muted-foreground">
+                Application: {formatVolunteerValue(selected.status)}
+              </p>
+              {selected.status === 'pending' && (
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    onClick={() => review('approved')}
+                    disabled={
+                      reviewing || volunteer?.verification_status !== 'verified'
+                    }
+                  >
+                    {reviewing ? 'Saving...' : 'Add to group'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => review('rejected')}
+                    disabled={reviewing}
+                  >
+                    Decline
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </MuiDrawer>
+    </OperationsDashboard>
   );
-};
-
-export default ReliefOrgManageVolunteersPage;
+}

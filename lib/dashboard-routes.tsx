@@ -8,8 +8,6 @@ import {
   FileText,
   Trash2,
   ShieldCheck,
-  ClipboardList,
-  MapPinned,
   FileWarning,
   UsersRound,
   AlertTriangle,
@@ -113,6 +111,14 @@ export const RELIEF_ORG_DASHBOARD_ROUTES: DashboardRouteItem[] = [
     category: 'dashboard',
   },
   {
+    id: 'volunteer-reports',
+    label: 'Volunteer Reports',
+    href: '/relief-org/volunteer-reports',
+    tab: 'volunteer-reports',
+    icon: FileWarning,
+    category: 'dashboard',
+  },
+  {
     id: 'profile',
     label: 'Your Profile',
     href: '/relief-org/profile',
@@ -186,22 +192,6 @@ export const VOLUNTEER_DASHBOARD_ROUTES: DashboardRouteItem[] = [
     href: '/volunteer/opportunities',
     tab: 'opportunities',
     icon: HeartHandshake,
-    category: 'operations',
-  },
-  {
-    id: 'my-tasks',
-    label: 'My Tasks',
-    href: '/volunteer/my-tasks',
-    tab: 'my-tasks',
-    icon: ClipboardList,
-    category: 'operations',
-  },
-  {
-    id: 'nearby-rescue',
-    label: 'Nearby Rescue',
-    href: '/volunteer/nearby-rescue',
-    tab: 'nearby-rescue',
-    icon: MapPinned,
     category: 'operations',
   },
   {
@@ -280,7 +270,7 @@ export const VOLUNTEER_DASHBOARD_ROUTES: DashboardRouteItem[] = [
 ];
 
 export const getDashboardRoutesByRole = (
-  role?: string | null
+  role?: string | null,
 ): DashboardRouteItem[] => {
   const norm = normalizeRole(role);
   if (norm === 'RELIEF_ORG' || norm === 'ADMIN') {

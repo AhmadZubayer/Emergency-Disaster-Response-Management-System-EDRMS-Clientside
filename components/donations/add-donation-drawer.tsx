@@ -263,6 +263,7 @@ const AddDonationDrawer = ({
               value={targetAmount}
               onChange={(e) => setTargetAmount(Number(e.target.value))}
 
+              className="pl-8"
             />
           </div>
           {errors.targetAmount && (

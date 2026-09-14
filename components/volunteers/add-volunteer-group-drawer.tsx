@@ -13,6 +13,7 @@ import { axiosSecure, publicApi } from '@/lib/api';
 import { volunteerGroupSchema } from '@/lib/validations/volunteer-group-schema';
 import { VolunteerGroup } from './types';
 import { Disaster } from '@/components/disaster/types';
+import { getApiErrorMessage } from '@/utils/api-error';
 
 interface AddVolunteerGroupDrawerProps {
   open: boolean;
@@ -27,7 +28,6 @@ const AddVolunteerGroupDrawer = ({
   onSuccess,
   editGroup,
 }: AddVolunteerGroupDrawerProps) => {
-
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
@@ -66,7 +66,7 @@ const AddVolunteerGroupDrawer = ({
       setRequiredSkills(
         Array.isArray(editGroup.required_skills)
           ? editGroup.required_skills.join(', ')
-          : ''
+          : '',
       );
       setDisasterName(editGroup.disaster_name || 'none');
       setAcceptingRequests(editGroup.status === 'open');
@@ -132,7 +132,7 @@ const AddVolunteerGroupDrawer = ({
         description,
         location,
         needed_volunteers: Number(neededVolunteers),
-        required_skills: skillsArray.length > 0 ? skillsArray : ['First Aid', 'Search and Rescue'],
+        required_skills: skillsArray,
         disaster_name: disasterName === 'none' ? null : disasterName,
         status: acceptingRequests ? 'open' : 'closed',
       };
@@ -140,7 +140,7 @@ const AddVolunteerGroupDrawer = ({
       if (editGroup) {
         await axiosSecure.patch(
           `/volunteers/organization-requests/${editGroup.id}`,
-          payload
+          payload,
         );
         toast.add({
           id: 'volunteer-group-updated',
@@ -160,9 +160,12 @@ const AddVolunteerGroupDrawer = ({
 
       onSuccess();
       onOpenChange(false);
-    } catch (err: any) {
+    } catch (err) {
       setServerError(
-        err?.response?.data?.message || 'Failed to save volunteer group. Please try again.'
+        getApiErrorMessage(
+          err,
+          'Failed to save volunteer group. Please try again.',
+        ),
       );
     } finally {
       setLoading(false);
@@ -189,15 +192,12 @@ const AddVolunteerGroupDrawer = ({
         )}
 
         <div className="space-y-1.5">
-          <Label htmlFor="title" >
-            Group Title / Number *
-          </Label>
+          <Label htmlFor="title">Group Title / Number *</Label>
           <Input
             id="title"
             placeholder="e.g. Rapid Rescue Unit Alpha"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-
           />
           {errors.title && (
             <p className="text-xs text-destructive">{errors.title}</p>
@@ -205,9 +205,7 @@ const AddVolunteerGroupDrawer = ({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="disaster" >
-            Assigned Disaster Alert
-          </Label>
+          <Label htmlFor="disaster">Assigned Disaster Alert</Label>
           <MuiSelect
             id="disaster"
             value={disasterName}
@@ -224,15 +222,12 @@ const AddVolunteerGroupDrawer = ({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="location" >
-            Deployment Location *
-          </Label>
+          <Label htmlFor="location">Deployment Location *</Label>
           <Input
             id="location"
             placeholder="e.g. Cox's Bazar Sadar Zone"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-
           />
           {errors.location && (
             <p className="text-xs text-destructive">{errors.location}</p>
@@ -240,7 +235,7 @@ const AddVolunteerGroupDrawer = ({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="neededVolunteers" >
+          <Label htmlFor="neededVolunteers">
             Number of Volunteers Required *
           </Label>
           <Input
@@ -249,15 +244,16 @@ const AddVolunteerGroupDrawer = ({
             min={1}
             value={neededVolunteers}
             onChange={(e) => setNeededVolunteers(Number(e.target.value))}
-
           />
           {errors.neededVolunteers && (
-            <p className="text-xs text-destructive">{errors.neededVolunteers}</p>
+            <p className="text-xs text-destructive">
+              {errors.neededVolunteers}
+            </p>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="requiredSkills" >
+          <Label htmlFor="requiredSkills">
             Required Skills (comma separated)
           </Label>
           <Input
@@ -265,21 +261,17 @@ const AddVolunteerGroupDrawer = ({
             placeholder="e.g. First Aid, Boat Navigation, Medical Support"
             value={requiredSkills}
             onChange={(e) => setRequiredSkills(e.target.value)}
-
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="description" >
-            Mission Description *
-          </Label>
+          <Label htmlFor="description">Mission Description *</Label>
           <Textarea
             id="description"
             rows={3}
             placeholder="Provide duty requirements, rendezvous points, and specific instructions..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-
           />
           {errors.description && (
             <p className="text-xs text-destructive">{errors.description}</p>
@@ -309,8 +301,8 @@ const AddVolunteerGroupDrawer = ({
             {loading
               ? 'Processing...'
               : editGroup
-              ? 'Update Volunteer Group'
-              : 'Create Volunteer Group'}
+                ? 'Update Volunteer Group'
+                : 'Create Volunteer Group'}
           </ModernButton>
         </div>
       </form>
